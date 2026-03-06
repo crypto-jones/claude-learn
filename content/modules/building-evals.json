@@ -1,0 +1,67 @@
+{
+  "id": "building-evals",
+  "title": "Building Systematic Evaluations",
+  "description": "Learn to design and implement rigorous evaluation suites for AI outputs — the foundation of reliable, production-grade AI systems that improve over time.",
+  "track": "production",
+  "trackTitle": "Production AI",
+  "estimatedMinutes": 15,
+  "difficulty": "advanced",
+  "prerequisites": ["evaluator-optimizer"],
+  "skillDimension": "evaluation",
+  "learningObjectives": [
+    "Understand why systematic evals are essential for production AI systems",
+    "Design effective test cases that cover correctness, edge cases, and quality dimensions",
+    "Build an evaluation suite with scoring rubrics, automated checks, and regression tracking"
+  ],
+  "sections": [
+    {
+      "id": "why-evals-matter",
+      "type": "concept",
+      "title": "Why Evals Matter",
+      "content": "In traditional software, you write tests that check deterministic behavior: given input X, expect output Y. AI systems are different — the same prompt can produce different outputs each time, and \"correct\" is often a spectrum rather than a binary. This makes evaluation both harder and more important.\n\n**Evals are how you make progress measurable.** Without evals, you're optimizing prompts by vibes — you try a change, read a few outputs, and guess whether it's better. This doesn't scale, doesn't catch regressions, and doesn't survive team handoffs.\n\nHere's what systematic evals give you:\n\n- **Confidence to change prompts** — When you modify a system prompt, evals tell you whether the change helped, hurt, or had no effect across a representative set of inputs, not just the one example you happened to test.\n- **Regression detection** — Model updates, prompt changes, and system modifications can cause subtle quality degradation. Evals catch this before your users do.\n- **Quantified quality** — Instead of \"the outputs seem better,\" you can say \"accuracy improved from 82% to 91% on our test suite, with no regression on tone scores.\"\n- **Shared understanding** — Evals encode what \"good\" means for your team. A new engineer can look at the eval suite and understand the quality bar.\n\nA useful mental model: **evals are to AI products what unit tests are to software, what clinical trials are to medicine, and what quality control is to manufacturing.** They're not optional for anything production-grade.\n\nThe biggest mistake teams make is treating evals as a one-time exercise. Evals should be a living artifact that grows with your product — new failure modes become new test cases, and eval scores are tracked over time like any other metric."
+    },
+    {
+      "id": "test-case-design",
+      "type": "concept",
+      "title": "Designing Effective Test Cases",
+      "content": "A good eval suite has test cases that cover different dimensions of quality. Here's a framework for designing them:\n\n**1. Start with failure modes, not happy paths**\nYou already know the easy cases work. Focus on where things break:\n- Edge cases: empty inputs, extremely long inputs, unusual formats\n- Adversarial inputs: prompt injections, contradictory instructions, misleading context\n- Ambiguous inputs: underspecified questions, multiple valid interpretations\n- Domain boundaries: questions that are almost but not quite in scope\n\n**2. Cover multiple quality dimensions**\nA single score rarely captures everything that matters. Define dimensions independently:\n```\nTest case: \"Explain quantum entanglement to a 10-year-old\"\n\nDimensions:\n- Accuracy: Is the science correct? (1-5)\n- Accessibility: Would a 10-year-old understand this? (1-5)\n- Engagement: Is it interesting, not dry? (1-5)\n- Conciseness: Is it the right length, not rambling? (1-5)\n```\n\n**3. Use a taxonomy of test types**\n- **Exact match** — For structured outputs: does the JSON have the right keys? Does the SQL query return the correct rows?\n- **Semantic match** — The answer conveys the right meaning even if worded differently. Use Claude-as-judge for these.\n- **Rubric-based** — Score against a multi-criteria rubric. Best for open-ended tasks like writing, analysis, or explanation.\n- **Comparative** — Is output A better than output B? Useful for A/B testing prompt changes.\n- **Safety/boundary** — Does the system correctly refuse out-of-scope requests? Does it avoid harmful content?\n\n**4. Annotate test cases with metadata**\n```json\n{\n  \"input\": \"Summarize this legal contract in plain English\",\n  \"context\": \"[contract text]\",\n  \"category\": \"summarization\",\n  \"difficulty\": \"hard\",\n  \"critical\": true,\n  \"expected_traits\": [\"mentions termination clause\", \"explains liability\"],\n  \"forbidden_traits\": [\"legal jargon\", \"gives legal advice\"]\n}\n```\nMetadata lets you slice results — you can see accuracy by category, by difficulty, or for just the critical cases."
+    },
+    {
+      "id": "scoring-approaches",
+      "type": "concept",
+      "title": "Scoring and Automation",
+      "content": "Different types of outputs need different scoring approaches. A practical eval suite usually combines several:\n\n**Code-based checks (fastest, cheapest)**\nUse programmatic assertions for anything structured:\n```python\ndef eval_json_output(output, expected_keys):\n    try:\n        parsed = json.loads(output)\n        has_keys = all(k in parsed for k in expected_keys)\n        return {'parseable': True, 'has_keys': has_keys}\n    except json.JSONDecodeError:\n        return {'parseable': False, 'has_keys': False}\n```\n\n**Claude-as-judge (flexible, nuanced)**\nFor subjective quality dimensions, use Claude to evaluate Claude's outputs. This is the same evaluator pattern from the previous module, but applied systematically across test cases:\n```python\ndef judge(output, criteria, reference_answer=None):\n    prompt = f\"\"\"Evaluate this output against the criteria below.\n    \n    Output: {output}\n    Criteria: {criteria}\n    {f'Reference answer: {reference_answer}' if reference_answer else ''}\n    \n    Score each criterion 1-5 and explain your reasoning.\"\"\"\n    return claude_evaluate(prompt)\n```\n\n**Human review (gold standard, expensive)**\nFor calibrating your automated evals, periodically have humans score a sample. Compare human scores to Claude-as-judge scores to check alignment.\n\n**Composite scoring**\nCombine multiple signals into a single pass/fail per test case:\n```python\ndef composite_score(code_checks, judge_scores):\n    if not code_checks['parseable']:\n        return 0  # Hard fail\n    weighted = (\n        judge_scores['accuracy'] * 0.4 +\n        judge_scores['completeness'] * 0.3 +\n        judge_scores['clarity'] * 0.2 +\n        judge_scores['conciseness'] * 0.1\n    )\n    return weighted\n```\n\n**Tracking over time**\nStore results with timestamps and prompt versions. A simple CSV or database table works:\n```\ntimestamp | prompt_version | test_id | overall_score | accuracy | completeness\n2025-01-15 | v2.3 | tc_042 | 4.2 | 5 | 4 | 3\n```\nThis lets you plot quality trends and pinpoint when regressions were introduced."
+    },
+    {
+      "id": "exercise-eval-suite",
+      "type": "exercise",
+      "title": "Build an Evaluation Suite",
+      "content": "Design a complete evaluation suite for a real AI feature.",
+      "exercise": {
+        "prompt": "You're building an AI-powered customer support system that reads a customer's message and:\n1. Classifies the intent (billing, technical, account, general)\n2. Extracts key entities (order IDs, product names, dates)\n3. Generates a helpful response\n\nDesign an evaluation suite for this system. Provide:\n\n1. **Eight test cases** spanning different intents, edge cases, and difficulty levels. For each, specify the input message, expected intent classification, expected entities, and quality criteria for the response.\n\n2. **Scoring approach** for each of the three outputs (classification, extraction, response). Specify which scoring method you'd use (code-based, Claude-as-judge, or both) and why.\n\n3. **Three failure modes** you'd specifically test for, with example test cases.\n\n4. **A composite scoring formula** that produces a single pass/fail for each test case, with clear thresholds.\n\nBe specific — write out actual test case content, not just descriptions of what they would contain.",
+        "hints": [
+          "Classification and extraction have objectively correct answers, so prefer code-based checks. Response quality is subjective, so use Claude-as-judge.",
+          "Failure modes to consider: multi-intent messages, messages with no clear intent, messages that try to manipulate the system, messages with misspelled entity names",
+          "Your composite score should weight hard failures (wrong classification) differently from soft failures (response could be more empathetic)"
+        ],
+        "evaluationCriteria": "Should provide: (1) Eight specific test cases with actual customer message text, not placeholders — covering standard cases (clear billing question), edge cases (message with two intents), adversarial cases (prompt injection attempt), ambiguous cases (complaint that could be billing or technical), and cases with tricky entity extraction (misspelled product names, multiple order IDs); (2) Scoring approach: exact match for classification, code-based extraction matching with fuzzy string comparison for entities, Claude-as-judge with a multi-dimensional rubric for response quality (helpfulness, accuracy, tone, completeness); (3) Three specific failure modes with example inputs — such as multi-intent handling, entity hallucination (extracting entities that aren't there), or unsafe response generation; (4) A composite formula with clear weights and thresholds — e.g., classification must be correct (hard gate), entity extraction F1 >= 0.8, response quality >= 3.5/5, with an overall pass requiring all three conditions."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Systematic evals transform AI development from guesswork into engineering. Design test cases around failure modes rather than happy paths, combine code-based checks with Claude-as-judge for comprehensive coverage, and track scores over time to catch regressions. An eval suite is a living artifact — every bug you find in production should become a new test case. The teams that ship reliable AI products are the ones that invest in evals early and run them on every change."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Reflect on the practical challenges of building and maintaining evals.",
+      "exercise": {
+        "prompt": "Your team has been running an eval suite for three months. You have 50 test cases and use Claude-as-judge for scoring. You notice two problems:\n\n1. The eval suite takes 20 minutes to run (because of 50 Claude API calls for judging), so developers skip running it before merging prompt changes.\n\n2. On a subset of test cases, Claude-as-judge gives inconsistent scores — the same output gets a 3/5 on one run and a 5/5 on another.\n\nHow would you address each problem? What architectural changes or process changes would you make? Are there tradeoffs to your solutions?",
+        "evaluationCriteria": "Should address both problems with practical solutions: (1) Speed problem — tier the eval suite: create a 'fast' subset of 10-15 critical test cases that runs in 3-4 minutes for pre-merge checks, run the full suite on CI after merge or nightly; use code-based checks wherever possible to replace slow Claude-as-judge calls; cache eval results for unchanged test cases; parallelize API calls. Tradeoff: fast suite might miss regressions that only appear in the full suite. (2) Consistency problem — reduce temperature to 0 for the judge calls; use more specific rubrics with concrete anchoring examples ('a score of 3 means X, a score of 5 means Y'); provide reference answers or few-shot examples in the judge prompt; run the judge multiple times and take the median score for high-variance cases; investigate whether the inconsistency is in specific test cases (suggesting the rubric is ambiguous for those cases). Tradeoff: stricter rubrics are more consistent but may miss nuanced quality differences; multiple judge runs increase cost and latency."
+      }
+    }
+  ]
+}

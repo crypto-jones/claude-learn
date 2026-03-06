@@ -31,6 +31,9 @@ import promptEngineering from '@/content/modules/prompt-engineering.json';
 import firstApiCall from '@/content/modules/first-api-call.json';
 import structuredOutput from '@/content/modules/structured-output.json';
 import toolUseIntro from '@/content/modules/tool-use-intro.json';
+import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
+import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
+import buildingEvals from '@/content/modules/building-evals.json';
 
 const moduleMap: Record<string, Module> = {
   'how-claude-thinks': howClaudeThinks as Module,
@@ -38,6 +41,9 @@ const moduleMap: Record<string, Module> = {
   'first-api-call': firstApiCall as Module,
   'structured-output': structuredOutput as Module,
   'tool-use-intro': toolUseIntro as Module,
+  'evaluator-optimizer': evaluatorOptimizer as Module,
+  'claude-code-intro': claudeCodeIntro as Module,
+  'building-evals': buildingEvals as Module,
 };
 
 const difficultyColors: Record<string, string> = {
@@ -254,8 +260,18 @@ export default function PathPage() {
               .map((preId) => moduleMap[preId]?.title)
               .filter(Boolean);
 
+            const handleModuleClick = () => {
+              if (!prereqsMet && !isCompleted) {
+                const confirmed = window.confirm(
+                  `This module requires: ${unmetPrereqs.join(', ')}. Continue anyway?`
+                );
+                if (!confirmed) return;
+              }
+              router.push(`/learn/${module.id}`);
+            };
+
             return (
-              <Link href={`/learn/${module.id}`} key={module.id}>
+              <div key={module.id} onClick={handleModuleClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleModuleClick(); } }}>
                 <Card
                   className={`p-5 transition-all hover:border-border/80 hover:shadow-sm cursor-pointer ${
                     isCompleted ? 'opacity-70' : ''
@@ -345,7 +361,7 @@ export default function PathPage() {
                     </div>
                   </div>
                 </Card>
-              </Link>
+              </div>
             );
           })}
         </div>

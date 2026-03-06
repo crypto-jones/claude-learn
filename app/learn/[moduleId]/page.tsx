@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Module, ModuleSection } from '@/lib/types';
+import { Module, ModuleSection, ExerciseFeedback } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import {
   CheckCircle2,
@@ -26,6 +26,7 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 
 // Import all modules
@@ -34,6 +35,9 @@ import promptEngineering from '@/content/modules/prompt-engineering.json';
 import firstApiCall from '@/content/modules/first-api-call.json';
 import structuredOutput from '@/content/modules/structured-output.json';
 import toolUseIntro from '@/content/modules/tool-use-intro.json';
+import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
+import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
+import buildingEvals from '@/content/modules/building-evals.json';
 
 const moduleMap: Record<string, Module> = {
   'how-claude-thinks': howClaudeThinks as Module,
@@ -41,6 +45,9 @@ const moduleMap: Record<string, Module> = {
   'first-api-call': firstApiCall as Module,
   'structured-output': structuredOutput as Module,
   'tool-use-intro': toolUseIntro as Module,
+  'evaluator-optimizer': evaluatorOptimizer as Module,
+  'claude-code-intro': claudeCodeIntro as Module,
+  'building-evals': buildingEvals as Module,
 };
 
 const allModuleIds = [
@@ -49,6 +56,9 @@ const allModuleIds = [
   'first-api-call',
   'structured-output',
   'tool-use-intro',
+  'evaluator-optimizer',
+  'claude-code-intro',
+  'building-evals',
 ];
 
 function SectionContent({ content }: { content: string }) {
@@ -159,12 +169,15 @@ function ExerciseBlock({
   moduleData: Module;
   onComplete: (sectionId: string, response: string) => void;
 }) {
-  const { profile } = useLearner();
+  const { profile, saveExerciseFeedback } = useLearner();
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [attemptNumber, setAttemptNumber] = useState(1);
+  const [showHistory, setShowHistory] = useState(false);
+  const previousAttempts = profile.moduleProgress[moduleData.id]?.exerciseFeedback?.[section.id] || [];
 
   const handleSubmit = async () => {
     if (!input.trim() || isSubmitting) return;
@@ -179,6 +192,7 @@ function ExerciseBlock({
           role: profile.role || undefined,
           moduleTitle: moduleData.title,
           sectionTitle: section.title,
+          sectionContent: section.content?.slice(0, 500),
           exercisePrompt: section.exercise?.prompt,
           evaluationCriteria: section.exercise?.evaluationCriteria,
         },
@@ -191,6 +205,12 @@ function ExerciseBlock({
         setIsSubmitting(false);
         setIsSubmitted(true);
         onComplete(section.id, input.trim());
+        saveExerciseFeedback(moduleData.id, section.id, {
+          response: input.trim(),
+          feedback: accumulated,
+          timestamp: Date.now(),
+          attemptNumber,
+        });
       },
       () => {
         setFeedback('Unable to get feedback right now. Your response has been saved.');
@@ -250,6 +270,33 @@ function ExerciseBlock({
             </div>
           )}
 
+          {previousAttempts.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                {showHistory ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {previousAttempts.length} previous attempt{previousAttempts.length > 1 ? 's' : ''}
+              </button>
+              {showHistory && (
+                <div className="mt-2 space-y-2">
+                  {previousAttempts.map((attempt, i) => (
+                    <div key={i} className="text-xs p-3 rounded bg-muted/50 border border-border/50">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-foreground">Attempt {attempt.attemptNumber}</span>
+                        <span className="text-muted-foreground">
+                          {new Date(attempt.timestamp).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground line-clamp-2">{attempt.response}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -285,6 +332,23 @@ function ExerciseBlock({
               </div>
             </div>
           )}
+
+          {isSubmitted && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setInput('');
+                setFeedback('');
+                setIsSubmitted(false);
+                setAttemptNumber(prev => prev + 1);
+              }}
+              className="mt-3 gap-1"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Try Again
+            </Button>
+          )}
         </>
       )}
     </Card>
@@ -293,9 +357,11 @@ function ExerciseBlock({
 
 export default function ModulePage() {
   const params = useParams();
-  const { profile, updateModuleProgress, completeModule } = useLearner();
+  const { profile, updateModuleProgress, completeModule, saveExerciseFeedback } = useLearner();
   const [showCompanion, setShowCompanion] = useState(false);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
+  const [currentSectionTitle, setCurrentSectionTitle] = useState<string | undefined>();
+  const [currentSectionContent, setCurrentSectionContent] = useState<string | undefined>();
 
   const moduleId = params.moduleId as string;
   const moduleData = moduleMap[moduleId];
@@ -312,6 +378,28 @@ export default function ModulePage() {
       setCompletedSections(new Set(progress.completedSections));
     }
   }, [profile.moduleProgress, moduleId]);
+
+  useEffect(() => {
+    if (!moduleData) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.id.replace('section-', '');
+            const section = moduleData.sections.find((s) => s.id === sectionId);
+            if (section) {
+              setCurrentSectionTitle(section.title);
+              setCurrentSectionContent(section.content?.slice(0, 500));
+            }
+          }
+        }
+      },
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+    );
+    const elements = document.querySelectorAll('[id^="section-"]');
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [moduleData]);
 
   if (!moduleData) {
     return (
@@ -353,7 +441,7 @@ export default function ModulePage() {
     });
 
     if (newCompleted.size === moduleData.sections.length) {
-      completeModule(moduleId);
+      completeModule(moduleId, moduleData.skillDimension);
     }
   };
 
@@ -594,9 +682,23 @@ export default function ModulePage() {
           <MessageCircle className="h-5 w-5" />
         </button>
 
-        {/* Companion panel */}
+        {/* Companion panel — overlay on mobile, sidebar on desktop */}
         {showCompanion && (
-          <CompanionPanel moduleData={moduleData} onClose={() => setShowCompanion(false)} />
+          <>
+            {/* Mobile backdrop */}
+            <div
+              className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+              onClick={() => setShowCompanion(false)}
+            />
+            <div className="fixed right-0 top-[57px] z-40 lg:relative lg:top-0 lg:z-auto">
+              <CompanionPanel
+                moduleData={moduleData}
+                currentSectionTitle={currentSectionTitle}
+                currentSectionContent={currentSectionContent}
+                onClose={() => setShowCompanion(false)}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

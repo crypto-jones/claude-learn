@@ -4,6 +4,31 @@ import { ChatRequest } from '@/lib/types';
 
 const anthropic = new Anthropic();
 
+// Simple in-memory rate limiter
+const rateLimit = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 20; // max requests per window
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimit.get(ip);
+  if (!entry || now > entry.resetTime) {
+    rateLimit.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
+// Clean up stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of rateLimit) {
+    if (now > val.resetTime) rateLimit.delete(key);
+  }
+}, 300000);
+
 function getSystemPrompt(request: ChatRequest): string {
   const { mode, context } = request;
 
@@ -13,7 +38,7 @@ function getSystemPrompt(request: ChatRequest): string {
 
 You are assessing a learner who is a ${context.role || 'developer'} with "${context.experienceLevel || 'new'}" experience with AI.
 
-Your job is to ask 3-5 adaptive questions to evaluate their actual skill level. Do NOT ask generic multiple-choice questions. Ask questions that test real understanding and ability.
+Your job is to ask exactly 4 adaptive questions to evaluate their actual skill level. Do NOT ask generic multiple-choice questions. Instead, ask questions that test real understanding and ability.
 
 For developers: Ask them to write prompts, design API calls, or solve practical problems.
 For product managers: Ask about evaluation strategies, use case identification, and AI product thinking.
@@ -28,11 +53,14 @@ You are evaluating skills across these dimensions:
 4. Evaluation & Testing - Understanding of how to evaluate AI outputs
 5. Production Deployment - Knowledge of shipping AI to production
 
-Ask ONE question at a time. Adapt each question based on their previous responses. Start with a question appropriate for their stated experience level, then adjust difficulty based on their answers.
-
-Keep your questions concise and practical. Don't explain the assessment process — just ask the questions naturally, like a knowledgeable colleague would.
-
-After asking 3-5 questions (adjust based on how clearly you can assess their level), provide your final assessment. Your final message MUST end with a JSON block in this exact format:
+IMPORTANT RULES:
+- Ask ONE question at a time
+- Adapt each question based on their previous responses
+- Start with a question appropriate for their stated experience level, then adjust difficulty
+- Keep questions concise and practical, like a knowledgeable colleague would ask
+- Do NOT explain the assessment process
+- After EXACTLY 4 questions from you (counting your first message as question 1), provide your final assessment in your response to their 4th answer
+- Your final message MUST end with a JSON block in this exact format:
 
 \`\`\`json
 {
@@ -48,31 +76,36 @@ After asking 3-5 questions (adjust based on how clearly you can assess their lev
 }
 \`\`\`
 
-Only include this JSON block in your FINAL message, after you've asked all your questions. Do not include it in intermediate messages.`;
+Only include this JSON block in your FINAL message. Never include it in intermediate messages.`;
 
     case 'feedback':
       return `You are a learning coach providing feedback on a student exercise on the Claude Learn platform.
 
-The student is learning about "${context.moduleTitle || 'Claude'}". Their current skill level in this area is based on their profile. They are a ${context.role || 'developer'}.
+The student is a ${context.role || 'developer'} learning about "${context.moduleTitle || 'Claude'}".
+${context.sectionTitle ? `They are working on the section: "${context.sectionTitle}"` : ''}
 
 The exercise asked: "${context.exercisePrompt || ''}"
 
 Evaluation criteria: ${context.evaluationCriteria || 'Evaluate the quality and correctness of the response.'}
 
-Provide specific, constructive feedback:
-1. What they did well (be specific, reference parts of their response)
-2. What could be improved (give concrete suggestions)
-3. A key insight or tip they might not have considered
+${context.sectionContent ? `Relevant module content for context:\n${context.sectionContent.slice(0, 1000)}` : ''}
 
-Keep your feedback concise (3-5 short paragraphs max). Be encouraging but honest. Use a warm, supportive tone like a great teacher would.
+Provide specific, constructive feedback in this structure:
 
-If their response shows misunderstanding, gently correct it and explain why. If it's strong, acknowledge that and push them to think deeper.`;
+**What you did well:** (reference specific parts of their response)
+
+**What could be improved:** (give concrete, actionable suggestions)
+
+**Key insight:** (one tip or deeper understanding they might not have considered)
+
+Keep your feedback concise (3-5 short paragraphs max). Be encouraging but honest. Use a warm, supportive tone like a great teacher would. If their response shows misunderstanding, gently correct it. If it's strong, push them to think deeper.`;
 
     case 'companion':
       return `You are a helpful learning companion on the Claude Learn platform. Your name is Claude, and you're helping someone learn about AI and specifically about how to use Claude effectively.
 
 The student is currently studying: "${context.moduleTitle || 'Claude'}"
 ${context.sectionTitle ? `Current section: "${context.sectionTitle}"` : ''}
+${context.sectionContent ? `\nCurrent section content (for reference):\n${context.sectionContent.slice(0, 1500)}\n` : ''}
 They are a ${context.role || 'developer'} at the ${context.skills?.['prompt-engineering'] || 'foundations'} level.
 
 The platform has these modules available for cross-referencing:
@@ -81,16 +114,18 @@ The platform has these modules available for cross-referencing:
 3. "Your First API Call" (API) — Messages API, request/response format, authentication
 4. "Structured Output" (API) — Getting Claude to return JSON, schema-guided output, prefilling
 5. "Introduction to Tool Use" (Agents) — Function calling, tool schemas, the tool use conversation flow
+6. "Evaluator-Optimizer Loop" (Agents) — Using Claude to evaluate and improve its own outputs
+7. "Getting Started with Claude Code" (Claude Code) — CLI tool, agentic coding, best practices
+8. "Building Your First Eval" (Production) — Systematic evaluation, test cases, scoring
 
 Guidelines:
 - Use Socratic questioning when appropriate — guide rather than give direct answers
-- When a concept connects to another module, reference it specifically: "This connects to what you'd learn in [Module Name] about [topic]" — help the learner see connections across modules
+- When a concept connects to another module, reference it specifically
 - Provide concrete examples relevant to their role as a ${context.role || 'developer'}
-- Keep responses concise and focused (2-4 paragraphs max)
+- Keep responses concise and focused (2-3 paragraphs max)
 - If they're struggling, break the concept down into simpler parts
 - Be warm, encouraging, and patient
-- When explaining code, use practical examples they can try themselves
-- If they ask about something covered in depth in another module, give a brief answer and recommend that module`;
+- When explaining code, use practical examples they can try themselves`;
 
     default:
       return 'You are a helpful AI assistant.';
@@ -98,6 +133,15 @@ Guidelines:
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limiting
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  if (!checkRateLimit(ip)) {
+    return new Response(
+      JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment.' }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body: ChatRequest = await req.json();
     const systemPrompt = getSystemPrompt(body);

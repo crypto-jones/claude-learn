@@ -15,19 +15,19 @@ interface SkillsRadarProps {
 
 export function SkillsRadar({ skills }: SkillsRadarProps) {
   const data = SKILL_DIMENSIONS.map((dim) => ({
-    skill: dim.label.split(' ').slice(0, 2).join(' '),
+    skill: dim.shortLabel,
     value: SKILL_LEVEL_VALUES[skills[dim.id]],
     fullMark: 3,
   }));
 
   return (
-    <div className="w-full h-[280px]">
+    <div className="w-full h-[340px]">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} cx="50%" cy="50%" outerRadius="75%">
+        <RadarChart data={data} cx="50%" cy="50%" outerRadius="90%">
           <PolarGrid stroke="hsl(var(--border))" />
           <PolarAngleAxis
             dataKey="skill"
-            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
           />
           <Radar
             name="Skills"

@@ -7,12 +7,17 @@ export function getDefaultProfile(): LearnerProfile {
     role: null,
     experienceLevel: null,
     skills: { ...DEFAULT_SKILLS },
+    initialSkills: null,
     completedModules: [],
     moduleProgress: {},
     learningPath: [],
     assessmentComplete: false,
     streakDays: 0,
     lastActiveDate: '',
+    totalMinutesLearned: 0,
+    currentSessionStart: null,
+    learningGoals: [],
+    reviews: [],
   };
 }
 
@@ -22,6 +27,20 @@ export function loadProfile(): LearnerProfile {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return getDefaultProfile();
     const profile = JSON.parse(stored) as LearnerProfile;
+
+    // Migrate old profiles that lack new fields
+    if (!profile.initialSkills) profile.initialSkills = null;
+    if (profile.totalMinutesLearned === undefined) profile.totalMinutesLearned = 0;
+    if (profile.currentSessionStart === undefined) profile.currentSessionStart = null;
+    if (!profile.learningGoals) profile.learningGoals = [];
+    if (!profile.reviews) profile.reviews = [];
+
+    // Migrate moduleProgress entries that lack exerciseFeedback
+    for (const key of Object.keys(profile.moduleProgress)) {
+      if (!profile.moduleProgress[key].exerciseFeedback) {
+        profile.moduleProgress[key].exerciseFeedback = {};
+      }
+    }
 
     // Update streak
     const today = new Date().toISOString().split('T')[0];
@@ -40,8 +59,13 @@ export function loadProfile(): LearnerProfile {
       profile.streakDays = 1;
     }
     profile.lastActiveDate = today;
-    saveProfile(profile);
 
+    // Start session timer
+    if (!profile.currentSessionStart) {
+      profile.currentSessionStart = Date.now();
+    }
+
+    saveProfile(profile);
     return profile;
   } catch {
     return getDefaultProfile();
@@ -60,4 +84,15 @@ export function saveProfile(profile: LearnerProfile): void {
 export function resetProfile(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(STORAGE_KEY);
+}
+
+/** Flush elapsed session time into totalMinutesLearned */
+export function flushSessionTime(profile: LearnerProfile): LearnerProfile {
+  if (!profile.currentSessionStart) return profile;
+  const elapsed = Math.floor((Date.now() - profile.currentSessionStart) / 60000);
+  return {
+    ...profile,
+    totalMinutesLearned: profile.totalMinutesLearned + Math.max(elapsed, 0),
+    currentSessionStart: Date.now(),
+  };
 }

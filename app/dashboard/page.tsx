@@ -12,11 +12,14 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   Module,
+  SkillDimension,
+  SkillLevel,
   SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
 } from '@/lib/types';
 import {
   ArrowRight,
+  ArrowUp,
   CheckCircle2,
   Clock,
   Flame,
@@ -24,6 +27,13 @@ import {
   Target,
   Sparkles,
   RotateCcw,
+  RefreshCw,
+  Plus,
+  X,
+  CalendarClock,
+  Goal,
+  Minus,
+  Equal,
 } from 'lucide-react';
 
 import howClaudeThinks from '@/content/modules/how-claude-thinks.json';
@@ -31,6 +41,9 @@ import promptEngineering from '@/content/modules/prompt-engineering.json';
 import firstApiCall from '@/content/modules/first-api-call.json';
 import structuredOutput from '@/content/modules/structured-output.json';
 import toolUseIntro from '@/content/modules/tool-use-intro.json';
+import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
+import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
+import buildingEvals from '@/content/modules/building-evals.json';
 
 const moduleMap: Record<string, Module> = {
   'how-claude-thinks': howClaudeThinks as Module,
@@ -38,11 +51,47 @@ const moduleMap: Record<string, Module> = {
   'first-api-call': firstApiCall as Module,
   'structured-output': structuredOutput as Module,
   'tool-use-intro': toolUseIntro as Module,
+  'evaluator-optimizer': evaluatorOptimizer as Module,
+  'claude-code-intro': claudeCodeIntro as Module,
+  'building-evals': buildingEvals as Module,
 };
+
+const SKILL_LEVEL_ORDER: SkillLevel[] = ['foundations', 'practitioner', 'advanced'];
+
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `${Math.round(minutes)}`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+}
+
+function levelLabel(level: SkillLevel): string {
+  return level.charAt(0).toUpperCase() + level.slice(1);
+}
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { profile, isLoaded, reset } = useLearner();
+  const {
+    profile,
+    isLoaded,
+    reset,
+    retakeAssessment,
+    addLearningGoal,
+    removeLearningGoal,
+    completeReview,
+    flushSession,
+  } = useLearner();
+
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [goalDimension, setGoalDimension] = useState<SkillDimension>('prompt-engineering');
+  const [goalLevel, setGoalLevel] = useState<SkillLevel>('practitioner');
+
+  // Flush session time on mount so minutes are up to date
+  useEffect(() => {
+    if (isLoaded) {
+      flushSession();
+    }
+  }, [isLoaded, flushSession]);
 
   useEffect(() => {
     if (isLoaded && !profile.assessmentComplete) {
@@ -69,11 +118,43 @@ export default function DashboardPage() {
     .map((id) => moduleMap[id])
     .filter(Boolean);
 
-  // Calculate total learning time
-  const totalMinutes = profile.completedModules.reduce((acc, id) => {
-    const mod = moduleMap[id];
-    return acc + (mod?.estimatedMinutes || 0);
-  }, 0);
+  // Reviews
+  const today = new Date().toISOString().split('T')[0];
+  const dueReviews = profile.reviews.filter((r) => r.nextReviewDate <= today);
+  const upcomingReviews = profile.reviews
+    .filter((r) => r.nextReviewDate > today)
+    .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
+
+  // Skill comparison helpers
+  const hasInitialSkills = profile.initialSkills !== null;
+  const skillChanged = (dim: SkillDimension): 'up' | 'down' | 'same' => {
+    if (!profile.initialSkills) return 'same';
+    const initial = SKILL_LEVEL_VALUES[profile.initialSkills[dim]];
+    const current = SKILL_LEVEL_VALUES[profile.skills[dim]];
+    if (current > initial) return 'up';
+    if (current < initial) return 'down';
+    return 'same';
+  };
+
+  const handleAddGoal = () => {
+    addLearningGoal({
+      skillDimension: goalDimension,
+      targetLevel: goalLevel,
+      createdAt: Date.now(),
+    });
+    setShowGoalForm(false);
+  };
+
+  const handleRetakeAssessment = () => {
+    if (!confirm('Retake assessment? Your current skill levels will be re-evaluated, but module progress will be kept.')) return;
+    retakeAssessment();
+    router.push('/assess');
+  };
+
+  const handleCompleteReview = (moduleId: string) => {
+    completeReview(moduleId);
+    router.push(`/learn/${moduleId}`);
+  };
 
   return (
     <div className="min-h-screen">
@@ -81,13 +162,24 @@ export default function DashboardPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-semibold text-foreground mb-2">
-            Skills Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Track your progress and see how your skills are growing.
-          </p>
+        <div className="flex items-start justify-between mb-10">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground mb-2">
+              Skills Dashboard
+            </h1>
+            <p className="text-muted-foreground">
+              Track your progress and see how your skills are growing.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRetakeAssessment}
+            className="gap-1.5 shrink-0"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Retake Assessment
+          </Button>
         </div>
 
         {/* Stats row */}
@@ -109,7 +201,7 @@ export default function DashboardPage() {
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-semibold text-foreground">
-              {totalMinutes}
+              {formatMinutes(profile.totalMinutesLearned)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               Minutes Learned
@@ -125,6 +217,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Skills radar + Skills breakdown */}
         <div className="grid grid-cols-5 gap-8 mb-10">
           {/* Skills radar chart */}
           <div className="col-span-3">
@@ -134,6 +227,59 @@ export default function DashboardPage() {
                 Skills Profile
               </h2>
               <SkillsRadar skills={profile.skills} />
+
+              {/* Before / After comparison */}
+              {hasInitialSkills && (
+                <div className="mt-6 pt-5 border-t border-border">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                    Before / After Comparison
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-[1fr_80px_24px_80px] gap-2 text-xs text-muted-foreground mb-1 px-1">
+                      <span>Skill</span>
+                      <span className="text-center">Initial</span>
+                      <span />
+                      <span className="text-center">Current</span>
+                    </div>
+                    {SKILL_DIMENSIONS.map((dim) => {
+                      const change = skillChanged(dim.id);
+                      const initial = profile.initialSkills![dim.id];
+                      const current = profile.skills[dim.id];
+                      return (
+                        <div
+                          key={dim.id}
+                          className="grid grid-cols-[1fr_80px_24px_80px] gap-2 items-center px-1 py-1.5 rounded-md hover:bg-muted/50 transition-colors"
+                        >
+                          <span className="text-sm text-foreground">{dim.shortLabel}</span>
+                          <span className="text-xs text-muted-foreground text-center capitalize">
+                            {levelLabel(initial)}
+                          </span>
+                          <span className="flex justify-center">
+                            {change === 'up' && (
+                              <ArrowUp className="h-3.5 w-3.5 text-green-600" />
+                            )}
+                            {change === 'down' && (
+                              <Minus className="h-3.5 w-3.5 text-red-500" />
+                            )}
+                            {change === 'same' && (
+                              <Equal className="h-3.5 w-3.5 text-muted-foreground/50" />
+                            )}
+                          </span>
+                          <span
+                            className={`text-xs text-center capitalize ${
+                              change === 'up'
+                                ? 'text-green-600 font-medium'
+                                : 'text-muted-foreground'
+                            }`}
+                          >
+                            {levelLabel(current)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </Card>
           </div>
 
@@ -169,6 +315,229 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
+
+        {/* Learning Goals */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Goal className="h-4 w-4 text-primary" />
+              Learning Goals
+            </h2>
+            {!showGoalForm && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowGoalForm(true)}
+                className="gap-1"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add Goal
+              </Button>
+            )}
+          </div>
+
+          {/* Goal form */}
+          {showGoalForm && (
+            <div className="flex items-end gap-3 mb-5 p-4 bg-muted/50 rounded-lg">
+              <div className="flex-1">
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                  Skill Dimension
+                </label>
+                <select
+                  value={goalDimension}
+                  onChange={(e) => setGoalDimension(e.target.value as SkillDimension)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  {SKILL_DIMENSIONS.map((dim) => (
+                    <option key={dim.id} value={dim.id}>
+                      {dim.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                  Target Level
+                </label>
+                <select
+                  value={goalLevel}
+                  onChange={(e) => setGoalLevel(e.target.value as SkillLevel)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  {SKILL_LEVEL_ORDER.map((level) => (
+                    <option key={level} value={level}>
+                      {levelLabel(level)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleAddGoal}>
+                  Save
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowGoalForm(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Goals list */}
+          {profile.learningGoals.length > 0 ? (
+            <div className="space-y-3">
+              {profile.learningGoals.map((goal) => {
+                const dim = SKILL_DIMENSIONS.find((d) => d.id === goal.skillDimension);
+                const currentLevel = profile.skills[goal.skillDimension];
+                const currentValue = SKILL_LEVEL_VALUES[currentLevel];
+                const targetValue = SKILL_LEVEL_VALUES[goal.targetLevel];
+                const isReached = currentValue >= targetValue;
+                const progressPercent = Math.min(
+                  (currentValue / targetValue) * 100,
+                  100
+                );
+
+                return (
+                  <div
+                    key={goal.skillDimension}
+                    className="flex items-center gap-4 p-3 rounded-lg border border-border"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-foreground">
+                          {dim?.label}
+                        </span>
+                        {isReached && (
+                          <Badge
+                            variant="default"
+                            className="bg-green-100 text-green-700 border-green-200 text-[10px] px-1.5 py-0"
+                          >
+                            Reached
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                        <span className="capitalize">{levelLabel(currentLevel)}</span>
+                        <ArrowRight className="h-3 w-3" />
+                        <span className="capitalize">{levelLabel(goal.targetLevel)}</span>
+                      </div>
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isReached ? 'bg-green-500' : 'bg-primary'
+                          }`}
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeLearningGoal(goal.skillDimension)}
+                      className="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8 p-0"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No learning goals set. Add a goal to track your progress toward specific skill levels.
+            </p>
+          )}
+        </Card>
+
+        {/* Spaced Repetition Reviews */}
+        {(dueReviews.length > 0 || upcomingReviews.length > 0) && (
+          <Card className="p-6 mb-8">
+            <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+              <CalendarClock className="h-4 w-4 text-primary" />
+              Spaced Repetition Reviews
+            </h2>
+
+            {/* Due reviews */}
+            {dueReviews.length > 0 && (
+              <div className="mb-5">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Due Now
+                </h3>
+                <div className="space-y-2">
+                  {dueReviews.map((review) => {
+                    const mod = moduleMap[review.moduleId];
+                    if (!mod) return null;
+                    return (
+                      <div
+                        key={review.moduleId}
+                        className="flex items-center justify-between p-3 rounded-lg border border-primary/20 bg-primary/5"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {mod.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Review #{review.reviewCount + 1}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => handleCompleteReview(review.moduleId)}
+                          className="gap-1.5"
+                        >
+                          <BookOpen className="h-3.5 w-3.5" />
+                          Review
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Upcoming reviews */}
+            {upcomingReviews.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Upcoming
+                </h3>
+                <div className="space-y-2">
+                  {upcomingReviews.map((review) => {
+                    const mod = moduleMap[review.moduleId];
+                    if (!mod) return null;
+                    const reviewDate = new Date(review.nextReviewDate);
+                    const formatted = reviewDate.toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    });
+                    return (
+                      <div
+                        key={review.moduleId}
+                        className="flex items-center justify-between p-3 rounded-lg border border-border"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {mod.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Review #{review.reviewCount + 1}
+                          </p>
+                        </div>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {formatted}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* Path progress */}
         <Card className="p-6 mb-8">
@@ -206,6 +575,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
+        {/* Recommended next + Recently completed */}
         <div className="grid grid-cols-2 gap-8">
           {/* Recommended next */}
           {nextModule && (

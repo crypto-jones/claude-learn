@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
 import { LearnerProvider } from '@/contexts/LearnerContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import './globals.css';
 
 const inter = Inter({
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-        <LearnerProvider>{children}</LearnerProvider>
+        <LearnerProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </LearnerProvider>
       </body>
     </html>
   );

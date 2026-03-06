@@ -42,6 +42,8 @@ const roleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 type Step = 'role' | 'experience' | 'conversation' | 'results';
 
+const MAX_ASSESSMENT_TURNS = 5;
+
 export default function AssessPage() {
   const router = useRouter();
   const { profile, setRole, setExperienceLevel, completeAssessment } = useLearner();
@@ -68,15 +70,12 @@ export default function AssessPage() {
     scrollToBottom();
   }, [messages, streamingContent, scrollToBottom]);
 
-  // Start the assessment conversation when entering the conversation step
   const startConversation = useCallback(async () => {
     if (!selectedRole || !selectedExperience) return;
 
     setIsStreaming(true);
     let accumulated = '';
 
-    // The Anthropic API requires at least one user message, so send a
-    // kick-off message that the system prompt can pick up from.
     const kickoff: ChatMessage = {
       role: 'user',
       content: `Hi! I'm a ${selectedRole} with ${selectedExperience} experience level. Please begin my skills assessment.`,
@@ -129,7 +128,6 @@ export default function AssessPage() {
   const handleNextFromExperience = () => {
     if (selectedExperience) {
       setStep('conversation');
-      // Start conversation after state update
       setTimeout(() => startConversation(), 100);
     }
   };
@@ -166,13 +164,14 @@ export default function AssessPage() {
         setMessages((prev) => [...prev, assistantMessage]);
         setStreamingContent('');
         setIsStreaming(false);
-        setQuestionCount((prev) => prev + 1);
+
+        const newCount = questionCount + 1;
+        setQuestionCount(newCount);
 
         // Check if assessment is complete
         const result = extractAssessmentResult(accumulated);
         if (result) {
           const skills = result.skills as unknown as SkillsProfile;
-          // Validate skills
           const validLevels: SkillLevel[] = ['foundations', 'practitioner', 'advanced'];
           const validatedSkills: SkillsProfile = {
             'prompt-engineering': validLevels.includes(skills['prompt-engineering'])
@@ -196,8 +195,19 @@ export default function AssessPage() {
             skills: validatedSkills,
             summary: result.summary,
           });
-
-          // Wait a moment then transition to results
+          setTimeout(() => setStep('results'), 1500);
+        } else if (newCount >= MAX_ASSESSMENT_TURNS) {
+          // Force completion with experience-based defaults
+          setAssessmentResult({
+            skills: {
+              'prompt-engineering': selectedExperience === 'building' ? 'practitioner' : selectedExperience === 'familiar' ? 'practitioner' : 'foundations',
+              'api-integration': selectedExperience === 'building' ? 'practitioner' : 'foundations',
+              'agent-design': 'foundations',
+              evaluation: 'foundations',
+              production: selectedExperience === 'building' ? 'foundations' : 'foundations',
+            },
+            summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
+          });
           setTimeout(() => setStep('results'), 1500);
         }
       },
@@ -237,19 +247,17 @@ export default function AssessPage() {
     <div className="min-h-screen flex flex-col">
       <Navigation />
 
-      {/* Progress bar */}
       <div className="max-w-2xl mx-auto w-full px-6 pt-6">
         <Progress value={progressPercent} className="h-1" />
         <p className="text-xs text-muted-foreground mt-2">
           {step === 'role' && 'Step 1 of 3 — Select your role'}
           {step === 'experience' && 'Step 2 of 3 — Your experience level'}
-          {step === 'conversation' && `Step 3 of 3 — Skills assessment`}
+          {step === 'conversation' && `Step 3 of 3 — Skills assessment (${Math.min(questionCount, MAX_ASSESSMENT_TURNS)}/${MAX_ASSESSMENT_TURNS})`}
           {step === 'results' && 'Assessment complete'}
         </p>
       </div>
 
       <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 py-8">
-        {/* Step 1: Role Selection */}
         {step === 'role' && (
           <div className="animate-fade-in-up">
             <h1 className="text-2xl font-semibold text-foreground mb-2">
@@ -286,11 +294,7 @@ export default function AssessPage() {
                       )}
                     </div>
                     <div>
-                      <p
-                        className={`font-medium ${
-                          isSelected ? 'text-foreground' : 'text-foreground'
-                        }`}
-                      >
+                      <p className="font-medium text-foreground">
                         {role.label}
                       </p>
                       <p className="text-sm text-muted-foreground">{role.description}</p>
@@ -315,7 +319,6 @@ export default function AssessPage() {
           </div>
         )}
 
-        {/* Step 2: Experience Level */}
         {step === 'experience' && (
           <div className="animate-fade-in-up">
             <h1 className="text-2xl font-semibold text-foreground mb-2">
@@ -364,7 +367,6 @@ export default function AssessPage() {
           </div>
         )}
 
-        {/* Step 3: Conversational Assessment */}
         {step === 'conversation' && (
           <div className="flex-1 flex flex-col animate-fade-in">
             <div className="mb-4">
@@ -372,11 +374,10 @@ export default function AssessPage() {
                 Skills Assessment
               </h1>
               <p className="text-sm text-muted-foreground">
-                Claude will ask you a few questions to understand your skill level.
+                Claude will ask you {MAX_ASSESSMENT_TURNS} questions to understand your skill level.
               </p>
             </div>
 
-            {/* Chat messages */}
             <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0">
               {messages.map((msg, i) => (
                 <div
@@ -399,7 +400,6 @@ export default function AssessPage() {
                 </div>
               ))}
 
-              {/* Streaming content */}
               {isStreaming && streamingContent && (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-muted text-foreground">
@@ -410,7 +410,6 @@ export default function AssessPage() {
                 </div>
               )}
 
-              {/* Loading indicator */}
               {isStreaming && !streamingContent && (
                 <div className="flex justify-start">
                   <div className="rounded-2xl px-4 py-3 bg-muted">
@@ -422,7 +421,6 @@ export default function AssessPage() {
                 </div>
               )}
 
-              {/* Assessment complete indicator */}
               {assessmentResult && (
                 <div className="flex justify-center">
                   <div className="flex items-center gap-2 text-sm text-primary font-medium py-2">
@@ -435,7 +433,6 @@ export default function AssessPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input area */}
             {!assessmentResult && (
               <div className="border-t border-border pt-4">
                 <div className="flex gap-2">
@@ -463,7 +460,6 @@ export default function AssessPage() {
           </div>
         )}
 
-        {/* Step 4: Results */}
         {step === 'results' && assessmentResult && (
           <div className="animate-fade-in-up">
             <div className="text-center mb-8">
@@ -478,7 +474,6 @@ export default function AssessPage() {
               </p>
             </div>
 
-            {/* Skills breakdown */}
             <Card className="p-6 mb-8">
               <div className="space-y-4">
                 {SKILL_DIMENSIONS.map((dim) => {

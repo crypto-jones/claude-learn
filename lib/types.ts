@@ -6,12 +6,12 @@ export type SkillDimension =
   | 'evaluation'
   | 'production';
 
-export const SKILL_DIMENSIONS: { id: SkillDimension; label: string }[] = [
-  { id: 'prompt-engineering', label: 'Prompt Engineering' },
-  { id: 'api-integration', label: 'API Integration' },
-  { id: 'agent-design', label: 'Agent Design' },
-  { id: 'evaluation', label: 'Evaluation & Testing' },
-  { id: 'production', label: 'Production Deployment' },
+export const SKILL_DIMENSIONS: { id: SkillDimension; label: string; shortLabel: string }[] = [
+  { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+  { id: 'api-integration', label: 'API Integration', shortLabel: 'API' },
+  { id: 'agent-design', label: 'Agent Design', shortLabel: 'Agents' },
+  { id: 'evaluation', label: 'Evaluation & Testing', shortLabel: 'Evaluation' },
+  { id: 'production', label: 'Production Deployment', shortLabel: 'Production' },
 ];
 
 // Skill levels
@@ -128,12 +128,30 @@ export interface Module {
   sections: ModuleSection[];
 }
 
+// Exercise feedback record
+export interface ExerciseFeedback {
+  response: string;
+  feedback: string;
+  timestamp: number;
+  attemptNumber: number;
+}
+
 // Module progress
 export interface ModuleProgress {
   started: boolean;
   completed: boolean;
   completedSections: string[];
   exerciseResponses: Record<string, string>;
+  exerciseFeedback: Record<string, ExerciseFeedback[]>;
+  completedAt?: number;
+  startedAt?: number;
+}
+
+// Learning goal
+export interface LearningGoal {
+  skillDimension: SkillDimension;
+  targetLevel: SkillLevel;
+  createdAt: number;
 }
 
 // Learning track
@@ -145,17 +163,30 @@ export interface Track {
   color: string;
 }
 
+// Spaced repetition review
+export interface ReviewItem {
+  moduleId: string;
+  nextReviewDate: string;
+  interval: number;
+  reviewCount: number;
+}
+
 // Learner profile
 export interface LearnerProfile {
   role: LearnerRole | null;
   experienceLevel: ExperienceLevel | null;
   skills: SkillsProfile;
+  initialSkills: SkillsProfile | null;
   completedModules: string[];
   moduleProgress: Record<string, ModuleProgress>;
   learningPath: string[];
   assessmentComplete: boolean;
   streakDays: number;
   lastActiveDate: string;
+  totalMinutesLearned: number;
+  currentSessionStart: number | null;
+  learningGoals: LearningGoal[];
+  reviews: ReviewItem[];
 }
 
 // Chat message
@@ -175,6 +206,7 @@ export interface ChatRequest {
     moduleId?: string;
     moduleTitle?: string;
     sectionTitle?: string;
+    sectionContent?: string;
     evaluationCriteria?: string;
     exercisePrompt?: string;
   };

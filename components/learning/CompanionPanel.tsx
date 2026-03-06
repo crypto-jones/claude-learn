@@ -9,15 +9,19 @@ import { X, Send, Loader2, Sparkles } from 'lucide-react';
 
 interface CompanionPanelProps {
   moduleData: Module;
+  currentSectionTitle?: string;
+  currentSectionContent?: string;
   onClose: () => void;
 }
 
-export function CompanionPanel({ moduleData, onClose }: CompanionPanelProps) {
+export function CompanionPanel({ moduleData, currentSectionTitle, currentSectionContent, onClose }: CompanionPanelProps) {
   const { profile } = useLearner();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: `I'm here to help you with "${moduleData.title}". Ask me anything about the concepts in this module, or if you're stuck on an exercise, I can guide you through it.`,
+      content: currentSectionTitle
+        ? `I'm here to help you with "${moduleData.title}" — specifically the "${currentSectionTitle}" section. Ask me anything!`
+        : `I'm here to help you with "${moduleData.title}". Ask me anything about the concepts in this module, or if you're stuck on an exercise, I can guide you through it.`,
     },
   ]);
   const [input, setInput] = useState('');
@@ -53,6 +57,8 @@ export function CompanionPanel({ moduleData, onClose }: CompanionPanelProps) {
           role: profile.role || undefined,
           skills: profile.skills,
           moduleTitle: moduleData.title,
+          sectionTitle: currentSectionTitle,
+          sectionContent: currentSectionContent,
         },
       },
       (text) => {
@@ -85,8 +91,7 @@ export function CompanionPanel({ moduleData, onClose }: CompanionPanelProps) {
   };
 
   return (
-    <div className="w-[380px] border-l border-border bg-card flex flex-col h-[calc(100vh-57px)] sticky top-[57px]">
-      {/* Header */}
+    <div className="w-[100vw] sm:w-[380px] border-l border-border bg-card flex flex-col h-[calc(100vh-57px)] sticky top-[57px]">
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
@@ -102,7 +107,6 @@ export function CompanionPanel({ moduleData, onClose }: CompanionPanelProps) {
         </button>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
           <div
@@ -144,7 +148,6 @@ export function CompanionPanel({ moduleData, onClose }: CompanionPanelProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="px-4 py-3 border-t border-border">
         <div className="flex gap-2">
           <textarea
