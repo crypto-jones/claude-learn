@@ -1,0 +1,68 @@
+{
+  "id": "first-api-call",
+  "title": "Your First API Call",
+  "description": "Get started with the Claude Messages API — from authentication to making your first request and understanding the response format.",
+  "track": "api",
+  "trackTitle": "Building with the API",
+  "estimatedMinutes": 12,
+  "difficulty": "beginner",
+  "prerequisites": ["prompt-engineering"],
+  "skillDimension": "api-integration",
+  "learningObjectives": [
+    "Understand the Claude Messages API structure",
+    "Construct a well-formed API request",
+    "Parse and work with the API response format"
+  ],
+  "sections": [
+    {
+      "id": "messages-api",
+      "type": "concept",
+      "title": "The Messages API",
+      "content": "The Claude Messages API is Anthropic's primary interface for integrating Claude into your applications. Every interaction with Claude through the API follows a simple pattern: you send a list of messages and get a response back.\n\nThe API endpoint is:\n```\nPOST https://api.anthropic.com/v1/messages\n```\n\nEvery request requires:\n- **model** — Which Claude model to use (e.g., `claude-sonnet-4-20250514`)\n- **max_tokens** — Maximum tokens in the response (required)\n- **messages** — Array of conversation messages\n\nOptional but important:\n- **system** — System prompt (sets Claude's behavior)\n- **temperature** — Controls randomness (0 = deterministic, 1 = more creative)\n- **stream** — Whether to stream the response token by token\n\nAuthentication uses an API key passed as the `x-api-key` header."
+    },
+    {
+      "id": "request-format",
+      "type": "concept",
+      "title": "Constructing a Request",
+      "content": "Here's the anatomy of a Claude API request:\n\n```json\n{\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 1024,\n  \"system\": \"You are a helpful assistant that responds concisely.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is the Messages API?\"\n    }\n  ]\n}\n```\n\n**Messages** are objects with `role` and `content`:\n- `role` is either `\"user\"` or `\"assistant\"`\n- `content` is either a string or an array of content blocks (for multimodal inputs)\n- Messages must alternate between user and assistant roles\n- The conversation must start with a user message\n\nUsing the Anthropic Python SDK:\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\nmessage = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=1024,\n    system=\"You are a helpful assistant.\",\n    messages=[\n        {\"role\": \"user\", \"content\": \"Hello, Claude!\"}\n    ]\n)\n\nprint(message.content[0].text)\n```\n\nOr with the TypeScript SDK:\n\n```typescript\nimport Anthropic from '@anthropic-ai/sdk';\n\nconst client = new Anthropic();\n\nconst message = await client.messages.create({\n  model: 'claude-sonnet-4-20250514',\n  max_tokens: 1024,\n  system: 'You are a helpful assistant.',\n  messages: [\n    { role: 'user', content: 'Hello, Claude!' }\n  ],\n});\n\nconsole.log(message.content[0].text);\n```"
+    },
+    {
+      "id": "response-format",
+      "type": "concept",
+      "title": "Understanding the Response",
+      "content": "The API returns a structured response with several important fields:\n\n```json\n{\n  \"id\": \"msg_abc123\",\n  \"type\": \"message\",\n  \"role\": \"assistant\",\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Hello! How can I help you today?\"\n    }\n  ],\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"stop_reason\": \"end_turn\",\n  \"usage\": {\n    \"input_tokens\": 25,\n    \"output_tokens\": 12\n  }\n}\n```\n\nKey fields to understand:\n- **content** — An array of content blocks. Usually just one text block, but can include multiple blocks with tool use.\n- **stop_reason** — Why Claude stopped generating:\n  - `\"end_turn\"` — Claude finished naturally\n  - `\"max_tokens\"` — Hit the token limit (response may be cut off)\n  - `\"stop_sequence\"` — Hit a custom stop sequence\n  - `\"tool_use\"` — Claude wants to use a tool\n- **usage** — Token counts for billing and monitoring\n\nAlways check `stop_reason`. If it's `\"max_tokens\"`, your response was truncated and you may need to increase `max_tokens` or ask Claude to be more concise."
+    },
+    {
+      "id": "exercise-api",
+      "type": "exercise",
+      "title": "Design an API Request",
+      "content": "Let's practice constructing a well-formed API request for a real use case.",
+      "exercise": {
+        "prompt": "You're building a feature that summarizes customer feedback emails into structured data. Write out the complete API request body (as JSON) that you would send to the Claude Messages API. The request should:\n\n1. Use an appropriate model\n2. Include a system prompt that instructs Claude to extract: sentiment (positive/negative/neutral), main topics (array), urgency level (low/medium/high), and a one-line summary\n3. Include a sample user message with a fictional customer email\n4. Set appropriate max_tokens\n\nWrite the full JSON request body.",
+        "hints": [
+          "Choose a model that balances cost and capability — claude-sonnet-4-20250514 is a good default",
+          "Your system prompt should specify the exact JSON output format you want",
+          "Include an example of what the output should look like in the system prompt",
+          "Think about what max_tokens you need for a structured JSON response"
+        ],
+        "evaluationCriteria": "The response should be a valid JSON request body with: (1) a model field with a real Claude model name, (2) a system prompt that clearly defines the extraction task and output format, (3) a messages array with at least one user message containing a realistic customer email, (4) reasonable max_tokens (256-1024 for this task). Bonus for including temperature (low for structured extraction) and specifying JSON output format in the system prompt."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "The Claude Messages API follows a simple request-response pattern: send messages, get a response. Always include a model, max_tokens, and messages. Use system prompts to shape behavior, and always check stop_reason to ensure you got a complete response."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Think about the API concepts you've just learned.",
+      "exercise": {
+        "prompt": "You're building a multi-turn chatbot. After the user sends their third message, the API returns a response with stop_reason: \"max_tokens\". What happened, what are the consequences, and how would you fix it?",
+        "evaluationCriteria": "Should explain that: (1) Claude's response was truncated because it hit the max_tokens limit, (2) the user received an incomplete response, (3) solutions include increasing max_tokens, instructing Claude to be more concise in the system prompt, or implementing a continuation strategy where you send the truncated response back and ask Claude to continue. Bonus for mentioning that in multi-turn conversations, the accumulated context (all previous messages) counts toward understanding why this might happen later in a conversation."
+      }
+    }
+  ]
+}

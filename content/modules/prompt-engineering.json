@@ -1,0 +1,74 @@
+{
+  "id": "prompt-engineering",
+  "title": "Prompt Engineering Essentials",
+  "description": "Master the core techniques for crafting effective prompts — from system prompts and few-shot examples to chain-of-thought reasoning.",
+  "track": "fundamentals",
+  "trackTitle": "Claude Fundamentals",
+  "estimatedMinutes": 15,
+  "difficulty": "beginner",
+  "prerequisites": ["how-claude-thinks"],
+  "skillDimension": "prompt-engineering",
+  "learningObjectives": [
+    "Write effective system prompts that shape Claude's behavior",
+    "Use few-shot examples to guide output format and style",
+    "Apply chain-of-thought prompting for complex reasoning tasks"
+  ],
+  "sections": [
+    {
+      "id": "why-prompts-matter",
+      "type": "concept",
+      "title": "Why Prompts Matter",
+      "content": "The prompt is your primary interface with Claude. The difference between a vague prompt and a well-crafted one can be the difference between a mediocre response and an exceptional one.\n\nThink of prompting like giving instructions to a brilliant new colleague. They're capable of excellent work, but they need clear context about:\n- **What** you want them to do\n- **How** you want it done (format, style, constraints)\n- **Why** it matters (context that helps them make good judgment calls)\n- **What good looks like** (examples of the desired output)\n\nThe most common prompting mistake is being too vague. \"Summarize this document\" will get you a generic summary. \"Summarize this document in 3 bullet points, focusing on action items for the engineering team, using specific metrics where available\" will get you something far more useful."
+    },
+    {
+      "id": "system-prompts",
+      "type": "concept",
+      "title": "System Prompts",
+      "content": "A **system prompt** is a special message that sets Claude's behavior for an entire conversation. It defines Claude's role, personality, constraints, and output format.\n\nA good system prompt answers these questions:\n1. **Who is Claude in this context?** (\"You are a senior code reviewer...\")\n2. **What are the rules?** (\"Never suggest deleting test files...\")\n3. **What format should responses use?** (\"Always respond in JSON...\")\n4. **What's the context?** (\"You're helping users of our e-commerce platform...\")\n\nHere's an example of a well-structured system prompt:\n\n```\nYou are a technical writing assistant for API documentation.\n\nYour job is to help developers write clear, accurate API reference docs.\n\nRules:\n- Use active voice and present tense\n- Include code examples for every endpoint\n- Specify parameter types, defaults, and constraints\n- Flag any ambiguous or missing information rather than guessing\n\nFormat responses as markdown with proper headings and code blocks.\n```\n\nNotice how specific this is. Claude now knows its role, its rules, and how to format its output."
+    },
+    {
+      "id": "few-shot",
+      "type": "concept",
+      "title": "Few-Shot Examples",
+      "content": "**Few-shot prompting** means giving Claude examples of the input-output pattern you want before asking it to handle new input.\n\nThis is one of the most powerful and reliable prompting techniques. Instead of describing what you want in abstract terms, you show Claude exactly what good looks like.\n\n```\nClassify the following customer feedback as Positive, Negative, or Neutral.\n\nFeedback: \"The new dashboard is so much faster!\"\nClassification: Positive\n\nFeedback: \"I can't find the export button anywhere.\"\nClassification: Negative\n\nFeedback: \"I updated my profile settings.\"\nClassification: Neutral\n\nFeedback: \"Your API documentation saved me hours of debugging.\"\nClassification:\n```\n\nWhen using few-shot examples:\n- **Use 2-5 examples** — enough to establish the pattern, not so many that you waste context\n- **Include edge cases** — show Claude how to handle tricky inputs\n- **Be consistent** — use the exact same format in every example\n- **Match the difficulty** — your examples should be similar in complexity to the real inputs"
+    },
+    {
+      "id": "chain-of-thought",
+      "type": "concept",
+      "title": "Chain-of-Thought Reasoning",
+      "content": "**Chain-of-thought (CoT) prompting** asks Claude to show its reasoning step by step before giving a final answer. This dramatically improves accuracy on complex reasoning tasks.\n\nSimply adding \"Think through this step by step\" or \"Let's work through this reasoning\" to your prompt can meaningfully improve performance on math, logic, and analysis tasks.\n\nWhy does this work? When Claude generates reasoning tokens, each token becomes context for the next. By forcing it to \"think out loud,\" you're giving it more context to work with before it commits to a final answer.\n\nYou can also structure the reasoning with explicit steps:\n\n```\nAnalyze this code change for potential bugs.\n\nThink through this systematically:\n1. First, identify what the code change is doing\n2. Consider the edge cases that could cause failures\n3. Check for common patterns that lead to bugs\n4. Give your final assessment with specific line references\n```\n\nThis approach works because it prevents Claude from jumping to a conclusion before considering all the relevant factors."
+    },
+    {
+      "id": "exercise-system-prompt",
+      "type": "exercise",
+      "title": "Write a System Prompt",
+      "content": "Let's put these techniques into practice by designing a system prompt for a real use case.",
+      "exercise": {
+        "prompt": "Write a system prompt for a customer support AI agent that handles refund requests for a SaaS company called \"DataFlow.\" The agent should:\n\n- Be helpful and empathetic\n- Only process refunds for amounts under $500\n- Escalate requests over $500 to a human agent\n- Collect the customer's email and order number before processing\n- Never promise a specific timeline for the refund\n\nWrite the complete system prompt.",
+        "hints": [
+          "Start with defining who Claude is in this context",
+          "Include all the rules as explicit constraints",
+          "Consider what format the responses should take",
+          "Think about edge cases — what if the customer doesn't have an order number?"
+        ],
+        "evaluationCriteria": "The response should include: (1) a clear role definition (customer support agent for DataFlow), (2) explicit constraints about the $500 threshold and escalation, (3) information gathering requirements (email, order number), (4) tone guidance (empathetic, helpful), (5) the timeline constraint about not promising specific dates. Bonus points for handling edge cases, specifying response format, and including an escalation message template."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Effective prompts are specific, structured, and include examples when possible. System prompts define the rules, few-shot examples show the pattern, and chain-of-thought reasoning improves accuracy on complex tasks."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Reflect on the prompting techniques you've learned.",
+      "exercise": {
+        "prompt": "You need Claude to extract structured data from restaurant menus (dish name, price, dietary tags like vegetarian/vegan/gluten-free). Which prompting techniques would you combine, and why? Describe your approach.",
+        "evaluationCriteria": "A strong response should mention: (1) using a system prompt to define the extraction task and output format (JSON), (2) few-shot examples showing how to handle different menu formats and edge cases (items without prices, ambiguous dietary info), (3) possibly chain-of-thought for ambiguous items. Should demonstrate understanding of when to use each technique and how they complement each other."
+      }
+    }
+  ]
+}

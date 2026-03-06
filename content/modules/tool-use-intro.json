@@ -1,0 +1,68 @@
+{
+  "id": "tool-use-intro",
+  "title": "Introduction to Tool Use",
+  "description": "Learn how Claude can call functions and interact with external systems through tool use — the foundation of building agentic applications.",
+  "track": "agents",
+  "trackTitle": "Tool Use & Agents",
+  "estimatedMinutes": 15,
+  "difficulty": "intermediate",
+  "prerequisites": ["first-api-call"],
+  "skillDimension": "agent-design",
+  "learningObjectives": [
+    "Understand how tool use works with the Claude API",
+    "Design effective tool schemas",
+    "Handle the tool use conversation flow"
+  ],
+  "sections": [
+    {
+      "id": "what-is-tool-use",
+      "type": "concept",
+      "title": "What Is Tool Use?",
+      "content": "**Tool use** (also called function calling) lets Claude interact with external systems. Instead of just generating text, Claude can decide to call functions you've defined — looking up data, performing calculations, taking actions, or accessing APIs.\n\nHere's the key insight: **Claude doesn't execute the tools itself.** Instead, it generates a structured request saying \"I want to call this function with these arguments.\" Your code then executes the function and sends the result back to Claude.\n\nThe flow looks like this:\n\n1. You define available tools with names, descriptions, and input schemas\n2. You send a message to Claude along with the tool definitions\n3. Claude analyzes the request and decides whether to use a tool\n4. If Claude wants to use a tool, it responds with a `tool_use` content block\n5. Your code executes the tool and sends back a `tool_result` message\n6. Claude uses the result to formulate its final response\n\nThis pattern is powerful because it lets Claude orchestrate complex workflows while you maintain control over what actually gets executed."
+    },
+    {
+      "id": "defining-tools",
+      "type": "concept",
+      "title": "Defining Tool Schemas",
+      "content": "Tools are defined using JSON Schema. Each tool needs:\n- **name** — A clear, descriptive function name\n- **description** — What the tool does (Claude uses this to decide when to call it)\n- **input_schema** — JSON Schema defining the parameters\n\n```json\n{\n  \"name\": \"get_weather\",\n  \"description\": \"Get the current weather for a specific location. Use this when the user asks about weather conditions, temperature, or forecasts.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"location\": {\n        \"type\": \"string\",\n        \"description\": \"City and state, e.g. 'San Francisco, CA'\"\n      },\n      \"unit\": {\n        \"type\": \"string\",\n        \"enum\": [\"celsius\", \"fahrenheit\"],\n        \"description\": \"Temperature unit\"\n      }\n    },\n    \"required\": [\"location\"]\n  }\n}\n```\n\nTips for effective tool schemas:\n- **Descriptions matter.** Claude uses the description to decide when to call the tool. Be specific about when it should and shouldn't be used.\n- **Name clearly.** Use verb_noun format: `get_weather`, `search_products`, `create_ticket`.\n- **Document parameters.** Add descriptions to every parameter — Claude reads these.\n- **Use enums.** For parameters with a fixed set of valid values, use `enum` to constrain inputs.\n- **Mark required fields.** Only require what's truly necessary."
+    },
+    {
+      "id": "tool-flow",
+      "type": "concept",
+      "title": "The Tool Use Flow",
+      "content": "Let's walk through a complete tool use interaction:\n\n**Step 1: Send request with tools**\n```python\nresponse = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=1024,\n    tools=[weather_tool],\n    messages=[{\n        \"role\": \"user\",\n        \"content\": \"What's the weather in Tokyo?\"\n    }]\n)\n```\n\n**Step 2: Check if Claude wants to use a tool**\n```python\nif response.stop_reason == \"tool_use\":\n    tool_block = next(\n        b for b in response.content\n        if b.type == \"tool_use\"\n    )\n    # tool_block.name == \"get_weather\"\n    # tool_block.input == {\"location\": \"Tokyo, Japan\"}\n```\n\n**Step 3: Execute the tool and send result**\n```python\nweather_data = call_weather_api(tool_block.input)\n\nfinal = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=1024,\n    tools=[weather_tool],\n    messages=[\n        {\"role\": \"user\", \"content\": \"What's the weather in Tokyo?\"},\n        {\"role\": \"assistant\", \"content\": response.content},\n        {\n            \"role\": \"user\",\n            \"content\": [{\n                \"type\": \"tool_result\",\n                \"tool_use_id\": tool_block.id,\n                \"content\": json.dumps(weather_data)\n            }]\n        }\n    ]\n)\n```\n\n**Step 4: Claude responds with the final answer**\nClaude uses the weather data to give a natural language response.\n\nNotice that you need to send the entire conversation history back, including Claude's tool use request and your tool result. This gives Claude the full context."
+    },
+    {
+      "id": "exercise-tool",
+      "type": "exercise",
+      "title": "Design a Tool Schema",
+      "content": "Let's practice designing tool schemas for a real application.",
+      "exercise": {
+        "prompt": "You're building a customer support assistant that needs to:\n1. Look up a customer's order status by order ID\n2. Process a refund for a specific order\n3. Search the knowledge base for answers to common questions\n\nDesign the tool schemas for all three tools. For each tool, provide the name, description, and complete input_schema with proper types, descriptions, and required fields.\n\nThink carefully about what information each tool needs and how Claude will decide which tool to use.",
+        "hints": [
+          "Each tool should have a clear, descriptive name and description",
+          "Think about what parameters each function needs to do its job",
+          "The refund tool might need additional confirmation fields",
+          "The search tool should support different search strategies"
+        ],
+        "evaluationCriteria": "Should provide three well-designed tool schemas with: (1) get_order_status / lookup_order — needs order_id (required string), clear description about when to use it; (2) process_refund — needs order_id (required), amount (number), reason (string), possibly a confirmation flag; (3) search_knowledge_base — needs query (required string), possibly category filter. All schemas should have proper JSON Schema format with types, descriptions, and required arrays. Bonus for thoughtful descriptions that help Claude choose the right tool."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Tool use lets Claude interact with external systems through a structured request-response pattern. You define the tools, Claude decides when and how to call them, your code executes them, and Claude uses the results. The quality of your tool schemas — especially descriptions — directly impacts how well Claude uses them."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Think about the tool use pattern and its implications.",
+      "exercise": {
+        "prompt": "Why doesn't Claude execute tools directly? What are the benefits of the pattern where Claude generates a tool call request and your code executes it? Can you think of any security implications?",
+        "evaluationCriteria": "Should explain that: (1) the pattern gives developers full control over what actions are actually taken — you can validate, rate-limit, or reject tool calls; (2) it keeps Claude sandboxed — Claude can't directly access your systems, databases, or APIs without your code as an intermediary; (3) you can log and audit every tool call; (4) security implications include: validating tool inputs before execution, ensuring tools can't be used for unintended purposes, implementing proper authentication for tools that access sensitive data. Should demonstrate understanding of the separation of concerns between Claude's reasoning and code execution."
+      }
+    }
+  ]
+}

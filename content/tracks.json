@@ -1,0 +1,37 @@
+[
+  {
+    "id": "fundamentals",
+    "title": "Claude Fundamentals",
+    "description": "Build a strong mental model for working with Claude effectively",
+    "moduleIds": ["how-claude-thinks", "prompt-engineering"],
+    "color": "#D4956A"
+  },
+  {
+    "id": "api",
+    "title": "Building with the Claude API",
+    "description": "Learn to integrate Claude into your applications",
+    "moduleIds": ["first-api-call", "structured-output"],
+    "color": "#6A9FD4"
+  },
+  {
+    "id": "agents",
+    "title": "Tool Use & Agents",
+    "description": "Build intelligent agentic workflows with Claude",
+    "moduleIds": ["tool-use-intro"],
+    "color": "#8B6AD4"
+  },
+  {
+    "id": "claude-code",
+    "title": "Claude Code & Developer Workflows",
+    "description": "Supercharge your development with Claude Code",
+    "moduleIds": [],
+    "color": "#D46A8B"
+  },
+  {
+    "id": "production",
+    "title": "Evaluation & Production",
+    "description": "Ship reliable, well-tested AI applications",
+    "moduleIds": [],
+    "color": "#6AD4A5"
+  }
+]
