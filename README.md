@@ -10,7 +10,7 @@
 
 Claude Learn rethinks how people learn to work with AI. Instead of static tutorials or passive video content, every interaction is powered by Claude itself — from evaluating what you already know to giving feedback on your work in real time.
 
-The platform takes learners from their first encounter with Claude through production-level patterns like tool use, evaluator-optimizer loops, and systematic evaluation design.
+The platform serves multiple audiences — developers building with the API, product managers evaluating AI use cases, designers prototyping AI experiences, and business professionals integrating AI into their workflows.
 
 ### The Learning Flow
 
@@ -28,13 +28,15 @@ The platform takes learners from their first encounter with Claude through produ
 
 ## Curriculum
 
-Eight modules across five learning tracks, progressing from fundamentals to advanced production patterns.
+Eleven modules across five learning tracks, covering fundamentals through advanced production patterns — with content for both technical and non-technical audiences.
 
 ### Claude Fundamentals
 | Module | Description | Difficulty |
 |--------|-------------|------------|
 | How Claude Thinks | Mental models for Claude's architecture, strengths, and limitations | Beginner |
 | Prompt Engineering Essentials | System prompts, few-shot examples, chain-of-thought reasoning | Beginner |
+| Evaluating AI Use Cases | Framework for identifying, evaluating, and scoping AI use cases | Beginner |
+| Claude for Content & Communication | Drafting, editing, research synthesis, and document analysis with Claude | Beginner |
 
 ### Building with the Claude API
 | Module | Description | Difficulty |
@@ -57,6 +59,7 @@ Eight modules across five learning tracks, progressing from fundamentals to adva
 | Module | Description | Difficulty |
 |--------|-------------|------------|
 | Building Systematic Evaluations | Designing rigorous evaluation suites for production AI systems | Advanced |
+| Responsible AI & Safety | Safety considerations, bias mitigation, data privacy, and guardrail design | Beginner |
 
 ---
 
@@ -92,7 +95,7 @@ claude-learn/
 ├── contexts/
 │   └── LearnerContext.tsx           # Global state + localStorage persistence
 ├── content/
-│   └── modules/                     # 8 module definitions (JSON)
+│   └── modules/                     # 11 module definitions (JSON)
 └── lib/
     ├── types.ts                     # Domain type definitions
     ├── claude.ts                    # Anthropic SDK integration

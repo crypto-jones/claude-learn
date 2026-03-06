@@ -3,7 +3,7 @@
     "id": "fundamentals",
     "title": "Claude Fundamentals",
     "description": "Build a strong mental model for working with Claude effectively",
-    "moduleIds": ["how-claude-thinks", "prompt-engineering"],
+    "moduleIds": ["how-claude-thinks", "prompt-engineering", "evaluating-ai-use-cases", "claude-for-content"],
     "color": "#D4956A"
   },
   {
@@ -17,21 +17,21 @@
     "id": "agents",
     "title": "Tool Use & Agents",
     "description": "Build intelligent agentic workflows with Claude",
-    "moduleIds": ["tool-use-intro"],
+    "moduleIds": ["tool-use-intro", "evaluator-optimizer"],
     "color": "#8B6AD4"
   },
   {
     "id": "claude-code",
     "title": "Claude Code & Developer Workflows",
     "description": "Supercharge your development with Claude Code",
-    "moduleIds": [],
+    "moduleIds": ["claude-code-intro"],
     "color": "#D46A8B"
   },
   {
     "id": "production",
     "title": "Evaluation & Production",
     "description": "Ship reliable, well-tested AI applications",
-    "moduleIds": [],
+    "moduleIds": ["building-evals", "responsible-ai-safety"],
     "color": "#6AD4A5"
   }
 ]

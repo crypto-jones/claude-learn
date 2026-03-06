@@ -1,0 +1,67 @@
+{
+  "id": "claude-for-content",
+  "title": "Claude for Content & Communication",
+  "description": "Practical techniques for using Claude as a writing partner — from drafting and editing to research synthesis, document analysis, and strategic communication.",
+  "track": "fundamentals",
+  "trackTitle": "Claude Fundamentals",
+  "estimatedMinutes": 12,
+  "difficulty": "beginner",
+  "prerequisites": ["prompt-engineering"],
+  "skillDimension": "prompt-engineering",
+  "learningObjectives": [
+    "Use Claude effectively for drafting, editing, and refining written content",
+    "Apply document analysis techniques to extract insights from complex materials",
+    "Structure prompts that produce high-quality content for different audiences and purposes"
+  ],
+  "sections": [
+    {
+      "id": "thinking-partner",
+      "type": "concept",
+      "title": "Claude as a Thinking Partner",
+      "content": "The most effective way to use Claude for content isn't to ask it to write something from scratch — it's to use it as a thinking partner who helps you develop and refine your ideas.\n\n**Brainstorming and ideation** — Claude excels at generating multiple angles on a topic. Instead of asking \"Write a blog post about remote work,\" try:\n- \"Give me 10 counterintuitive angles for a blog post about remote work that would surprise a reader who's seen every standard take\"\n- \"I'm writing about remote work for CTOs. What are the three topics they care about most that aren't being covered well?\"\n\n**Research synthesis** — When you have multiple sources, Claude can help identify patterns, contradictions, and gaps:\n- \"Here are the key findings from these four market research reports. What themes emerge? Where do they disagree?\"\n- \"Summarize the main arguments for and against this proposal. What questions remain unanswered?\"\n\n**Strategic thinking** — Claude can help you think through communication strategy before you write:\n- \"I need to present a budget increase to my VP. What objections should I prepare for?\"\n- \"We're launching a new feature next week. Help me think through the announcement — who are the audiences, what do they care about, and what's the right channel for each?\"\n\nThe key principle: **use Claude to think better, not to avoid thinking.** The best results come when you bring domain expertise and Claude brings structured reasoning and breadth of perspective."
+    },
+    {
+      "id": "writing-editing",
+      "type": "concept",
+      "title": "Writing and Editing with Claude",
+      "content": "Claude can dramatically speed up the writing process at every stage — but the approach matters. Here are the techniques that produce the best results:\n\n**Drafting from an outline, not a blank page.** Giving Claude structure produces better output than open-ended requests:\n- Provide your key points, audience, and desired length\n- Include the tone you want (formal, conversational, technical, persuasive)\n- Specify what to emphasize and what to skip\n\n**Editing with specific direction.** \"Make this better\" gives Claude nothing to work with. Be specific about what kind of improvement you want:\n- \"Tighten this to half the length without losing any key points\"\n- \"Make this more persuasive — add concrete evidence and address the reader's likely objections\"\n- \"Simplify this for a non-technical audience. Replace jargon with everyday language and add analogies\"\n- \"Check this for logical gaps — are there claims that aren't supported or transitions that don't follow?\"\n\n**Iterative refinement.** The best content usually comes from multiple passes:\n1. Start with a rough draft (yours or Claude's)\n2. Ask Claude to critique it against specific criteria\n3. Revise based on the critique\n4. Ask Claude to polish specific sections\n\n**Maintaining your voice.** If you want Claude to write in your style, give it examples of your previous writing and say: \"Match the tone and style of these examples.\" Claude is remarkably good at adapting to a voice when given samples.\n\n**A critical rule: always review AI-generated content before sharing it.** Claude can produce confident-sounding text that contains subtle errors, unsupported claims, or tone-deaf phrasing. Your review is what turns a draft into something you'd put your name on."
+    },
+    {
+      "id": "document-analysis",
+      "type": "concept",
+      "title": "Document Analysis and Summarization",
+      "content": "Claude's 200,000-token context window makes it excellent for analyzing long documents — contracts, reports, research papers, meeting transcripts, and more.\n\n**Structured extraction** — Don't just ask Claude to summarize. Tell it exactly what to look for:\n- \"Read this contract and extract: (1) payment terms, (2) termination clauses, (3) liability limitations, (4) anything unusual that a lawyer should review\"\n- \"Analyze this quarterly report and list: the three most important metrics, how each compares to last quarter, and any red flags\"\n\n**Multi-document analysis** — Claude can compare and synthesize across documents:\n- \"Here are three competitor product pages. What features do they all emphasize? What does each one have that the others don't?\"\n- \"Compare these two proposals. Where do they agree? Where do they differ? Which is stronger on cost justification?\"\n\n**Meeting transcript processing** — One of the highest-value everyday uses:\n- \"Extract all action items from this meeting transcript. For each one, identify who's responsible and the deadline if mentioned\"\n- \"Summarize this meeting for someone who wasn't there. Focus on decisions made and open questions\"\n\n**Tips for better document analysis:**\n- **Ask for evidence.** \"Quote the specific passages that support each finding\" — this prevents Claude from making claims not supported by the source material\n- **Specify the audience.** A summary for an executive looks different from one for a technical team\n- **Request what's missing.** \"What important questions does this document not answer?\" is often the most valuable prompt for any document"
+    },
+    {
+      "id": "exercise-content",
+      "type": "exercise",
+      "title": "Transform a Document",
+      "content": "Practice using Claude for a realistic content task.",
+      "exercise": {
+        "prompt": "You have the following raw notes from a product team meeting:\n\n\"Talked about Q2 roadmap. Sarah wants to prioritize the mobile app redesign, said customer complaints are up 40% about mobile experience. Jake disagreed, thinks we should focus on API performance — three enterprise clients threatened to leave because of latency issues. Maria suggested we could do both if we cut the analytics dashboard project. Budget is tight — we have 4 engineers available. Decision: mobile redesign gets 2 engineers starting next week, API performance gets 2 engineers, analytics dashboard pushed to Q3. Sarah will own mobile, Jake owns API. Need to tell the analytics stakeholders. Follow up meeting next Tuesday to check progress.\"\n\nCreate two different outputs from these notes:\n\n1. **Executive summary email** — A concise email to the VP of Product summarizing the key decisions, rationale, and risks. Professional tone, focused on business impact.\n\n2. **Team action items** — A structured list of action items with owners, deadlines, and dependencies. Format it so it could be pasted directly into a project management tool.\n\nFor each, describe the prompt you would use to get Claude to produce the best result, then write the actual output.",
+        "hints": [
+          "For the executive summary, think about what a VP cares about — decisions, rationale, risks, resource allocation",
+          "For the action items, be very specific about the format you want — owner, deadline, status, dependencies",
+          "Consider what information is implied but not stated — like the risk of not communicating with analytics stakeholders"
+        ],
+        "evaluationCriteria": "Should provide: (1) A well-crafted prompt for the executive summary that specifies audience (VP), tone (professional, concise), key elements to include (decisions made, business rationale, risks), and format; (2) An executive summary that highlights the key tradeoff (mobile vs API vs analytics), the resource allocation decision, the business drivers (customer complaints, enterprise churn risk), and the risk of pushing analytics; (3) A prompt for action items specifying format (owner, deadline, description, dependencies); (4) Structured action items including: mobile redesign (Sarah, 2 engineers, start next week), API performance (Jake, 2 engineers, start next week), communicate analytics delay to stakeholders (unassigned — should note this needs an owner), follow-up meeting Tuesday. Strong responses will note the unstated tasks like stakeholder communication."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Claude is most powerful as a content tool when you bring the direction and Claude brings the execution. Use it to brainstorm angles before you write, draft from outlines rather than blank pages, edit with specific criteria rather than vague requests, and extract structured insights from documents. Always review AI-generated content before it reaches your audience."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Think about how you'd apply these techniques in your own work.",
+      "exercise": {
+        "prompt": "Think of a real document or piece of content you've worked on recently (a report, presentation, email, proposal, or analysis). Describe:\n\n1. How you created it without AI\n2. How you would approach the same task using Claude, applying the techniques from this module\n3. Where in the process would Claude add the most value, and where would your expertise still be essential?\n\nBe specific about which prompting techniques you'd use and what you'd expect Claude to produce at each step.",
+        "evaluationCriteria": "Should provide a specific, realistic example and demonstrate understanding of: (1) the distinction between tasks AI handles well (drafting, structuring, editing, synthesizing) and tasks that require human judgment (strategy, final approval, stakeholder context, institutional knowledge); (2) concrete application of techniques from the module — using Claude for brainstorming angles, drafting from outlines, editing with specific criteria, or document analysis; (3) awareness that the human's value is in direction-setting, quality judgment, and domain expertise, not in first-draft writing or manual data extraction. Strong responses will identify specific stages where Claude accelerates the workflow and stages where human review is non-negotiable."
+      }
+    }
+  ]
+}

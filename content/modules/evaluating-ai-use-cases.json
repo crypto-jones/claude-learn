@@ -1,0 +1,67 @@
+{
+  "id": "evaluating-ai-use-cases",
+  "title": "Evaluating AI Use Cases",
+  "description": "Learn a practical framework for identifying, evaluating, and scoping AI use cases — whether you're a product manager building a roadmap, a designer prototyping experiences, or a business leader evaluating AI investments.",
+  "track": "fundamentals",
+  "trackTitle": "Claude Fundamentals",
+  "estimatedMinutes": 12,
+  "difficulty": "beginner",
+  "prerequisites": ["how-claude-thinks"],
+  "skillDimension": "evaluation",
+  "learningObjectives": [
+    "Apply a structured framework to evaluate whether AI is the right solution for a problem",
+    "Distinguish between high-value and low-value AI use cases",
+    "Define success metrics and scope for an AI-powered feature"
+  ],
+  "sections": [
+    {
+      "id": "right-problems",
+      "type": "concept",
+      "title": "Finding the Right Problems for AI",
+      "content": "Not every problem benefits from AI. The most common mistake organizations make is starting with the technology (\"let's use AI!\") rather than the problem (\"this process is slow and error-prone — could AI help?\").\n\nAI is a strong fit when the task involves:\n- **Language understanding** — Interpreting unstructured text, answering questions, extracting meaning from documents\n- **Generation with guardrails** — Drafting content, writing code, producing variations within constraints\n- **Classification and routing** — Sorting items into categories, prioritizing queues, directing requests\n- **Transformation** — Converting between formats, summarizing, translating, restructuring data\n- **Analysis and reasoning** — Comparing options, identifying patterns, evaluating against criteria\n\nAI is a poor fit when the task requires:\n- **Deterministic correctness** — If a 1% error rate is unacceptable (financial calculations, compliance checks), AI alone isn't enough\n- **Real-time data** — AI doesn't have access to live information without external tools\n- **Institutional memory** — AI doesn't remember past conversations without a retrieval system\n- **Physical world interaction** — AI processes text and images, not physical objects\n\nThe sweet spot for AI is tasks that humans can do but that are time-consuming, repetitive, or don't scale — and where the occasional imperfect output is acceptable or can be caught by review."
+    },
+    {
+      "id": "evaluation-framework",
+      "type": "concept",
+      "title": "The AI Use Case Evaluation Framework",
+      "content": "When evaluating a potential AI use case, score it across five dimensions:\n\n**1. Value — How much impact does this have?**\nEstimate the time saved, quality improved, or new capability unlocked. A use case that saves 10 hours per week for a team of 20 is worth more than one that saves 5 minutes per day for one person.\n\n**2. Feasibility — Can AI actually do this well?**\nTest the core task with Claude directly. If Claude can handle 80%+ of cases correctly with a good prompt, the use case is feasible. If it struggles below 60%, the task may need a different approach or heavy human oversight.\n\n**3. Risk — What happens when AI gets it wrong?**\nConsider the blast radius of errors. An AI that miscategorizes an internal support ticket has low risk. An AI that sends incorrect medical information has extremely high risk. Higher risk demands more guardrails, human review, or a hybrid approach.\n\n**4. Data readiness — Do you have what you need?**\nAI needs context to work well. Do you have the documents, examples, or data that Claude would need? Are they clean, accessible, and representative? Missing or poor-quality data is the most common blocker.\n\n**5. User acceptance — Will people actually use it?**\nThe best AI feature fails if users don't trust it or find it awkward. Consider whether the target users are comfortable with AI, whether the interaction model is natural, and whether there's a graceful fallback when AI isn't helpful.\n\nA quick scoring approach: rate each dimension 1-5 and multiply. A score above 2,000 (out of 3,125) suggests a strong use case. Below 500 suggests significant challenges."
+    },
+    {
+      "id": "scoping-success",
+      "type": "concept",
+      "title": "Scoping and Measuring Success",
+      "content": "Once you've identified a promising use case, scope it tightly before building. The most successful AI features start narrow and expand.\n\n**Start with one workflow, not a platform.** Instead of \"AI-powered customer support,\" start with \"AI categorizes incoming support tickets by urgency and topic.\" Instead of \"AI content generation,\" start with \"AI drafts first versions of weekly team status updates.\"\n\n**Define measurable success criteria before you build:**\n- **Accuracy** — What percentage of outputs need to be correct? How will you measure correctness?\n- **Speed** — How much faster is the AI-assisted workflow compared to the manual one?\n- **Adoption** — What percentage of the target users should be actively using the feature within 30 days?\n- **Satisfaction** — How do users rate the quality of AI outputs? (Use a simple thumbs up/down or 1-5 scale)\n\n**Plan for the feedback loop.** The best AI features improve over time because they collect signal about what works and what doesn't. Design feedback mechanisms from the start:\n- Let users rate or correct AI outputs\n- Log the inputs that produce poor results\n- Track which categories of requests have the lowest accuracy\n- Use this data to improve prompts, add examples, or refine guardrails\n\n**Set a review cadence.** AI performance can drift as usage patterns change. Plan monthly reviews of accuracy metrics, user feedback, and edge cases. This is how you catch degradation before users notice."
+    },
+    {
+      "id": "exercise-evaluate",
+      "type": "exercise",
+      "title": "Evaluate a Use Case",
+      "content": "Apply the framework to a real scenario.",
+      "exercise": {
+        "prompt": "A mid-size e-commerce company (200 employees, 50,000 orders/month) is considering three AI use cases:\n\n1. **AI Product Descriptions** — Automatically generate product descriptions from product specs and images for their catalog of 5,000 products.\n\n2. **AI Fraud Detection** — Use Claude to analyze order patterns and flag potentially fraudulent transactions before they're processed.\n\n3. **AI Customer Email Drafts** — When a support agent opens a customer email, AI generates a draft response that the agent can edit and send.\n\nFor each use case, evaluate it using the five-dimension framework (Value, Feasibility, Risk, Data Readiness, User Acceptance). Give each dimension a score of 1-5 and explain your reasoning. Which use case would you recommend they start with, and why?",
+        "hints": [
+          "Consider which tasks play to AI's strengths (language generation, classification) vs. weaknesses (deterministic accuracy, real-time data)",
+          "Think about what happens when the AI gets it wrong in each case — a bad product description vs. a missed fraud case vs. a tone-deaf email draft",
+          "Consider which use case has the fastest path to measurable impact"
+        ],
+        "evaluationCriteria": "Should evaluate all three use cases across all five dimensions. Strong responses will: (1) Rate AI Product Descriptions highly on feasibility and value (bulk content generation is an AI sweet spot) but note data readiness depends on having good specs; (2) Rate AI Fraud Detection low on feasibility (Claude isn't designed for pattern detection across numerical data — this is better suited to traditional ML) and high on risk (missing fraud is expensive); (3) Rate AI Customer Email Drafts highly on feasibility, value, and user acceptance (human-in-the-loop review mitigates risk). The recommendation should be either Product Descriptions or Email Drafts, with clear reasoning about the Fraud Detection case being a poor fit for LLMs. Bonus for discussing the human-in-the-loop pattern as a risk mitigation strategy."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "The best AI use cases combine high value with high feasibility and manageable risk. Start by finding problems where language understanding or generation is the bottleneck, scope tightly to a single workflow, define measurable success criteria before building, and plan for continuous improvement through user feedback."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Reflect on how to apply the evaluation framework.",
+      "exercise": {
+        "prompt": "Your CEO just came back from a conference excited about AI and wants to \"add AI to everything.\" They've asked you to identify the top AI opportunity across the company. Describe your approach: what questions would you ask, how would you prioritize opportunities, and how would you present your recommendation to get buy-in from both the CEO and the teams who would implement it?",
+        "evaluationCriteria": "Should describe a structured approach: (1) Start by auditing current workflows for high-volume, repetitive language tasks — not jumping to solutions; (2) Interview teams to find pain points and time sinks; (3) Apply the evaluation framework to top candidates; (4) Recommend starting with one high-confidence use case rather than many; (5) Present with concrete metrics (time saved, error reduction) rather than vague AI hype; (6) Propose a pilot with clear success criteria and timeline. Bonus for mentioning the importance of choosing a use case with a visible win to build organizational confidence in AI."
+      }
+    }
+  ]
+}

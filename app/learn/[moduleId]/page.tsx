@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLearner } from '@/contexts/LearnerContext';
@@ -38,6 +38,9 @@ import toolUseIntro from '@/content/modules/tool-use-intro.json';
 import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
 import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
 import buildingEvals from '@/content/modules/building-evals.json';
+import evaluatingAiUseCases from '@/content/modules/evaluating-ai-use-cases.json';
+import responsibleAiSafety from '@/content/modules/responsible-ai-safety.json';
+import claudeForContent from '@/content/modules/claude-for-content.json';
 
 const moduleMap: Record<string, Module> = {
   'how-claude-thinks': howClaudeThinks as Module,
@@ -48,112 +51,141 @@ const moduleMap: Record<string, Module> = {
   'evaluator-optimizer': evaluatorOptimizer as Module,
   'claude-code-intro': claudeCodeIntro as Module,
   'building-evals': buildingEvals as Module,
+  'evaluating-ai-use-cases': evaluatingAiUseCases as Module,
+  'responsible-ai-safety': responsibleAiSafety as Module,
+  'claude-for-content': claudeForContent as Module,
 };
 
 const allModuleIds = [
   'how-claude-thinks',
   'prompt-engineering',
+  'evaluating-ai-use-cases',
+  'claude-for-content',
   'first-api-call',
   'structured-output',
   'tool-use-intro',
   'evaluator-optimizer',
   'claude-code-intro',
   'building-evals',
+  'responsible-ai-safety',
 ];
 
+function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string }> {
+  const segments: Array<{ type: 'code' | 'text'; content: string }> = [];
+  const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      const text = content.slice(lastIndex, match.index).trim();
+      if (text) segments.push({ type: 'text', content: text });
+    }
+    segments.push({ type: 'code', content: match[2].replace(/\n$/, '') });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    const text = content.slice(lastIndex).trim();
+    if (text) segments.push({ type: 'text', content: text });
+  }
+
+  return segments;
+}
+
+function formatInlineText(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>');
+}
+
 function SectionContent({ content }: { content: string }) {
-  const paragraphs = content.split('\n\n');
+  const segments = parseContentSegments(content);
 
   return (
     <div className="prose-module">
-      {paragraphs.map((para, i) => {
-        if (para.startsWith('```')) {
-          const lines = para.split('\n');
-          const code = lines.slice(1, -1).join('\n');
+      {segments.map((segment, i) => {
+        if (segment.type === 'code') {
           return (
             <pre key={i} className="bg-muted/80 rounded-lg p-4 mb-4 overflow-x-auto">
-              <code className="text-sm font-mono">{code}</code>
+              <code className="text-sm font-mono">{segment.content}</code>
             </pre>
           );
         }
 
-        if (para.includes('```')) {
-          const parts = para.split(/```[\w]*\n/);
-          return (
-            <div key={i}>
-              {parts.map((part, j) => {
-                if (part.includes('```')) {
-                  const code = part.replace('```', '');
-                  return (
-                    <pre key={j} className="bg-muted/80 rounded-lg p-4 mb-4 overflow-x-auto">
-                      <code className="text-sm font-mono">{code}</code>
-                    </pre>
-                  );
-                }
+        const paragraphs = segment.content.split('\n\n');
+        return (
+          <Fragment key={i}>
+            {paragraphs.map((para, j) => {
+              const trimmed = para.trim();
+              if (!trimmed) return null;
+
+              if (trimmed.startsWith('## ')) {
                 return (
-                  <p
-                    key={j}
-                    className="mb-4 leading-7 text-muted-foreground"
-                    dangerouslySetInnerHTML={{
-                      __html: part
-                        .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                        .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>'),
-                    }}
-                  />
+                  <h2 key={j} className="text-xl font-semibold mt-8 mb-3 text-foreground">
+                    {trimmed.replace('## ', '')}
+                  </h2>
                 );
-              })}
-            </div>
-          );
-        }
+              }
+              if (trimmed.startsWith('### ')) {
+                return (
+                  <h3 key={j} className="text-lg font-medium mt-6 mb-2 text-foreground">
+                    {trimmed.replace('### ', '')}
+                  </h3>
+                );
+              }
 
-        if (para.startsWith('## ')) {
-          return (
-            <h2 key={i} className="text-xl font-semibold mt-8 mb-3 text-foreground">
-              {para.replace('## ', '')}
-            </h2>
-          );
-        }
-        if (para.startsWith('### ')) {
-          return (
-            <h3 key={i} className="text-lg font-medium mt-6 mb-2 text-foreground">
-              {para.replace('### ', '')}
-            </h3>
-          );
-        }
+              if (trimmed.match(/^[-*]\s/m)) {
+                const items = trimmed.split('\n').filter((l) => l.trim());
+                return (
+                  <ul key={j} className="mb-4 ml-6 space-y-1.5 list-disc text-muted-foreground">
+                    {items.map((item, k) => (
+                      <li
+                        key={k}
+                        className="leading-7"
+                        dangerouslySetInnerHTML={{
+                          __html: formatInlineText(
+                            item.replace(/^[-*]\s+/, '').replace(/^\d+[.)]\s+/, '')
+                          ),
+                        }}
+                      />
+                    ))}
+                  </ul>
+                );
+              }
 
-        if (para.match(/^[-\d]/m)) {
-          const items = para.split('\n').filter((l) => l.trim());
-          return (
-            <ul key={i} className="mb-4 ml-6 space-y-1.5 list-disc text-muted-foreground">
-              {items.map((item, j) => (
-                <li
+              if (trimmed.match(/^\d+[.)]\s/m)) {
+                const items = trimmed.split('\n').filter((l) => l.trim());
+                return (
+                  <ol key={j} className="mb-4 ml-6 space-y-1.5 list-decimal text-muted-foreground">
+                    {items.map((item, k) => (
+                      <li
+                        key={k}
+                        className="leading-7"
+                        dangerouslySetInnerHTML={{
+                          __html: formatInlineText(
+                            item.replace(/^\d+[.)]\s+/, '')
+                          ),
+                        }}
+                      />
+                    ))}
+                  </ol>
+                );
+              }
+
+              return (
+                <p
                   key={j}
-                  className="leading-7"
+                  className="mb-4 leading-7 text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: item
-                      .replace(/^[-*]\s*/, '')
-                      .replace(/^\d+\.\s*/, '')
-                      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                      .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>'),
+                    __html: formatInlineText(trimmed),
                   }}
                 />
-              ))}
-            </ul>
-          );
-        }
-
-        return (
-          <p
-            key={i}
-            className="mb-4 leading-7 text-muted-foreground"
-            dangerouslySetInnerHTML={{
-              __html: para
-                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>'),
-            }}
-          />
+              );
+            })}
+          </Fragment>
         );
       })}
     </div>

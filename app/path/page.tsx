@@ -35,6 +35,9 @@ import toolUseIntro from '@/content/modules/tool-use-intro.json';
 import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
 import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
 import buildingEvals from '@/content/modules/building-evals.json';
+import evaluatingAiUseCases from '@/content/modules/evaluating-ai-use-cases.json';
+import responsibleAiSafety from '@/content/modules/responsible-ai-safety.json';
+import claudeForContent from '@/content/modules/claude-for-content.json';
 
 const moduleMap: Record<string, Module> = {
   'how-claude-thinks': howClaudeThinks as Module,
@@ -45,6 +48,9 @@ const moduleMap: Record<string, Module> = {
   'evaluator-optimizer': evaluatorOptimizer as Module,
   'claude-code-intro': claudeCodeIntro as Module,
   'building-evals': buildingEvals as Module,
+  'evaluating-ai-use-cases': evaluatingAiUseCases as Module,
+  'responsible-ai-safety': responsibleAiSafety as Module,
+  'claude-for-content': claudeForContent as Module,
 };
 
 const difficultyColors: Record<string, string> = {

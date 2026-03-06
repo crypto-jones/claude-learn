@@ -1,0 +1,68 @@
+{
+  "id": "responsible-ai-safety",
+  "title": "Responsible AI & Safety",
+  "description": "Understand the safety considerations, ethical dimensions, and responsible practices essential for anyone working with AI — from handling sensitive data to recognizing bias and designing appropriate guardrails.",
+  "track": "production",
+  "trackTitle": "Production AI",
+  "estimatedMinutes": 12,
+  "difficulty": "beginner",
+  "prerequisites": ["how-claude-thinks"],
+  "skillDimension": "production",
+  "learningObjectives": [
+    "Identify common safety risks when deploying AI in real-world applications",
+    "Apply practical strategies for handling bias, sensitive data, and harmful outputs",
+    "Design appropriate guardrails and human oversight for AI-powered features"
+  ],
+  "sections": [
+    {
+      "id": "why-safety-matters",
+      "type": "concept",
+      "title": "Why AI Safety Matters",
+      "content": "AI safety isn't an abstract concern for researchers — it's a practical requirement for anyone building or using AI in production. When Claude generates content that reaches real users, the stakes are real.\n\nSafety issues fall into several categories:\n\n**Harmful outputs** — AI can generate content that is misleading, offensive, biased, or dangerous. Even well-intentioned prompts can produce problematic results if the system prompt doesn't include appropriate guardrails.\n\n**Privacy and data exposure** — AI processes everything you give it as context. Sharing sensitive customer data, proprietary information, or personal details in prompts creates risk. Understanding what data flows through your AI pipeline is essential.\n\n**Over-reliance** — When people trust AI outputs without verification, errors propagate. A wrong medical suggestion, an incorrect legal citation, or a fabricated statistic can cause real harm when treated as authoritative.\n\n**Misuse** — AI tools can be used to generate spam, create misleading content, or automate harmful activities. Building responsible systems means anticipating misuse and designing against it.\n\nAnthropic builds safety into Claude at the model level through techniques like Constitutional AI (CAI), where Claude is trained to follow a set of principles about helpfulness and harmlessness. But model-level safety is a foundation, not a complete solution — you still need application-level guardrails."
+    },
+    {
+      "id": "bias-fairness",
+      "type": "concept",
+      "title": "Recognizing and Mitigating Bias",
+      "content": "AI models learn patterns from training data, which means they can absorb and amplify biases present in that data. This isn't a theoretical problem — it affects real decisions.\n\n**Common forms of AI bias:**\n- **Representation bias** — If training data overrepresents certain groups, the model performs better for those groups and worse for others\n- **Association bias** — The model may associate certain roles, attributes, or behaviors with specific demographic groups based on patterns in training data\n- **Confirmation bias** — AI can reinforce existing assumptions by generating outputs that align with stereotypical patterns rather than challenging them\n\n**Practical mitigation strategies:**\n\n**Test with diverse inputs.** When evaluating an AI feature, test it with a wide range of names, cultural contexts, and demographic scenarios. Does a resume screener rate candidates differently based on names? Does a content generator use different language for different groups?\n\n**Audit outputs regularly.** Don't just test at launch — check outputs periodically for patterns you didn't intend. Track whether certain categories of users receive lower-quality responses.\n\n**Use specific, inclusive prompts.** Vague prompts give the model room to fall back on stereotypical patterns. Specific instructions that emphasize fairness and inclusivity produce better results.\n\n**Design for human review.** For high-stakes decisions (hiring, lending, content moderation), AI should recommend rather than decide. Keep a human in the loop for any output that materially affects individuals."
+    },
+    {
+      "id": "data-privacy",
+      "type": "concept",
+      "title": "Data Privacy and Security",
+      "content": "Every prompt you send to an AI model is data that flows through a system. Understanding that pipeline is essential for responsible usage.\n\n**What to consider before sending data to an AI:**\n- **Is this data sensitive?** Personal information, health records, financial data, and proprietary business information all require careful handling.\n- **What are the data retention policies?** Anthropic's API does not use your data to train models (unlike some free consumer AI tools). But understand the data handling policies of whatever service you use.\n- **Does this comply with regulations?** GDPR, HIPAA, CCPA, and industry-specific regulations may restrict what data you can process through third-party AI services.\n- **What if this prompt leaked?** A useful thought experiment — if the content of this prompt appeared publicly, would that be a problem?\n\n**Practical guidelines:**\n- **Anonymize before sending.** Replace real names, account numbers, and identifying details with placeholders before using AI for analysis. You can map results back afterward.\n- **Use the API, not consumer chat.** Anthropic's API has stronger data handling guarantees than consumer chat products. For business use cases, always use the API.\n- **Minimize context.** Send only the data Claude needs for the specific task. Don't include entire databases when you only need a few fields.\n- **Implement access controls.** Not everyone in your organization should be able to send any data to AI. Design your AI integration with the same access controls you'd apply to any sensitive system.\n- **Log and audit.** Keep records of what data is sent to AI services, who sent it, and for what purpose. This is essential for compliance and incident response."
+    },
+    {
+      "id": "exercise-guardrails",
+      "type": "exercise",
+      "title": "Design Safety Guardrails",
+      "content": "Apply safety principles to a real product scenario.",
+      "exercise": {
+        "prompt": "You're designing an AI-powered feature for a healthcare company's patient portal. The feature lets patients describe their symptoms in natural language, and Claude provides general health information and suggests whether they should see a doctor, visit urgent care, or go to the ER.\n\nDesign the safety guardrails for this feature. Address:\n\n1. **System prompt constraints** — What rules should Claude follow? What should it never do?\n2. **Data handling** — How would you handle the sensitive health information patients share?\n3. **Bias considerations** — How might bias affect this feature, and how would you mitigate it?\n4. **Human oversight** — When should the system escalate to a human?\n5. **User communication** — How would you set appropriate expectations with users about what this tool is and isn't?\n\nBe specific — write out actual constraints and rules, not general principles.",
+        "hints": [
+          "Claude should never diagnose conditions or recommend specific treatments — it should only provide general health information",
+          "Consider what happens when someone describes emergency symptoms like chest pain or suicidal thoughts",
+          "Health information is subject to HIPAA — think about data minimization and anonymization",
+          "Bias in healthcare AI is well-documented — certain conditions present differently across demographics"
+        ],
+        "evaluationCriteria": "Should provide specific, actionable guardrails: (1) System prompt constraints — must include: never diagnose, never recommend specific treatments or medications, always recommend seeing a doctor for anything potentially serious, include disclaimer in every response, immediately flag emergency symptoms (chest pain, difficulty breathing, suicidal ideation) with clear instructions to call 911; (2) Data handling — anonymize patient identifiers, don't store conversation content longer than the session, comply with HIPAA, minimize data sent to the API; (3) Bias considerations — test with symptoms that present differently across demographics (e.g., heart attack symptoms in women vs. men), ensure the system doesn't make assumptions based on age or gender; (4) Human oversight — escalate emergency symptoms, flag when confidence is low, provide easy access to human support; (5) User communication — clear disclaimers that this is not medical advice, explain limitations, always offer the option to speak with a human."
+      }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Responsible AI is about designing systems that are helpful while minimizing harm. The key practices are: test for bias with diverse inputs, protect sensitive data through anonymization and access controls, keep humans in the loop for high-stakes decisions, and set clear expectations with users about what AI can and cannot do. Safety isn't a feature you add at the end — it's a design constraint from the start."
+    },
+    {
+      "id": "check",
+      "type": "check",
+      "title": "Check Your Understanding",
+      "content": "Reflect on the practical tradeoffs in AI safety.",
+      "exercise": {
+        "prompt": "A colleague argues that adding safety guardrails to your AI product will make it less useful: \"Every constraint we add makes Claude less helpful. Users will just go use ChatGPT instead if our tool is too restrictive.\" How would you respond? Are they entirely wrong? How do you balance safety with usefulness?",
+        "evaluationCriteria": "Should acknowledge the real tension between safety and utility while arguing that they're not inherently opposed: (1) Well-designed guardrails improve user trust, which increases adoption — users who trust the tool use it more; (2) The colleague has a point that over-restriction is a real problem — guardrails should be proportional to risk; (3) The right approach is risk-proportional safety: low-risk tasks get minimal guardrails, high-risk tasks get more; (4) Good guardrails are transparent — users understand why certain constraints exist; (5) Safety failures are far more costly than minor inconvenience — one harmful output can destroy trust and create liability. Bonus for discussing the difference between model-level safety (which Anthropic handles) and application-level safety (which the builder handles)."
+      }
+    }
+  ]
+}
