@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLearner } from '@/contexts/LearnerContext';
-import { BookOpen, BarChart3, Route, Sparkles } from 'lucide-react';
+import { BarChart3, Route, Sparkles } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -51,14 +51,14 @@ export function Navigation() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'bg-primary/10 text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                {link.label}
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">{link.label}</span>
               </Link>
             );
           })}

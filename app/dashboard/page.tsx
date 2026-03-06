@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import {
   Module,
   SkillDimension,
@@ -83,6 +84,8 @@ export default function DashboardPage() {
   } = useLearner();
 
   const [showGoalForm, setShowGoalForm] = useState(false);
+  const [retakeDialogOpen, setRetakeDialogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [goalDimension, setGoalDimension] = useState<SkillDimension>('prompt-engineering');
   const [goalLevel, setGoalLevel] = useState<SkillLevel>('practitioner');
 
@@ -146,7 +149,6 @@ export default function DashboardPage() {
   };
 
   const handleRetakeAssessment = () => {
-    if (!confirm('Retake assessment? Your current skill levels will be re-evaluated, but module progress will be kept.')) return;
     retakeAssessment();
     router.push('/assess');
   };
@@ -174,7 +176,7 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleRetakeAssessment}
+            onClick={() => setRetakeDialogOpen(true)}
             className="gap-1.5 shrink-0"
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -183,7 +185,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <Card className="p-4 text-center">
             <div className="text-2xl font-semibold text-foreground">
               {completedModules}
@@ -218,9 +220,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Skills radar + Skills breakdown */}
-        <div className="grid grid-cols-5 gap-8 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 mb-10">
           {/* Skills radar chart */}
-          <div className="col-span-3">
+          <div className="sm:col-span-3">
             <Card className="p-6">
               <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Target className="h-4 w-4 text-primary" />
@@ -284,7 +286,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Skills breakdown */}
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <Card className="p-6">
               <h2 className="text-sm font-semibold text-foreground mb-4">
                 Skill Levels
@@ -576,7 +578,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recommended next + Recently completed */}
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {/* Recommended next */}
           {nextModule && (
             <Card className="p-6">
@@ -646,12 +648,7 @@ export default function DashboardPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              if (confirm('Reset all progress? This cannot be undone.')) {
-                reset();
-                router.push('/');
-              }
-            }}
+            onClick={() => setResetDialogOpen(true)}
             className="text-muted-foreground gap-1"
           >
             <RotateCcw className="h-3 w-3" />
@@ -659,6 +656,25 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={retakeDialogOpen}
+        onOpenChange={setRetakeDialogOpen}
+        title="Retake Assessment"
+        description="Your current skill levels will be re-evaluated, but module progress will be kept."
+        confirmLabel="Retake"
+        onConfirm={handleRetakeAssessment}
+      />
+
+      <ConfirmDialog
+        open={resetDialogOpen}
+        onOpenChange={setResetDialogOpen}
+        title="Reset All Progress"
+        description="This will erase all your progress, skills, and completed modules. This cannot be undone."
+        confirmLabel="Reset Everything"
+        onConfirm={() => { reset(); router.push('/'); }}
+        variant="destructive"
+      />
     </div>
   );
 }

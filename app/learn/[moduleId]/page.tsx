@@ -670,17 +670,15 @@ export default function ModulePage() {
           </div>
         </div>
 
-        {/* Companion toggle button */}
-        <button
-          onClick={() => setShowCompanion(!showCompanion)}
-          className={`fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-colors z-40 ${
-            showCompanion
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-card border border-border text-foreground hover:bg-muted'
-          }`}
-        >
-          <MessageCircle className="h-5 w-5" />
-        </button>
+        {/* Companion toggle button — hidden when panel is open */}
+        {!showCompanion && (
+          <button
+            onClick={() => setShowCompanion(true)}
+            className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-colors z-40 bg-card border border-border text-foreground hover:bg-muted"
+          >
+            <MessageCircle className="h-5 w-5" />
+          </button>
+        )}
 
         {/* Companion panel — overlay on mobile, sidebar on desktop */}
         {showCompanion && (

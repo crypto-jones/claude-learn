@@ -8,6 +8,7 @@ import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import {
   Module,
   SkillDimension,
@@ -126,6 +127,8 @@ export default function PathPage() {
   const { profile, isLoaded, setLearningPath } = useLearner();
   const [modules, setModules] = useState<Module[]>([]);
   const [focusArea, setFocusArea] = useState<FocusArea>('recommended');
+  const [prereqDialogOpen, setPrereqDialogOpen] = useState(false);
+  const [pendingModule, setPendingModule] = useState<{ id: string; unmet: string[] } | null>(null);
 
   // Redirect if not assessed
   useEffect(() => {
@@ -262,10 +265,9 @@ export default function PathPage() {
 
             const handleModuleClick = () => {
               if (!prereqsMet && !isCompleted) {
-                const confirmed = window.confirm(
-                  `This module requires: ${unmetPrereqs.join(', ')}. Continue anyway?`
-                );
-                if (!confirmed) return;
+                setPendingModule({ id: module.id, unmet: unmetPrereqs });
+                setPrereqDialogOpen(true);
+                return;
               }
               router.push(`/learn/${module.id}`);
             };
@@ -376,6 +378,15 @@ export default function PathPage() {
           </Link>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={prereqDialogOpen}
+        onOpenChange={setPrereqDialogOpen}
+        title="Prerequisites Not Met"
+        description={pendingModule ? `This module requires: ${pendingModule.unmet.join(', ')}. Continue anyway?` : ''}
+        confirmLabel="Continue Anyway"
+        onConfirm={() => { if (pendingModule) router.push(`/learn/${pendingModule.id}`); }}
+      />
     </div>
   );
 }
