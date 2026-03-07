@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { SkillsRadar } from '@/components/dashboard/SkillsRadar';
+import { ShareDialog } from '@/components/dashboard/ShareDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,7 @@ import {
   Sparkles,
   RotateCcw,
   RefreshCw,
+  Share2,
   Plus,
   X,
   CalendarClock,
@@ -68,6 +70,7 @@ export default function DashboardPage() {
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [retakeDialogOpen, setRetakeDialogOpen] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [goalDimension, setGoalDimension] = useState<SkillDimension>('prompt-engineering');
   const [goalLevel, setGoalLevel] = useState<SkillLevel>('practitioner');
 
@@ -201,15 +204,26 @@ export default function DashboardPage() {
               Track your progress and see how your skills are growing.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setRetakeDialogOpen(true)}
-            className="gap-1.5 shrink-0"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Retake Assessment
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShareDialogOpen(true)}
+              className="gap-1.5 shrink-0"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Share
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRetakeDialogOpen(true)}
+              className="gap-1.5 shrink-0"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Retake Assessment
+            </Button>
+          </div>
         </div>
 
         {/* Stats row */}
@@ -684,6 +698,17 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        skills={profile.skills}
+        completedModules={completedModules}
+        totalModules={totalModules}
+        streakDays={profile.streakDays}
+        totalMinutesLearned={profile.totalMinutesLearned}
+        role={profile.role}
+      />
 
       <ConfirmDialog
         open={retakeDialogOpen}

@@ -8,6 +8,7 @@ import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { CompanionPanel } from '@/components/learning/CompanionPanel';
 import { PromptPlayground } from '@/components/learning/PromptPlayground';
+import { CodeBlock } from '@/components/learning/CodeBlock';
 import { AdaptedContent } from '@/components/learning/AdaptedContent';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -38,8 +39,8 @@ import {
   X,
 } from 'lucide-react';
 
-function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string }> {
-  const segments: Array<{ type: 'code' | 'text'; content: string }> = [];
+function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string; language?: string }> {
+  const segments: Array<{ type: 'code' | 'text'; content: string; language?: string }> = [];
   const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
 
   let lastIndex = 0;
@@ -50,7 +51,7 @@ function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; c
       const text = content.slice(lastIndex, match.index).trim();
       if (text) segments.push({ type: 'text', content: text });
     }
-    segments.push({ type: 'code', content: match[2].replace(/\n$/, '') });
+    segments.push({ type: 'code', content: match[2].replace(/\n$/, ''), language: match[1] || undefined });
     lastIndex = match.index + match[0].length;
   }
 
@@ -80,11 +81,7 @@ function SectionContent({ content, moduleId, sectionId }: { content: string; mod
     <div className="prose-module">
       {segments.map((segment, i) => {
         if (segment.type === 'code') {
-          return (
-            <pre key={i} className="bg-muted/80 rounded-lg p-4 mb-4 overflow-x-auto">
-              <code className="text-sm font-mono">{segment.content}</code>
-            </pre>
-          );
+          return <CodeBlock key={i} code={segment.content} language={segment.language} />;
         }
 
         const paragraphs = segment.content.split('\n\n');
