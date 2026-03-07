@@ -549,10 +549,10 @@ export default function ModulePage() {
                   variant="secondary"
                   className={`text-xs ${
                     moduleData.difficulty === 'beginner'
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                       : moduleData.difficulty === 'intermediate'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-purple-100 text-purple-700'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                        : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                   }`}
                 >
                   {moduleData.difficulty}

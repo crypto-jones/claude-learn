@@ -54,9 +54,9 @@ const moduleMap: Record<string, Module> = {
 };
 
 const difficultyColors: Record<string, string> = {
-  beginner: 'bg-green-100 text-green-700',
-  intermediate: 'bg-blue-100 text-blue-700',
-  advanced: 'bg-purple-100 text-purple-700',
+  beginner: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  intermediate: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  advanced: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 };
 
 // Map skill dimensions to a human-friendly recommendation reason
@@ -332,8 +332,8 @@ export default function PathPage() {
                           <span
                             className={`flex items-center gap-1 text-xs ${
                               prereqsMet
-                                ? 'text-green-600'
-                                : 'text-amber-600'
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-amber-600 dark:text-amber-400'
                             }`}
                           >
                             {prereqsMet ? (
