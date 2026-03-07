@@ -14,6 +14,7 @@ import { SkillsProfile, SKILL_DIMENSIONS, SKILL_LEVEL_VALUES } from '@/lib/types
 
 interface SkillsRadarProps {
   skills: SkillsProfile;
+  initialSkills?: SkillsProfile | null;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -46,7 +47,7 @@ function createCustomTick(targetDist: number, fontSize: number, color: string) {
   };
 }
 
-export function SkillsRadar({ skills }: SkillsRadarProps) {
+export function SkillsRadar({ skills, initialSkills }: SkillsRadarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const [dimensions, setDimensions] = useState({ targetDist: 130, fontSize: 13, outerRadius: '100%' });
@@ -86,8 +87,13 @@ export function SkillsRadar({ skills }: SkillsRadarProps) {
   const data = SKILL_DIMENSIONS.map((dim) => ({
     skill: dim.shortLabel,
     value: SKILL_LEVEL_VALUES[skills[dim.id]],
+    initial: initialSkills ? SKILL_LEVEL_VALUES[initialSkills[dim.id]] : undefined,
     fullMark: 3,
   }));
+
+  const hasGrowth = initialSkills && SKILL_DIMENSIONS.some(
+    (dim) => SKILL_LEVEL_VALUES[skills[dim.id]] > SKILL_LEVEL_VALUES[initialSkills[dim.id]]
+  );
 
   const TickComponent = createCustomTick(dimensions.targetDist, dimensions.fontSize, colors.mutedForeground);
 
@@ -103,6 +109,19 @@ export function SkillsRadar({ skills }: SkillsRadarProps) {
             tick={false}
             axisLine={false}
           />
+          {hasGrowth && (
+            <Radar
+              name="Initial"
+              dataKey="initial"
+              stroke={colors.mutedForeground}
+              fill={colors.mutedForeground}
+              fillOpacity={0.08}
+              strokeWidth={1}
+              strokeDasharray="4 4"
+              dot={false}
+              isAnimationActive={false}
+            />
+          )}
           <Radar
             name="Skills"
             dataKey="value"
@@ -111,6 +130,9 @@ export function SkillsRadar({ skills }: SkillsRadarProps) {
             fillOpacity={0.22}
             strokeWidth={2}
             dot={{ r: 4, fill: colors.primary, strokeWidth: 0 }}
+            isAnimationActive={true}
+            animationDuration={1200}
+            animationEasing="ease-out"
           />
         </RadarChart>
       </ResponsiveContainer>

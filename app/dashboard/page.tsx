@@ -256,7 +256,7 @@ export default function DashboardPage() {
                 <Target className="h-4 w-4 text-primary" />
                 Skills Profile
               </h2>
-              <SkillsRadar skills={profile.skills} />
+              <SkillsRadar skills={profile.skills} initialSkills={profile.initialSkills} />
 
               {/* Before / After comparison */}
               {hasInitialSkills && (

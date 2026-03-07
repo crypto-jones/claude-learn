@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { LearnerProvider } from '@/contexts/LearnerContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageTransition } from '@/components/PageTransition';
 import './globals.css';
 
 const inter = Inter({
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LearnerProvider>
-            <ErrorBoundary>{children}</ErrorBoundary>
+            <ErrorBoundary>
+              <PageTransition>{children}</PageTransition>
+            </ErrorBoundary>
           </LearnerProvider>
         </ThemeProvider>
       </body>
