@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import confetti from 'canvas-confetti';
 import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { CompanionPanel } from '@/components/learning/CompanionPanel';
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Module, ModuleSection, ExerciseFeedback } from '@/lib/types';
+import { Module, ModuleSection, ExerciseFeedback, SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { moduleMap, allModuleIds } from '@/lib/modules';
 import {
@@ -30,6 +31,9 @@ import {
   ChevronUp,
   Sparkles,
   RotateCcw,
+  Trophy,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 
 function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string }> {
@@ -356,6 +360,9 @@ export default function ModulePage() {
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [currentSectionTitle, setCurrentSectionTitle] = useState<string | undefined>();
   const [currentSectionContent, setCurrentSectionContent] = useState<string | undefined>();
+  const [prereqDismissed, setPrereqDismissed] = useState(false);
+  const wasCompletedRef = useRef(false);
+  const [justCompleted, setJustCompleted] = useState(false);
 
   const moduleId = params.moduleId as string;
   const moduleData = moduleMap[moduleId];
@@ -395,6 +402,46 @@ export default function ModulePage() {
     return () => observer.disconnect();
   }, [moduleData]);
 
+  // Track completion state for confetti trigger
+  const isCompleted = profile.completedModules.includes(moduleId);
+
+  useEffect(() => {
+    if (isCompleted && !wasCompletedRef.current) {
+      // Module just completed — fire confetti
+      setJustCompleted(true);
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#c2724f', '#e8a87c', '#d4956a', '#f0c9a8'],
+      });
+      // Second burst slightly delayed for a richer effect
+      setTimeout(() => {
+        confetti({
+          particleCount: 40,
+          spread: 100,
+          origin: { y: 0.5, x: 0.3 },
+          colors: ['#c2724f', '#e8a87c', '#d4956a', '#f0c9a8'],
+        });
+        confetti({
+          particleCount: 40,
+          spread: 100,
+          origin: { y: 0.5, x: 0.7 },
+          colors: ['#c2724f', '#e8a87c', '#d4956a', '#f0c9a8'],
+        });
+      }, 300);
+    }
+    wasCompletedRef.current = isCompleted;
+  }, [isCompleted]);
+
+  // Compute unmet prerequisites
+  const unmetPrereqs = moduleData
+    ? moduleData.prerequisites
+        .filter((preId) => !profile.completedModules.includes(preId))
+        .map((preId) => ({ id: preId, title: moduleMap[preId]?.title || preId }))
+    : [];
+  const showPrereqBanner = unmetPrereqs.length > 0 && !isCompleted && !prereqDismissed;
+
   if (!moduleData) {
     return (
       <div className="min-h-screen">
@@ -414,7 +461,6 @@ export default function ModulePage() {
     currentModuleIndex < allModuleIds.length - 1 ? allModuleIds[currentModuleIndex + 1] : null;
   const prevModuleId = currentModuleIndex > 0 ? allModuleIds[currentModuleIndex - 1] : null;
 
-  const isCompleted = profile.completedModules.includes(moduleId);
   const progressPercent =
     moduleData.sections.length > 0
       ? (completedSections.size / moduleData.sections.length) * 100
@@ -553,6 +599,42 @@ export default function ModulePage() {
               </div>
             </div>
 
+            {/* Prerequisite soft-gate banner */}
+            {showPrereqBanner && (
+              <div className="mb-8 animate-fade-in">
+                <Card className="p-4 border-amber-300/50 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-950/20">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-amber-800 dark:text-amber-300">
+                        {unmetPrereqs.length === 1 ? 'Recommended prerequisite:' : 'Recommended prerequisites:'}{' '}
+                        {unmetPrereqs.map((prereq, i) => (
+                          <Fragment key={prereq.id}>
+                            {i > 0 && ', '}
+                            <Link
+                              href={`/learn/${prereq.id}`}
+                              className="font-medium underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-200"
+                            >
+                              {prereq.title}
+                            </Link>
+                          </Fragment>
+                        ))}
+                      </p>
+                      <p className="text-xs text-amber-700/70 dark:text-amber-400/60 mt-1">
+                        You can continue anyway — this is just a suggestion.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setPrereqDismissed(true)}
+                      className="text-amber-600/60 hover:text-amber-800 dark:text-amber-400/60 dark:hover:text-amber-300 p-0.5"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </Card>
+              </div>
+            )}
+
             {/* Sections */}
             <div className="space-y-10">
               {moduleData.sections.map((section) => (
@@ -636,10 +718,22 @@ export default function ModulePage() {
             {/* Module completion & navigation */}
             <div className="mt-12 pt-8 border-t border-border">
               {isCompleted && (
-                <div className="flex items-center gap-2 mb-6 text-primary">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span className="font-medium">Module completed!</span>
-                </div>
+                <Card className={`p-6 mb-6 border-primary/20 bg-primary/[0.04] ${justCompleted ? 'animate-scale-in' : ''}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center ${justCompleted ? 'animate-celebrate-bounce' : ''}`}>
+                      <Trophy className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Module Completed!</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Your {SKILL_DIMENSIONS.find((d) => d.id === moduleData.skillDimension)?.label || moduleData.skillDimension} skill leveled up to{' '}
+                        <span className="font-medium text-primary">
+                          {profile.skills[moduleData.skillDimension] || 'Practitioner'}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </Card>
               )}
               <div className="flex justify-between">
                 {prevModuleId ? (

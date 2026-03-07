@@ -180,6 +180,15 @@
   animation: pulse-gentle 2s ease-in-out infinite;
 }
 
+@keyframes celebrate-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-celebrate-bounce {
+  animation: celebrate-bounce 0.6s ease-in-out;
+}
+
 /* Stagger children animations */
 .stagger-children > * {
   opacity: 0;
