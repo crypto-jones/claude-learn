@@ -182,7 +182,7 @@ function ExerciseBlock({
   const [showHints, setShowHints] = useState(false);
   const [attemptNumber, setAttemptNumber] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
-  const previousAttempts = profile.moduleProgress[moduleData.id]?.exerciseFeedback?.[section.id] || [];
+  const previousAttempts = profile.moduleProgress?.[moduleData.id]?.exerciseFeedback?.[section.id] || [];
 
   const handleSubmit = async () => {
     if (!input.trim() || isSubmitting) return;
@@ -382,7 +382,7 @@ export default function ModulePage() {
   }, [moduleId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const progress = profile.moduleProgress[moduleId];
+    const progress = profile.moduleProgress?.[moduleId];
     if (progress?.completedSections) {
       setCompletedSections(new Set(progress.completedSections));
     }
@@ -540,8 +540,8 @@ export default function ModulePage() {
     setCompletedSections(newCompleted);
 
     const exerciseResponses = response
-      ? { ...profile.moduleProgress[moduleId]?.exerciseResponses, [sectionId]: response }
-      : profile.moduleProgress[moduleId]?.exerciseResponses || {};
+      ? { ...profile.moduleProgress?.[moduleId]?.exerciseResponses, [sectionId]: response }
+      : profile.moduleProgress?.[moduleId]?.exerciseResponses || {};
 
     updateModuleProgress(moduleId, {
       completedSections: Array.from(newCompleted),

@@ -81,22 +81,26 @@ export function CodeBlock({ code, language = '' }: CodeBlockProps) {
         code={code}
         language={normalizedLang || 'text'}
       >
-        {({ style, tokens, getLineProps, getTokenProps }) => (
-          <pre
-            className="rounded-t-none rounded-b-lg p-4 overflow-x-auto text-sm !bg-muted/80"
-            style={{ ...style, background: undefined }}
-          >
-            <code className="font-mono">
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line })}>
-                  {line.map((token, key) => (
-                    <span key={key} {...getTokenProps({ token })} />
-                  ))}
-                </div>
-              ))}
-            </code>
-          </pre>
-        )}
+        {({ style, tokens, getLineProps, getTokenProps }) => {
+          const { background: _bg, backgroundColor: _bgc, ...safeStyle } = style;
+          void _bg; void _bgc;
+          return (
+            <pre
+              className="rounded-t-none rounded-b-lg p-4 overflow-x-auto text-sm"
+              style={{ ...safeStyle, backgroundColor: 'var(--color-muted)' }}
+            >
+              <code className="font-mono">
+                {tokens.map((line, i) => (
+                  <div key={i} {...getLineProps({ line })}>
+                    {line.map((token, key) => (
+                      <span key={key} {...getTokenProps({ token })} />
+                    ))}
+                  </div>
+                ))}
+              </code>
+            </pre>
+          );
+        }}
       </Highlight>
     </div>
   );
