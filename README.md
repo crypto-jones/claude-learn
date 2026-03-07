@@ -4,8 +4,6 @@
 
 **[Try it live](https://claude-learn-phi.vercel.app)**
 
-![Claude Learn](docs/screenshot.png)
-
 ---
 
 ## What It Does
