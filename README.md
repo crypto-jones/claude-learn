@@ -2,9 +2,9 @@
 
 **An AI-native learning platform for mastering Claude.** Adaptive assessment, personalized curriculum, real-time exercise feedback, and an AI learning companion — all powered by Claude.
 
-Built as a portfolio project for Anthropic's Sr. Education Platform Engineer role.
-
 **[Try it live](https://claude-learn-phi.vercel.app)**
+
+![Claude Learn](docs/screenshot.png)
 
 ---
 
@@ -28,51 +28,38 @@ The platform serves multiple audiences — developers building with the API, pro
 
 ---
 
-## Key Features
+## Features
 
-### AI-Powered
-
-- **Conversational skill assessment** — Claude evaluates your competency through natural dialogue, not quizzes
-- **Streaming exercise feedback** — Submit exercises and get real-time, rubric-based feedback with improvement suggestions
-- **Context-aware companion** — IntersectionObserver tracks which section you're reading so the companion gives relevant answers
 - **Role-adaptive content** — Examples and explanations adjust based on whether you're a developer, PM, designer, or business user
 - **Live prompt playground** — Test prompts against the Claude API directly within module pages, with streaming responses
-
-### Learning Experience
-
-- **Prerequisite soft-gates** — Modules suggest (but don't require) prerequisite completion, with direct links to recommended modules
+- **Prerequisite soft-gates** — Modules suggest (but don't require) prerequisite completion, with direct links
 - **Concept connections** — Key terms link across modules, building a knowledge graph as you learn
 - **Module completion celebration** — Confetti animation and skill-level-up reveal when you finish a module
 - **Spaced repetition reviews** — Dashboard surfaces modules for review based on when you completed them
 - **Learning goals** — Set target skill levels and track progress toward them
-
-### Visual Polish
-
-- **Syntax-highlighted code blocks** — prism-react-renderer with language badges, one-click copy, and light/dark theme support
-- **Animated skills radar** — Recharts radar with growth overlay showing initial vs. current skill levels
-- **Shareable skills card** — Export a hand-drawn SVG radar card as a PNG image for sharing progress
+- **Shareable skills card** — Export your skills radar as a PNG for sharing progress
+- **Syntax-highlighted code blocks** — Language badges, one-click copy, light/dark theme support
+- **Dark mode** — Full dark theme with system preference detection and manual toggle
 - **Skeleton loading states** — Content-aware placeholder UI on every page during data hydration
 - **Smooth page transitions** — Fade/slide animations between routes
-- **Dark mode** — Full dark theme with system preference detection and manual toggle
-
-### Robustness
-
 - **Per-route error boundaries** — Errors in one page don't break navigation; each route recovers independently
-- **Graceful degradation** — Optional chaining throughout profile access prevents crashes with incomplete state
 - **Rate limiting** — Server-side request throttling (20 req/min per IP) protects the API key
-- **Session persistence** — Auto-saves to localStorage every 60 seconds and on page unload via ref-based handler
 
 ---
 
 ## Curriculum
 
-Five implemented modules with real educational content. Module definitions are JSON, making the curriculum easy to extend.
+14 modules across 5 tracks, covering fundamentals through advanced production patterns — with content for both technical and non-technical audiences (~3 hours total). Module definitions are JSON, making the curriculum easy to extend.
 
 ### Claude Fundamentals
 | Module | Description | Difficulty |
 |--------|-------------|------------|
 | How Claude Thinks | Mental models for Claude's architecture, strengths, and limitations | Beginner |
 | Prompt Engineering Essentials | System prompts, few-shot examples, chain-of-thought reasoning | Beginner |
+| Evaluating AI Use Cases | Framework for identifying, evaluating, and scoping AI use cases | Beginner |
+| Claude for Content & Communication | Drafting, editing, research synthesis, and document analysis | Beginner |
+| Automating Business Workflows | AI-powered templates, automation opportunities, and ROI measurement | Intermediate |
+| AI-Enhanced Creative Workflows | UX research synthesis, copy generation, and conversational UI prototyping | Intermediate |
 
 ### Building with the Claude API
 | Module | Description | Difficulty |
@@ -84,6 +71,19 @@ Five implemented modules with real educational content. Module definitions are J
 | Module | Description | Difficulty |
 |--------|-------------|------------|
 | Introduction to Tool Use | Function calling, tool schemas, and the tool use loop | Intermediate |
+| Evaluator-Optimizer Loops | Building loops where Claude evaluates and improves its own outputs | Intermediate |
+
+### Claude Code & Developer Workflows
+| Module | Description | Difficulty |
+|--------|-------------|------------|
+| Getting Started with Claude Code | Anthropic's agentic CLI for planning, writing, and debugging code | Intermediate |
+
+### Production AI
+| Module | Description | Difficulty |
+|--------|-------------|------------|
+| AI Product Strategy | Evaluating AI opportunities, defining success metrics, building product strategies | Intermediate |
+| Building Systematic Evaluations | Designing rigorous evaluation suites for production AI systems | Advanced |
+| Responsible AI & Safety | Safety considerations, bias mitigation, data privacy, and guardrail design | Beginner |
 
 ---
 
@@ -98,7 +98,7 @@ The platform tracks learner growth across six competency areas:
 - **Evaluation** — Evaluator-optimizer patterns and systematic evals
 - **Agent Design** — Tool use, agentic workflows, and Claude Code
 
-Each dimension is assessed at three levels: *Foundations*, *Developing*, *Practitioner*, and *Advanced*.
+Each dimension is assessed at four levels: *Foundations*, *Developing*, *Practitioner*, and *Advanced*.
 
 ---
 
@@ -133,7 +133,7 @@ claude-learn/
 ├── contexts/
 │   └── LearnerContext.tsx             # Global state + localStorage persistence + ref-based unload
 ├── content/
-│   └── modules/                       # 5 module definitions (JSON)
+│   └── modules/                       # 14 module definitions (JSON)
 └── lib/
     ├── types.ts                       # Domain type definitions (profiles, skills, modules)
     ├── claude.ts                      # Anthropic SDK integration with streaming
@@ -141,20 +141,6 @@ claude-learn/
     ├── concepts.ts                    # Cross-module concept linking
     └── progress.ts                    # Profile serialization, session tracking, streak management
 ```
-
-### Key Design Decisions
-
-- **Single API route** — One endpoint at `/api/chat` handles all three Claude interaction modes (assessment, exercise feedback, learning companion) with mode-specific system prompts and context injection. This keeps the API surface minimal and the prompt engineering centralized.
-
-- **Server-side only API key** — The Anthropic API key never reaches the client. All Claude interactions are proxied through a Next.js API route with in-memory rate limiting.
-
-- **Client-side state** — Learner profiles persist in localStorage with no backend database. The context provider auto-saves on a 60-second interval and on page unload using a ref-based handler to avoid stale closure issues.
-
-- **Content as data** — All module content lives in JSON files with a consistent schema (sections, exercises, evaluation criteria, learning objectives, prerequisites). This makes the curriculum easy to extend, version, and eventually source from a CMS.
-
-- **Section-aware companion** — The learning companion uses `IntersectionObserver` to track which module section the learner is currently reading, passing that context to Claude for more relevant responses.
-
-- **Hand-drawn SVG for export** — The shareable skills card uses raw SVG polygons instead of Recharts because chart libraries don't export reliably with html-to-image. Colors are hardcoded oklch values rather than CSS variables for the same reason.
 
 ---
 
