@@ -12,6 +12,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const features = [
   {
@@ -52,22 +53,25 @@ export default function Home() {
             <Sparkles className="h-5 w-5 text-primary" />
             <span className="font-semibold text-foreground">Claude Learn</span>
           </div>
-          {isLoaded && profile.assessmentComplete && (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/path"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-              >
-                My Path
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-              >
-                Dashboard
-              </Link>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {isLoaded && profile.assessmentComplete && (
+              <>
+                <Link
+                  href="/path"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                >
+                  My Path
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                >
+                  Dashboard
+                </Link>
+              </>
+            )}
+            <ThemeToggle />
+          </div>
         </div>
       </nav>
 

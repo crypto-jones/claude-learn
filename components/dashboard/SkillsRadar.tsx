@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import {
   RadarChart,
   PolarGrid,
@@ -47,6 +48,7 @@ function createCustomTick(targetDist: number, fontSize: number, color: string) {
 
 export function SkillsRadar({ skills }: SkillsRadarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
   const [dimensions, setDimensions] = useState({ targetDist: 130, fontSize: 13, outerRadius: '100%' });
   const [colors, setColors] = useState({
     primary: '#b87a4a',
@@ -55,13 +57,16 @@ export function SkillsRadar({ skills }: SkillsRadarProps) {
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    const style = getComputedStyle(root);
-    const primary = style.getPropertyValue('--color-primary').trim();
-    const border = style.getPropertyValue('--color-border').trim();
-    const mutedFg = style.getPropertyValue('--color-muted-foreground').trim();
-    if (primary) setColors({ primary, border, mutedForeground: mutedFg });
-  }, []);
+    const timer = setTimeout(() => {
+      const root = document.documentElement;
+      const style = getComputedStyle(root);
+      const primary = style.getPropertyValue('--color-primary').trim();
+      const border = style.getPropertyValue('--color-border').trim();
+      const mutedFg = style.getPropertyValue('--color-muted-foreground').trim();
+      if (primary) setColors({ primary, border, mutedForeground: mutedFg });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     function update() {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLearner } from '@/contexts/LearnerContext';
 import { BarChart3, Route, Sparkles } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -15,11 +16,12 @@ export function Navigation() {
   if (isAssessment) {
     return (
       <nav className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center">
+        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <span className="font-semibold text-foreground">Claude Learn</span>
           </Link>
+          <ThemeToggle />
         </div>
       </nav>
     );
@@ -62,6 +64,7 @@ export function Navigation() {
               </Link>
             );
           })}
+          <ThemeToggle />
         </div>
       </div>
     </nav>

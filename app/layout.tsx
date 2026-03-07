@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
 import { LearnerProvider } from '@/contexts/LearnerContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import './globals.css';
@@ -26,11 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-        <LearnerProvider>
-          <ErrorBoundary>{children}</ErrorBoundary>
-        </LearnerProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <LearnerProvider>
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </LearnerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
