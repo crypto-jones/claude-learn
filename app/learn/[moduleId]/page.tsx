@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { useLearner } from '@/contexts/LearnerContext';
@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Module, ModuleSection, ExerciseFeedback, SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { moduleMap, allModuleIds } from '@/lib/modules';
+import { injectConceptLinks } from '@/lib/concepts';
 import {
   CheckCircle2,
   Circle,
@@ -60,14 +62,18 @@ function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; c
   return segments;
 }
 
-function formatInlineText(text: string): string {
-  return text
+function formatInlineText(text: string, moduleId?: string, sectionId?: string): string {
+  let result = text
     .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>');
+  if (moduleId && sectionId) {
+    result = injectConceptLinks(result, moduleId, sectionId);
+  }
+  return result;
 }
 
-function SectionContent({ content }: { content: string }) {
+function SectionContent({ content, moduleId, sectionId }: { content: string; moduleId?: string; sectionId?: string }) {
   const segments = parseContentSegments(content);
 
   return (
@@ -113,7 +119,9 @@ function SectionContent({ content }: { content: string }) {
                         className="leading-7"
                         dangerouslySetInnerHTML={{
                           __html: formatInlineText(
-                            item.replace(/^[-*]\s+/, '').replace(/^\d+[.)]\s+/, '')
+                            item.replace(/^[-*]\s+/, '').replace(/^\d+[.)]\s+/, ''),
+                            moduleId,
+                            sectionId,
                           ),
                         }}
                       />
@@ -132,7 +140,9 @@ function SectionContent({ content }: { content: string }) {
                         className="leading-7"
                         dangerouslySetInnerHTML={{
                           __html: formatInlineText(
-                            item.replace(/^\d+[.)]\s+/, '')
+                            item.replace(/^\d+[.)]\s+/, ''),
+                            moduleId,
+                            sectionId,
                           ),
                         }}
                       />
@@ -146,7 +156,7 @@ function SectionContent({ content }: { content: string }) {
                   key={j}
                   className="mb-4 leading-7 text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: formatInlineText(trimmed),
+                    __html: formatInlineText(trimmed, moduleId, sectionId),
                   }}
                 />
               );
@@ -355,7 +365,8 @@ function ExerciseBlock({
 
 export default function ModulePage() {
   const params = useParams();
-  const { profile, updateModuleProgress, completeModule, saveExerciseFeedback } = useLearner();
+  const searchParams = useSearchParams();
+  const { profile, isLoaded, updateModuleProgress, completeModule, saveExerciseFeedback } = useLearner();
   const [showCompanion, setShowCompanion] = useState(false);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [currentSectionTitle, setCurrentSectionTitle] = useState<string | undefined>();
@@ -401,6 +412,17 @@ export default function ModulePage() {
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [moduleData]);
+
+  // Scroll to section from ?section= query param (concept connections)
+  useEffect(() => {
+    const sectionParam = searchParams.get('section');
+    if (sectionParam && moduleData) {
+      const el = document.getElementById(`section-${sectionParam}`);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+      }
+    }
+  }, [searchParams, moduleData]);
 
   // Track completion state for confetti trigger
   const isCompleted = profile.completedModules.includes(moduleId);
@@ -451,6 +473,55 @@ export default function ModulePage() {
           <Link href="/path">
             <Button variant="outline">Back to Learning Path</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <div className="flex-1 flex">
+          <aside className="w-56 shrink-0 border-r border-border bg-card/50 sticky top-[57px] h-[calc(100vh-57px)] hidden lg:block">
+            <div className="p-4">
+              <Skeleton className="h-3 w-24 mb-4" />
+              <div className="space-y-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Skeleton className="h-3.5 w-3.5 rounded-full" />
+                    <Skeleton className="h-3 flex-1" />
+                  </div>
+                ))}
+              </div>
+              <Skeleton className="h-1.5 w-full mt-6 rounded-full" />
+            </div>
+          </aside>
+          <div className="flex-1 min-w-0">
+            <div className="max-w-3xl mx-auto px-6 py-8">
+              <div className="mb-8">
+                <div className="flex gap-2 mb-3">
+                  <Skeleton className="h-5 w-24 rounded-full" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-4 w-14" />
+                </div>
+                <Skeleton className="h-7 w-80 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+              <div className="space-y-10">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className="h-6 w-48 mb-4" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-5/6 mb-2" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -645,7 +716,7 @@ export default function ModulePage() {
                         <BookOpen className="h-5 w-5 text-primary" />
                         {section.title}
                       </h2>
-                      <SectionContent content={section.content} />
+                      <SectionContent content={section.content} moduleId={moduleId} sectionId={section.id} />
                       {profile.role && profile.role !== 'developer' && (
                         <AdaptedContent
                           sectionContent={section.content}

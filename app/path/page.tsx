@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Module,
   SkillDimension,
@@ -162,7 +163,53 @@ export default function PathPage() {
   }, [isLoaded, profile.assessmentComplete, profile.completedModules, profile.role, focusArea]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLoaded || !profile.assessmentComplete) {
-    return null;
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="max-w-3xl mx-auto px-6 py-12">
+          <div className="mb-10">
+            <Skeleton className="h-4 w-32 mb-4" />
+            <Skeleton className="h-8 w-64 mb-3" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Card className="p-5 mb-6">
+            <Skeleton className="h-4 w-28 mb-4" />
+            <div className="flex gap-6">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  <Skeleton className="h-3 w-3 rounded-full" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              ))}
+            </div>
+          </Card>
+          <Skeleton className="h-9 w-full mb-6 rounded-lg" />
+          <div className="space-y-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="p-5">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="h-5 w-5 rounded-full mt-0.5" />
+                  <div className="flex-1">
+                    <div className="flex gap-2 mb-2">
+                      <Skeleton className="h-4 w-6" />
+                      <Skeleton className="h-4 w-16 rounded-full" />
+                      <Skeleton className="h-4 w-24 rounded-full" />
+                    </div>
+                    <Skeleton className="h-5 w-48 mb-1.5" />
+                    <Skeleton className="h-4 w-full" />
+                    <div className="flex gap-4 mt-2">
+                      <Skeleton className="h-3 w-14" />
+                      <Skeleton className="h-3 w-28" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-4 w-4" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const completedCount = profile.completedModules.length;

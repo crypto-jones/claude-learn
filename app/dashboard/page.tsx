@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Module,
   SkillDimension,
@@ -83,7 +84,53 @@ export default function DashboardPage() {
     }
   }, [isLoaded, profile, router]);
 
-  if (!isLoaded || !profile.assessmentComplete) return null;
+  if (!isLoaded || !profile.assessmentComplete) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-between mb-8">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-9 w-36 rounded-md" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="p-4">
+                <Skeleton className="h-3 w-20 mb-2" />
+                <Skeleton className="h-7 w-12" />
+              </Card>
+            ))}
+          </div>
+          <Card className="p-6 mb-8">
+            <Skeleton className="h-5 w-32 mb-4" />
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              <div className="lg:col-span-3 flex items-center justify-center">
+                <Skeleton className="h-48 w-48 rounded-full" />
+              </div>
+              <div className="lg:col-span-2 space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className="h-3 w-24 mb-1.5" />
+                    <Skeleton className="h-2 w-full rounded-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-5">
+              <Skeleton className="h-5 w-36 mb-3" />
+              <Skeleton className="h-16 w-full rounded-md" />
+            </Card>
+            <Card className="p-5">
+              <Skeleton className="h-5 w-36 mb-3" />
+              <Skeleton className="h-16 w-full rounded-md" />
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const totalModules = Object.keys(moduleMap).length;
   const completedModules = profile.completedModules.length;
