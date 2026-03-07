@@ -442,6 +442,7 @@ export default function AssessPage() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your response..."
+                    aria-label="Type your assessment response"
                     disabled={isStreaming}
                     className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[44px] max-h-[120px]"
                     rows={1}

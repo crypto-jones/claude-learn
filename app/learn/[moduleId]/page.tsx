@@ -306,6 +306,7 @@ function ExerciseBlock({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Write your response here..."
+            aria-label="Write your exercise response"
             disabled={isSubmitted}
             className="w-full min-h-[120px] resize-y rounded-lg border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-60 mb-3"
           />
@@ -363,7 +364,7 @@ function ExerciseBlock({
 export default function ModulePage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const { profile, isLoaded, updateModuleProgress, completeModule, saveExerciseFeedback } = useLearner();
+  const { profile, isLoaded, updateModuleProgress, completeModule } = useLearner();
   const [showCompanion, setShowCompanion] = useState(false);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [currentSectionTitle, setCurrentSectionTitle] = useState<string | undefined>();
@@ -694,6 +695,7 @@ export default function ModulePage() {
                     </div>
                     <button
                       onClick={() => setPrereqDismissed(true)}
+                      aria-label="Dismiss prerequisite suggestion"
                       className="text-amber-600/60 hover:text-amber-800 dark:text-amber-400/60 dark:hover:text-amber-300 p-0.5"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -843,6 +845,7 @@ export default function ModulePage() {
         {!showCompanion && (
           <button
             onClick={() => setShowCompanion(true)}
+            aria-label="Open learning companion"
             className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-colors z-40 bg-card border border-border text-foreground hover:bg-muted"
           >
             <MessageCircle className="h-5 w-5" />
@@ -855,6 +858,7 @@ export default function ModulePage() {
             {/* Mobile backdrop */}
             <div
               className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+              aria-hidden="true"
               onClick={() => setShowCompanion(false)}
             />
             <div className="fixed right-0 top-[57px] z-40 lg:relative lg:top-0 lg:z-auto">

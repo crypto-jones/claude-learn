@@ -14,7 +14,6 @@ import { Progress } from '@/components/ui/progress';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Module,
   SkillDimension,
   SkillLevel,
   SKILL_DIMENSIONS,
@@ -51,6 +50,7 @@ function formatMinutes(minutes: number): string {
 }
 
 function levelLabel(level: SkillLevel): string {
+  if (!level) return '';
   return level.charAt(0).toUpperCase() + level.slice(1);
 }
 
@@ -140,7 +140,7 @@ export default function DashboardPage() {
   const overallProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
 
   // Find next recommended module
-  const nextModuleId = profile.learningPath.find(
+  const nextModuleId = profile.learningPath?.find(
     (id) => !profile.completedModules.includes(id)
   );
   const nextModule = nextModuleId ? moduleMap[nextModuleId] : null;
@@ -384,10 +384,11 @@ export default function DashboardPage() {
           {showGoalForm && (
             <div className="flex items-end gap-3 mb-5 p-4 bg-muted/50 rounded-lg">
               <div className="flex-1">
-                <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                <label htmlFor="goal-dimension" className="text-xs font-medium text-muted-foreground block mb-1.5">
                   Skill Dimension
                 </label>
                 <select
+                  id="goal-dimension"
                   value={goalDimension}
                   onChange={(e) => setGoalDimension(e.target.value as SkillDimension)}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -400,10 +401,11 @@ export default function DashboardPage() {
                 </select>
               </div>
               <div className="flex-1">
-                <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                <label htmlFor="goal-level" className="text-xs font-medium text-muted-foreground block mb-1.5">
                   Target Level
                 </label>
                 <select
+                  id="goal-level"
                   value={goalLevel}
                   onChange={(e) => setGoalLevel(e.target.value as SkillLevel)}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"

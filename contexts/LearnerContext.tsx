@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {
   LearnerProfile,
   LearnerRole,
@@ -40,6 +40,8 @@ const LearnerContext = createContext<LearnerContextType | undefined>(undefined);
 export function LearnerProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<LearnerProfile>(getDefaultProfile());
   const [isLoaded, setIsLoaded] = useState(false);
+  const profileRef = useRef(profile);
+  useEffect(() => { profileRef.current = profile; }, [profile]);
 
   useEffect(() => {
     const loaded = loadProfile();
@@ -59,15 +61,15 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Flush session time on page unload
+  // Flush session time on page unload — uses ref to always read latest profile
   useEffect(() => {
     const handleUnload = () => {
-      const flushed = flushSessionTime(profile);
+      const flushed = flushSessionTime(profileRef.current);
       saveProfile(flushed);
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [profile]);
+  }, []);
 
   // Expose test helper for injecting profiles (dev only)
   useEffect(() => {

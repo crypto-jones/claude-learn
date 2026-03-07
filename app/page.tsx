@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLearner } from '@/contexts/LearnerContext';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Sparkles,
   Brain,
@@ -93,23 +94,29 @@ export default function Home() {
             by Claude.
           </p>
           <div className="flex items-center gap-4">
-            <Link href={profile.assessmentComplete ? '/path' : '/assess'}>
-              <Button size="lg" className="gap-2 text-base px-6 h-12">
-                {profile.assessmentComplete ? (
-                  <>
-                    Continue Learning
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    Start Your Assessment
-                    <Zap className="h-4 w-4" />
-                  </>
+            {!isLoaded ? (
+              <Skeleton className="h-12 w-52 rounded-md" />
+            ) : (
+              <>
+                <Link href={profile.assessmentComplete ? '/path' : '/assess'}>
+                  <Button size="lg" className="gap-2 text-base px-6 h-12">
+                    {profile.assessmentComplete ? (
+                      <>
+                        Continue Learning
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Start Your Assessment
+                        <Zap className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </Link>
+                {!profile.assessmentComplete && (
+                  <span className="text-sm text-muted-foreground">Takes ~3 minutes</span>
                 )}
-              </Button>
-            </Link>
-            {!profile.assessmentComplete && (
-              <span className="text-sm text-muted-foreground">Takes ~3 minutes</span>
+              </>
             )}
           </div>
         </div>

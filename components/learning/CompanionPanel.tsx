@@ -104,6 +104,7 @@ export function CompanionPanel({ moduleData, currentSectionTitle, currentSection
         </div>
         <button
           onClick={onClose}
+          aria-label="Close companion panel"
           className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
         >
           <X className="h-4 w-4 text-muted-foreground" />
@@ -158,6 +159,7 @@ export function CompanionPanel({ moduleData, currentSectionTitle, currentSection
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask a question..."
+            aria-label="Ask the learning companion a question"
             disabled={isStreaming}
             className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[36px] max-h-[80px]"
             rows={1}
