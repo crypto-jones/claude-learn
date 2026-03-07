@@ -105,12 +105,19 @@ export interface ModuleExercise {
   sampleResponse?: string;
 }
 
+export interface PlaygroundTemplate {
+  systemPrompt: string;
+  userMessage: string;
+  description?: string;
+}
+
 export interface ModuleSection {
   id: string;
   type: 'concept' | 'exercise' | 'takeaway' | 'check';
   title: string;
   content: string;
   exercise?: ModuleExercise;
+  playground?: PlaygroundTemplate;
 }
 
 // Learning module
@@ -198,7 +205,7 @@ export interface ChatMessage {
 // API request types
 export interface ChatRequest {
   messages: ChatMessage[];
-  mode: 'assessment' | 'feedback' | 'companion';
+  mode: 'assessment' | 'feedback' | 'companion' | 'playground';
   context: {
     role?: LearnerRole;
     experienceLevel?: ExperienceLevel;
@@ -209,6 +216,7 @@ export interface ChatRequest {
     sectionContent?: string;
     evaluationCriteria?: string;
     exercisePrompt?: string;
+    playgroundSystemPrompt?: string;
   };
 }
 

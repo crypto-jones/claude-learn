@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { CompanionPanel } from '@/components/learning/CompanionPanel';
+import { PromptPlayground } from '@/components/learning/PromptPlayground';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -602,23 +603,28 @@ export default function ModulePage() {
                         {section.title}
                       </h2>
                       <SectionContent content={section.content} />
-                      {!completedSections.has(section.id) && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => markConceptComplete(section.id)}
-                          className="mt-4 gap-1"
-                        >
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Mark as read
-                        </Button>
-                      )}
-                      {completedSections.has(section.id) && (
-                        <div className="flex items-center gap-1 mt-4 text-sm text-primary">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Completed
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 mt-4">
+                        {section.playground && (
+                          <PromptPlayground section={section} moduleData={moduleData} />
+                        )}
+                        {!completedSections.has(section.id) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => markConceptComplete(section.id)}
+                            className="gap-1"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Mark as read
+                          </Button>
+                        )}
+                        {completedSections.has(section.id) && (
+                          <div className="flex items-center gap-1 text-sm text-primary">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Completed
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

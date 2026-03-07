@@ -24,7 +24,12 @@
       "id": "context-window",
       "type": "concept",
       "title": "The Context Window",
-      "content": "Claude has a **context window** — a limit on how much text it can consider at once. Think of it as Claude's working memory for a single conversation.\n\nClaude's context window is 200,000 tokens (roughly 150,000 words, or about 500 pages of text). This is large enough to process entire codebases, long documents, or extended conversations.\n\nImportant things to understand about the context window:\n\n- **Everything in the conversation counts.** Your system prompt, all previous messages, and Claude's own responses all consume context.\n- **There's no memory between conversations.** Each new conversation starts fresh. Claude doesn't remember what you discussed yesterday.\n- **Position matters.** Claude tends to pay more attention to content at the beginning and end of the context window. Content in the middle of very long contexts may receive less attention.\n- **Quality over quantity.** Stuffing the context with irrelevant information can actually hurt performance. Give Claude what it needs, not everything you have."
+      "content": "Claude has a **context window** — a limit on how much text it can consider at once. Think of it as Claude's working memory for a single conversation.\n\nClaude's context window is 200,000 tokens (roughly 150,000 words, or about 500 pages of text). This is large enough to process entire codebases, long documents, or extended conversations.\n\nImportant things to understand about the context window:\n\n- **Everything in the conversation counts.** Your system prompt, all previous messages, and Claude's own responses all consume context.\n- **There's no memory between conversations.** Each new conversation starts fresh. Claude doesn't remember what you discussed yesterday.\n- **Position matters.** Claude tends to pay more attention to content at the beginning and end of the context window. Content in the middle of very long contexts may receive less attention.\n- **Quality over quantity.** Stuffing the context with irrelevant information can actually hurt performance. Give Claude what it needs, not everything you have.",
+      "playground": {
+        "description": "See how giving Claude more context changes its response. Try adding details like the language, framework, or environment to the user message.",
+        "systemPrompt": "You are a helpful coding assistant. Be specific and thorough in your code reviews.",
+        "userMessage": "Fix the bug in this code:\n\nfunction getUser(id) {\n  return db.query('SELECT * FROM users WHERE id = ' + id);\n}"
+      }
     },
     {
       "id": "strengths",

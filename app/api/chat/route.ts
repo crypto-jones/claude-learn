@@ -127,6 +127,11 @@ Guidelines:
 - Be warm, encouraging, and patient
 - When explaining code, use practical examples they can try themselves`;
 
+    case 'playground':
+      return context.playgroundSystemPrompt
+        ? `${context.playgroundSystemPrompt}\n\n[Note: You are part of an educational platform. Keep responses concise (under 300 words) and appropriate for a learning context.]`
+        : 'You are a helpful assistant. Keep responses concise.';
+
     default:
       return 'You are a helpful AI assistant.';
   }
@@ -148,7 +153,7 @@ export async function POST(req: NextRequest) {
 
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
+      max_tokens: body.mode === 'playground' ? 512 : 1024,
       system: systemPrompt,
       messages: body.messages.map((m) => ({
         role: m.role,
