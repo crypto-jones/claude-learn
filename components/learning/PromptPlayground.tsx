@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLearner } from '@/contexts/LearnerContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { streamChat } from '@/lib/claude';
-import { Module, ModuleSection } from '@/lib/types';
+import { Module, ModuleSection, LearnerRole } from '@/lib/types';
 import { Terminal, Send, Loader2, RotateCcw, ChevronUp } from 'lucide-react';
 
 interface PromptPlaygroundProps {
@@ -13,9 +13,19 @@ interface PromptPlaygroundProps {
   moduleData: Module;
 }
 
+function resolveTemplate(section: ModuleSection, role: LearnerRole | null) {
+  const base = section.playground!;
+  const variant = role ? base.roleVariants?.[role] : undefined;
+  return {
+    systemPrompt: variant?.systemPrompt || base.systemPrompt,
+    userMessage: variant?.userMessage || base.userMessage,
+    description: variant?.description || base.description,
+  };
+}
+
 export function PromptPlayground({ section, moduleData }: PromptPlaygroundProps) {
   const { profile } = useLearner();
-  const template = section.playground!;
+  const template = resolveTemplate(section, profile.role);
 
   const [isOpen, setIsOpen] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
@@ -23,6 +33,16 @@ export function PromptPlayground({ section, moduleData }: PromptPlaygroundProps)
   const [response, setResponse] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const lastRole = useRef(profile.role);
+
+  // Update template when role changes (e.g., profile loads async)
+  useEffect(() => {
+    if (profile.role !== lastRole.current) {
+      lastRole.current = profile.role;
+      setSystemPrompt(template.systemPrompt);
+      setUserMessage(template.userMessage);
+    }
+  }, [profile.role, template.systemPrompt, template.userMessage]);
 
   const handleSend = async () => {
     if (!userMessage.trim() || isStreaming) return;

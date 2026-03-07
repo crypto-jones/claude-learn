@@ -8,6 +8,7 @@
   "difficulty": "advanced",
   "prerequisites": ["evaluator-optimizer"],
   "skillDimension": "evaluation",
+  "targetRoles": ["developer", "product-manager"],
   "learningObjectives": [
     "Understand why systematic evals are essential for production AI systems",
     "Design effective test cases that cover correctness, edge cases, and quality dimensions",

@@ -8,6 +8,7 @@
   "difficulty": "intermediate",
   "prerequisites": ["prompt-engineering"],
   "skillDimension": "agent-design",
+  "targetRoles": ["developer"],
   "learningObjectives": [
     "Understand what Claude Code is and how it differs from chat-based coding assistants",
     "Apply effective usage patterns for planning, implementing, and debugging with Claude Code",

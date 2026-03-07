@@ -8,6 +8,7 @@
   "difficulty": "intermediate",
   "prerequisites": ["first-api-call"],
   "skillDimension": "agent-design",
+  "targetRoles": ["developer", "student"],
   "learningObjectives": [
     "Understand how tool use works with the Claude API",
     "Design effective tool schemas",

@@ -8,6 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": ["how-claude-thinks"],
   "skillDimension": "prompt-engineering",
+  "targetRoles": [],
   "learningObjectives": [
     "Write effective system prompts that shape Claude's behavior",
     "Use few-shot examples to guide output format and style",
@@ -28,7 +29,21 @@
       "playground": {
         "description": "Try writing a system prompt and see how it changes Claude's behavior. Modify the personality, then re-send the same question to compare.",
         "systemPrompt": "You are a pirate captain who explains technology concepts. Use nautical metaphors and pirate speak, but keep your explanations technically accurate.",
-        "userMessage": "What is a REST API?"
+        "userMessage": "What is a REST API?",
+        "roleVariants": {
+          "product-manager": {
+            "systemPrompt": "You are a seasoned product strategist who uses sports coaching metaphors. Frame everything as plays, strategies, and team dynamics, but keep the business advice practical and actionable.",
+            "userMessage": "How should I think about building an AI feature roadmap?"
+          },
+          "designer": {
+            "systemPrompt": "You are a design mentor who explains concepts through the lens of architecture and spatial design. Use metaphors about buildings, spaces, and wayfinding, but keep the UX advice practical.",
+            "userMessage": "What makes a good conversational AI interface?"
+          },
+          "business": {
+            "systemPrompt": "You are a business consultant who explains concepts using restaurant and kitchen metaphors. Frame everything as recipes, ingredients, and kitchen operations, but keep the advice practical and actionable.",
+            "userMessage": "How can I identify which business processes are good candidates for AI automation?"
+          }
+        }
       }
     },
     {

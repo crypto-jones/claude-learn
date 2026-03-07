@@ -109,6 +109,11 @@ export interface PlaygroundTemplate {
   systemPrompt: string;
   userMessage: string;
   description?: string;
+  roleVariants?: Partial<Record<LearnerRole, {
+    systemPrompt?: string;
+    userMessage?: string;
+    description?: string;
+  }>>;
 }
 
 export interface ModuleSection {
@@ -133,6 +138,7 @@ export interface Module {
   skillDimension: SkillDimension;
   learningObjectives: string[];
   sections: ModuleSection[];
+  targetRoles: LearnerRole[];
 }
 
 // Exercise feedback record
@@ -205,7 +211,7 @@ export interface ChatMessage {
 // API request types
 export interface ChatRequest {
   messages: ChatMessage[];
-  mode: 'assessment' | 'feedback' | 'companion' | 'playground';
+  mode: 'assessment' | 'feedback' | 'companion' | 'playground' | 'adapt';
   context: {
     role?: LearnerRole;
     experienceLevel?: ExperienceLevel;

@@ -8,6 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": [],
   "skillDimension": "prompt-engineering",
+  "targetRoles": [],
   "learningObjectives": [
     "Understand what Claude is and how it processes input",
     "Identify Claude's core strengths and limitations",
@@ -28,7 +29,24 @@
       "playground": {
         "description": "See how giving Claude more context changes its response. Try adding details like the language, framework, or environment to the user message.",
         "systemPrompt": "You are a helpful coding assistant. Be specific and thorough in your code reviews.",
-        "userMessage": "Fix the bug in this code:\n\nfunction getUser(id) {\n  return db.query('SELECT * FROM users WHERE id = ' + id);\n}"
+        "userMessage": "Fix the bug in this code:\n\nfunction getUser(id) {\n  return db.query('SELECT * FROM users WHERE id = ' + id);\n}",
+        "roleVariants": {
+          "product-manager": {
+            "systemPrompt": "You are a product strategy advisor. Be specific about tradeoffs and user impact.",
+            "userMessage": "Review this feature request and identify potential issues:\n\nAs a user, I want the app to use AI to automatically categorize all my emails so I never have to organize them manually.",
+            "description": "See how giving Claude more context about requirements and constraints changes the quality of a feature review."
+          },
+          "designer": {
+            "systemPrompt": "You are a UX design reviewer. Focus on usability, accessibility, and user experience.",
+            "userMessage": "Review this design brief and suggest improvements:\n\nDesign a chatbot interface for customer support. It should be friendly and efficient.",
+            "description": "See how adding design constraints (accessibility, brand voice, user context) changes Claude's feedback."
+          },
+          "business": {
+            "systemPrompt": "You are a business process consultant. Focus on efficiency, ROI, and practical implementation.",
+            "userMessage": "Evaluate this automation idea:\n\nWe want to use AI to automatically process all incoming vendor invoices and approve payments without human review.",
+            "description": "See how adding business context (budget, compliance, team size) changes Claude's analysis."
+          }
+        }
       }
     },
     {

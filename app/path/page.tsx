@@ -14,7 +14,9 @@ import {
   SkillDimension,
   SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
+  LEARNER_ROLES,
 } from '@/lib/types';
+import { moduleMap, getModulesByRole } from '@/lib/modules';
 import {
   ArrowRight,
   Clock,
@@ -25,33 +27,6 @@ import {
   AlertCircle,
   Focus,
 } from 'lucide-react';
-
-// Import modules statically
-import howClaudeThinks from '@/content/modules/how-claude-thinks.json';
-import promptEngineering from '@/content/modules/prompt-engineering.json';
-import firstApiCall from '@/content/modules/first-api-call.json';
-import structuredOutput from '@/content/modules/structured-output.json';
-import toolUseIntro from '@/content/modules/tool-use-intro.json';
-import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
-import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
-import buildingEvals from '@/content/modules/building-evals.json';
-import evaluatingAiUseCases from '@/content/modules/evaluating-ai-use-cases.json';
-import responsibleAiSafety from '@/content/modules/responsible-ai-safety.json';
-import claudeForContent from '@/content/modules/claude-for-content.json';
-
-const moduleMap: Record<string, Module> = {
-  'how-claude-thinks': howClaudeThinks as Module,
-  'prompt-engineering': promptEngineering as Module,
-  'first-api-call': firstApiCall as Module,
-  'structured-output': structuredOutput as Module,
-  'tool-use-intro': toolUseIntro as Module,
-  'evaluator-optimizer': evaluatorOptimizer as Module,
-  'claude-code-intro': claudeCodeIntro as Module,
-  'building-evals': buildingEvals as Module,
-  'evaluating-ai-use-cases': evaluatingAiUseCases as Module,
-  'responsible-ai-safety': responsibleAiSafety as Module,
-  'claude-for-content': claudeForContent as Module,
-};
 
 const difficultyColors: Record<string, string> = {
   beginner: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -76,28 +51,54 @@ function getRecommendationReason(
   return null;
 }
 
-// Focus areas for dynamic reordering
-const FOCUS_AREAS = [
-  { id: 'recommended', label: 'Recommended Order', description: 'Based on your assessment' },
-  { id: 'fundamentals', label: 'Fundamentals First', description: 'Start with core concepts' },
-  { id: 'api', label: 'API & Integration', description: 'Focus on building with the API' },
-  { id: 'agents', label: 'Agents & Tools', description: 'Focus on agentic workflows' },
-] as const;
+// Role-specific subtitles
+const roleSubtitles: Record<string, string> = {
+  developer: 'Master the Claude API, build agentic workflows, and ship production AI.',
+  'product-manager': 'Evaluate AI opportunities, define success metrics, and lead AI product strategy.',
+  designer: 'Design AI-powered experiences and integrate Claude into creative workflows.',
+  business: 'Automate workflows, analyze documents, and measure AI ROI.',
+  student: 'Build a strong foundation in AI concepts and practical Claude skills.',
+};
 
-type FocusArea = (typeof FOCUS_AREAS)[number]['id'];
+// Focus areas for dynamic reordering — adapted per role
+type FocusAreaItem = { id: string; label: string; description: string };
+
+function getFocusAreas(role: string | null): FocusAreaItem[] {
+  const base: FocusAreaItem[] = [
+    { id: 'recommended', label: 'Recommended Order', description: 'Based on your assessment' },
+    { id: 'fundamentals', label: 'Fundamentals First', description: 'Start with core concepts' },
+  ];
+
+  if (role === 'developer' || role === 'student') {
+    base.push(
+      { id: 'api', label: 'API & Integration', description: 'Focus on building with the API' },
+      { id: 'agents', label: 'Agents & Tools', description: 'Focus on agentic workflows' },
+    );
+  }
+  if (role === 'product-manager') {
+    base.push(
+      { id: 'production', label: 'Evaluation & Strategy', description: 'Focus on evals and AI strategy' },
+    );
+  }
+  return base;
+}
+
+type FocusArea = string;
 
 function reorderModules(
-  modules: Module[],
+  roleModules: Module[],
   focus: FocusArea,
   learningPath: string[],
   completedModules: string[]
 ): Module[] {
   if (focus === 'recommended') {
-    // Use the assessment-generated order
+    // Use the assessment-generated order, then append any role modules not in path
+    const roleModuleIds = new Set(roleModules.map((m) => m.id));
     const ordered = learningPath
+      .filter((id) => roleModuleIds.has(id))
       .map((id) => moduleMap[id])
       .filter(Boolean);
-    Object.values(moduleMap).forEach((mod) => {
+    roleModules.forEach((mod) => {
       if (!ordered.find((m) => m.id === mod.id)) ordered.push(mod);
     });
     return ordered;
@@ -105,14 +106,15 @@ function reorderModules(
 
   // For other focuses, prioritize the matching track, then the rest
   const trackPriority: Record<string, string[]> = {
-    fundamentals: ['fundamentals', 'api', 'agents'],
+    fundamentals: ['fundamentals', 'api', 'agents', 'claude-code', 'production'],
     api: ['api', 'fundamentals', 'agents'],
     agents: ['agents', 'api', 'fundamentals'],
+    production: ['production', 'agents', 'fundamentals'],
   };
 
   const priority = trackPriority[focus] || ['fundamentals', 'api', 'agents'];
 
-  return [...modules].sort((a, b) => {
+  return [...roleModules].sort((a, b) => {
     // Completed modules go to the end
     const aCompleted = completedModules.includes(a.id);
     const bCompleted = completedModules.includes(b.id);
@@ -122,7 +124,9 @@ function reorderModules(
     // Sort by track priority
     const aTrackIndex = priority.indexOf(a.track);
     const bTrackIndex = priority.indexOf(b.track);
-    if (aTrackIndex !== bTrackIndex) return aTrackIndex - bTrackIndex;
+    const aIdx = aTrackIndex >= 0 ? aTrackIndex : 99;
+    const bIdx = bTrackIndex >= 0 ? bTrackIndex : 99;
+    if (aIdx !== bIdx) return aIdx - bIdx;
 
     return 0;
   });
@@ -143,19 +147,19 @@ export default function PathPage() {
     }
   }, [isLoaded, profile.assessmentComplete, router]);
 
-  // Reorder modules when focus changes
+  // Reorder modules when focus changes — filtered by role
   useEffect(() => {
     if (!isLoaded || !profile.assessmentComplete) return;
 
-    const allModules = Object.values(moduleMap);
+    const roleModules = getModulesByRole(profile.role);
     const ordered = reorderModules(
-      allModules,
+      roleModules,
       focusArea,
       profile.learningPath,
       profile.completedModules
     );
     setModules(ordered);
-  }, [isLoaded, profile.assessmentComplete, profile.completedModules, focusArea]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoaded, profile.assessmentComplete, profile.completedModules, profile.role, focusArea]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLoaded || !profile.assessmentComplete) {
     return null;
@@ -174,15 +178,19 @@ export default function PathPage() {
           <div className="flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-primary/60" />
             <span className="text-sm font-medium text-primary">
-              Personalized for you
+              {profile.role
+                ? `${LEARNER_ROLES.find((r) => r.id === profile.role)?.label} Path`
+                : 'Personalized for you'}
             </span>
           </div>
           <h1 className="text-3xl font-semibold text-foreground mb-3">
             Your Learning Path
           </h1>
           <p className="text-muted-foreground max-w-lg">
-            Based on your assessment, here&apos;s a curated sequence of modules
-            ordered by what you need most. Adjust your focus to reorder the path.
+            {profile.role && roleSubtitles[profile.role]
+              ? roleSubtitles[profile.role]
+              : 'Based on your assessment, here\'s a curated sequence of modules ordered by what you need most.'}
+            {' '}Adjust your focus to reorder the path.
           </p>
         </div>
 
@@ -234,7 +242,7 @@ export default function PathPage() {
             </h2>
           </div>
           <div className="flex gap-2 flex-wrap">
-            {FOCUS_AREAS.map((area) => (
+            {getFocusAreas(profile.role).map((area) => (
               <button
                 key={area.id}
                 onClick={() => setFocusArea(area.id)}
@@ -249,7 +257,7 @@ export default function PathPage() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            {FOCUS_AREAS.find((a) => a.id === focusArea)?.description}
+            {getFocusAreas(profile.role).find((a) => a.id === focusArea)?.description}
           </p>
         </Card>
 

@@ -8,6 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": ["prompt-engineering"],
   "skillDimension": "prompt-engineering",
+  "targetRoles": [],
   "learningObjectives": [
     "Use Claude effectively for drafting, editing, and refining written content",
     "Apply document analysis techniques to extract insights from complex materials",

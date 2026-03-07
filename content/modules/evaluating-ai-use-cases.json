@@ -8,6 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": ["how-claude-thinks"],
   "skillDimension": "evaluation",
+  "targetRoles": [],
   "learningObjectives": [
     "Apply a structured framework to evaluate whether AI is the right solution for a problem",
     "Distinguish between high-value and low-value AI use cases",

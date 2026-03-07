@@ -8,6 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": ["how-claude-thinks"],
   "skillDimension": "production",
+  "targetRoles": [],
   "learningObjectives": [
     "Identify common safety risks when deploying AI in real-world applications",
     "Apply practical strategies for handling bias, sensitive data, and harmful outputs",

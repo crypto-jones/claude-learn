@@ -7,12 +7,14 @@ import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { CompanionPanel } from '@/components/learning/CompanionPanel';
 import { PromptPlayground } from '@/components/learning/PromptPlayground';
+import { AdaptedContent } from '@/components/learning/AdaptedContent';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Module, ModuleSection, ExerciseFeedback } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
+import { moduleMap, allModuleIds } from '@/lib/modules';
 import {
   CheckCircle2,
   Circle,
@@ -29,47 +31,6 @@ import {
   Sparkles,
   RotateCcw,
 } from 'lucide-react';
-
-// Import all modules
-import howClaudeThinks from '@/content/modules/how-claude-thinks.json';
-import promptEngineering from '@/content/modules/prompt-engineering.json';
-import firstApiCall from '@/content/modules/first-api-call.json';
-import structuredOutput from '@/content/modules/structured-output.json';
-import toolUseIntro from '@/content/modules/tool-use-intro.json';
-import evaluatorOptimizer from '@/content/modules/evaluator-optimizer.json';
-import claudeCodeIntro from '@/content/modules/claude-code-intro.json';
-import buildingEvals from '@/content/modules/building-evals.json';
-import evaluatingAiUseCases from '@/content/modules/evaluating-ai-use-cases.json';
-import responsibleAiSafety from '@/content/modules/responsible-ai-safety.json';
-import claudeForContent from '@/content/modules/claude-for-content.json';
-
-const moduleMap: Record<string, Module> = {
-  'how-claude-thinks': howClaudeThinks as Module,
-  'prompt-engineering': promptEngineering as Module,
-  'first-api-call': firstApiCall as Module,
-  'structured-output': structuredOutput as Module,
-  'tool-use-intro': toolUseIntro as Module,
-  'evaluator-optimizer': evaluatorOptimizer as Module,
-  'claude-code-intro': claudeCodeIntro as Module,
-  'building-evals': buildingEvals as Module,
-  'evaluating-ai-use-cases': evaluatingAiUseCases as Module,
-  'responsible-ai-safety': responsibleAiSafety as Module,
-  'claude-for-content': claudeForContent as Module,
-};
-
-const allModuleIds = [
-  'how-claude-thinks',
-  'prompt-engineering',
-  'evaluating-ai-use-cases',
-  'claude-for-content',
-  'first-api-call',
-  'structured-output',
-  'tool-use-intro',
-  'evaluator-optimizer',
-  'claude-code-intro',
-  'building-evals',
-  'responsible-ai-safety',
-];
 
 function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string }> {
   const segments: Array<{ type: 'code' | 'text'; content: string }> = [];
@@ -603,6 +564,14 @@ export default function ModulePage() {
                         {section.title}
                       </h2>
                       <SectionContent content={section.content} />
+                      {profile.role && profile.role !== 'developer' && (
+                        <AdaptedContent
+                          sectionContent={section.content}
+                          role={profile.role}
+                          moduleId={moduleId as string}
+                          sectionId={section.id}
+                        />
+                      )}
                       <div className="flex items-center gap-2 mt-4">
                         {section.playground && (
                           <PromptPlayground section={section} moduleData={moduleData} />

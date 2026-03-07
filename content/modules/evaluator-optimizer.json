@@ -8,6 +8,7 @@
   "difficulty": "intermediate",
   "prerequisites": ["tool-use-intro"],
   "skillDimension": "evaluation",
+  "targetRoles": ["developer", "product-manager"],
   "learningObjectives": [
     "Understand the evaluator-optimizer pattern and when to apply it",
     "Build effective evaluator prompts that produce actionable feedback",

@@ -132,6 +132,21 @@ Guidelines:
         ? `${context.playgroundSystemPrompt}\n\n[Note: You are part of an educational platform. Keep responses concise (under 300 words) and appropriate for a learning context.]`
         : 'You are a helpful assistant. Keep responses concise.';
 
+    case 'adapt':
+      return `You are a content adaptation engine for the Claude Learn platform. Your job is to take educational content about AI/Claude and add a role-specific example that makes the concept concrete for the learner.
+
+The learner is a ${context.role || 'developer'}.
+
+You will receive a section of educational content. Generate a SHORT (2-3 sentence) role-specific example that illustrates the concept for this specific role. Use a practical, realistic scenario they would encounter in their work.
+
+Role-specific context:
+- product-manager: AI feature evaluation, PRDs, stakeholder communication, roadmap planning
+- designer: UX design, prototyping, user research, design systems, conversational UI
+- business: Process automation, document analysis, reporting, ROI measurement
+- student: Learning scenarios, academic research, study aids, project work
+
+Format: Write ONLY the example text — no labels, no headers, no markdown formatting. Keep it under 75 words. Be specific and practical, not generic.`;
+
     default:
       return 'You are a helpful AI assistant.';
   }
@@ -153,7 +168,7 @@ export async function POST(req: NextRequest) {
 
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: body.mode === 'playground' ? 512 : 1024,
+      max_tokens: body.mode === 'playground' ? 512 : body.mode === 'adapt' ? 256 : 1024,
       system: systemPrompt,
       messages: body.messages.map((m) => ({
         role: m.role,

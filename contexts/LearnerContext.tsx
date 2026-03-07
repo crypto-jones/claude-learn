@@ -69,6 +69,16 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [profile]);
 
+  // Expose test helper for injecting profiles (dev only)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      (window as unknown as Record<string, unknown>).__setTestProfile = (p: LearnerProfile) => {
+        setProfile(p);
+        saveProfile(p);
+      };
+    }
+  }, []);
+
   const updateProfile = useCallback((updates: Partial<LearnerProfile>) => {
     setProfile((prev) => {
       const updated = { ...prev, ...updates };
