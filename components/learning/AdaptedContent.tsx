@@ -35,7 +35,13 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
       return;
     }
 
-    // Set up IntersectionObserver for lazy loading
+    // Observe the parent section element (which is tall and enters the viewport
+    // earlier) instead of this small container div. This ensures we start fetching
+    // as soon as the user begins reading the section, not after they've scrolled
+    // past all the section content.
+    const sectionEl = document.getElementById(`section-${sectionId}`);
+    const observeTarget = sectionEl || containerRef.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !hasTriggered.current) {
@@ -43,11 +49,11 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
           fetchAdaptedContent();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0, rootMargin: '200px 0px' }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (observeTarget) {
+      observer.observe(observeTarget);
     }
 
     return () => observer.disconnect();
@@ -90,7 +96,7 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
   if (hasError && !content) return <div ref={containerRef} />;
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className={!content && !isLoading ? 'min-h-[1px]' : undefined}>
       {(content || isLoading) && (
         <Card className="p-3 bg-primary/5 border-primary/15 mt-3">
           <div className="flex items-start gap-2">

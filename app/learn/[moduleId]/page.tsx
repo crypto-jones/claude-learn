@@ -542,10 +542,10 @@ export default function ModulePage() {
   const moduleData = moduleMap[moduleId];
 
   useEffect(() => {
-    if (moduleData) {
+    if (moduleData && isLoaded) {
       updateModuleProgress(moduleId, { started: true });
     }
-  }, [moduleId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [moduleId, isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const progress = profile.moduleProgress?.[moduleId];
