@@ -158,7 +158,7 @@ const MAX_ASSESSMENT_TURNS = 4;
 function AssessPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile, setRole, setExperienceLevel, completeAssessment } = useLearner();
+  const { profile, isLoaded, setRole, setExperienceLevel, completeAssessment } = useLearner();
   const [step, setStep] = useState<Step>('role');
   const [selectedRole, setSelectedRole] = useState<LearnerRole | null>(null);
   const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null);
@@ -175,8 +175,16 @@ function AssessPageInner() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Redirect to /path if assessment is already complete
+  useEffect(() => {
+    if (isLoaded && profile.assessmentComplete) {
+      router.replace('/path');
+    }
+  }, [isLoaded, profile.assessmentComplete, router]);
+
   // Pre-select role from query param (e.g., /assess?role=developer)
   useEffect(() => {
+    if (profile.assessmentComplete) return; // Don't mutate profile if redirecting
     const roleParam = searchParams.get('role');
     if (roleParam && LEARNER_ROLES.some((r) => r.id === roleParam)) {
       const role = roleParam as LearnerRole;
@@ -184,7 +192,7 @@ function AssessPageInner() {
       setRole(role);
       setStep('experience');
     }
-  }, [searchParams, setRole]);
+  }, [searchParams, setRole, profile.assessmentComplete]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

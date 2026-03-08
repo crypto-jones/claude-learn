@@ -344,9 +344,9 @@ export default function Home() {
                       <BookOpen className="h-4 w-4 shrink-0" />
                       <span><span className="font-semibold text-foreground">{moduleCount}</span> modules</span>
                     </div>
-                    <Link href={`/assess?role=${role.id}`}>
+                    <Link href={profile.assessmentComplete ? '/path' : `/assess?role=${role.id}`}>
                       <Button variant="outline" size="sm" className="gap-1.5 whitespace-nowrap shrink-0">
-                        <span>Start as <span className="sm:hidden">{({ 'business': 'Business', 'getting-started': 'Beginner', 'product-manager': 'PM' } as Record<string, string>)[role.id] ?? role.label}</span><span className="hidden sm:inline">{({ 'business': 'Business', 'getting-started': 'Beginner' } as Record<string, string>)[role.id] ?? role.label}</span></span>
+                        <span>{profile.assessmentComplete ? 'View' : 'Start as'} <span className="sm:hidden">{({ 'business': 'Business', 'getting-started': 'Beginner', 'product-manager': 'PM' } as Record<string, string>)[role.id] ?? role.label}</span><span className="hidden sm:inline">{({ 'business': 'Business', 'getting-started': 'Beginner' } as Record<string, string>)[role.id] ?? role.label}</span></span>
                         <ChevronRight className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
