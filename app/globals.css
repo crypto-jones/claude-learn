@@ -237,7 +237,7 @@
   @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
 }
 .prose-module pre {
-  @apply bg-muted/80 rounded-lg p-4 mb-4 overflow-x-auto;
+  @apply bg-muted/80 p-4 mb-4 overflow-x-auto;
 }
 .prose-module pre code {
   @apply bg-transparent p-0;

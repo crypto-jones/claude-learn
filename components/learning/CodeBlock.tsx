@@ -82,7 +82,7 @@ export function CodeBlock({ code, language = '' }: CodeBlockProps) {
         language={normalizedLang || 'text'}
       >
         {({ style, tokens, getLineProps, getTokenProps }) => {
-          const { background: _, backgroundColor: __, ...safeStyle } = style;
+          const { background: _, backgroundColor: __, borderRadius: ___, ...safeStyle } = style;
           return (
             <pre
               className="rounded-t-none rounded-b-lg p-4 overflow-x-auto text-sm"
