@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { LearnerRole, LEARNER_ROLES } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
+import { renderChatMarkdown } from '@/lib/render-markdown';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 interface AdaptedContentProps {
@@ -116,9 +117,9 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId, stat
               <span className="text-xs font-medium text-primary">
                 {role === 'getting-started' ? 'Real-world example' : `For you as a ${roleLabel}`}
               </span>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                {content || 'Generating a role-specific example...'}
-              </p>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                {content ? renderChatMarkdown(content) : 'Generating a role-specific example...'}
+              </div>
             </div>
           </div>
         </Card>

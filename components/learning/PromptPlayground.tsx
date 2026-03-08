@@ -5,6 +5,7 @@ import { useLearner } from '@/contexts/LearnerContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { streamChat } from '@/lib/claude';
+import { renderChatMarkdown } from '@/lib/render-markdown';
 import { Module, ModuleSection, LearnerRole } from '@/lib/types';
 import { Terminal, Send, Loader2, RotateCcw, ChevronUp } from 'lucide-react';
 
@@ -190,8 +191,8 @@ export function PromptPlayground({ section, moduleData }: PromptPlaygroundProps)
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Claude&apos;s Response
             </label>
-            <div className="rounded-md bg-muted/50 p-4 text-sm text-foreground leading-relaxed whitespace-pre-wrap min-h-[60px]">
-              {response || (
+            <div className="rounded-md bg-muted/50 p-4 text-sm text-foreground leading-relaxed min-h-[60px]">
+              {response ? renderChatMarkdown(response) : (
                 <span className="text-muted-foreground/50 italic">Waiting for response...</span>
               )}
             </div>

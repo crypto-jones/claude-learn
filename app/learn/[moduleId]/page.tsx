@@ -17,6 +17,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Module, ModuleSection, ExerciseFeedback, ChatMessage, ALL_SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
+import { renderChatMarkdown } from '@/lib/render-markdown';
 import { moduleMap, allModuleIds } from '@/lib/modules';
 import { injectConceptLinks } from '@/lib/concepts';
 import {
@@ -415,8 +416,8 @@ function ExerciseBlock({
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-foreground">Claude&apos;s Feedback</span>
               </div>
-              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {feedback}
+              <div className="text-sm text-muted-foreground leading-relaxed">
+                {renderChatMarkdown(feedback)}
               </div>
             </div>
           )}
@@ -445,9 +446,11 @@ function ExerciseBlock({
                             : 'bg-muted text-foreground'
                         }`}
                       >
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {msg.content}
-                        </p>
+                        <div className="text-sm leading-relaxed">
+                          {msg.role === 'assistant'
+                            ? renderChatMarkdown(msg.content)
+                            : <p className="whitespace-pre-wrap">{msg.content}</p>}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -455,9 +458,9 @@ function ExerciseBlock({
                   {isFollowUpStreaming && followUpStreamingContent && (
                     <div className="flex justify-start">
                       <div className="max-w-[85%] rounded-2xl px-3 py-2 bg-muted text-foreground">
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {followUpStreamingContent}
-                        </p>
+                        <div className="text-sm leading-relaxed">
+                          {renderChatMarkdown(followUpStreamingContent)}
+                        </div>
                       </div>
                     </div>
                   )}

@@ -5,6 +5,7 @@ import { useLearner } from '@/contexts/LearnerContext';
 import { Button } from '@/components/ui/button';
 import { Module, ChatMessage } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
+import { renderChatMarkdown } from '@/lib/render-markdown';
 import { X, Send, Loader2, Sparkles } from 'lucide-react';
 
 interface CompanionPanelProps {
@@ -124,9 +125,11 @@ export function CompanionPanel({ moduleData, currentSectionTitle, currentSection
                   : 'bg-muted text-foreground'
               }`}
             >
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {msg.content}
-              </p>
+              <div className="text-sm leading-relaxed">
+                {msg.role === 'assistant'
+                  ? renderChatMarkdown(msg.content)
+                  : <p className="whitespace-pre-wrap">{msg.content}</p>}
+              </div>
             </div>
           </div>
         ))}
@@ -134,9 +137,9 @@ export function CompanionPanel({ moduleData, currentSectionTitle, currentSection
         {isStreaming && streamingContent && (
           <div className="flex justify-start">
             <div className="max-w-[90%] rounded-2xl px-3 py-2 bg-muted text-foreground">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {streamingContent}
-              </p>
+              <div className="text-sm leading-relaxed">
+                {renderChatMarkdown(streamingContent)}
+              </div>
             </div>
           </div>
         )}
