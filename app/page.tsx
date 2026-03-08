@@ -140,18 +140,18 @@ export default function Home() {
           <div className="flex items-center gap-1">
             {isLoaded && !profile.assessmentComplete && (
               <>
-                <a
-                  href="#paths"
+                <button
+                  onClick={() => document.getElementById('paths')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
                 >
                   Paths
-                </a>
-                <a
-                  href="#how-it-works"
+                </button>
+                <button
+                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
                 >
                   How It Works
-                </a>
+                </button>
                 <Link
                   href="/assess"
                   className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-md ml-1"
