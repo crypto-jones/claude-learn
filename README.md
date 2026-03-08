@@ -14,7 +14,7 @@ The platform serves multiple audiences — developers building with the API, pro
 
 ### The Learning Flow
 
-1. **Conversational Assessment** — Claude conducts a natural conversation to understand your role, experience, and current skill level across six dimensions. No multiple choice — Claude infers your competencies from how you talk about AI.
+1. **Conversational Assessment** — Claude conducts a natural conversation to understand your role, experience, and current skill level. The assessment adapts to your role — developers and students are evaluated across all five dimensions, while product managers, designers, and business users are assessed only on the dimensions relevant to their path. No multiple choice — Claude infers your competencies from how you talk about AI.
 
 2. **Personalized Learning Path** — Based on assessment results, the platform generates a recommended sequence of modules tailored to your skill gaps. A developer building with the API gets a different path than a product manager evaluating AI features.
 
@@ -22,7 +22,7 @@ The platform serves multiple audiences — developers building with the API, pro
 
 4. **AI Learning Companion** — A context-aware sidebar assistant that knows which module you're in, which section you're reading, and your skill profile. It answers questions, offers encouragement, and helps you connect concepts across the curriculum.
 
-5. **Progress Dashboard** — A skills radar chart tracks growth across all dimensions with animated before/after comparison. Set learning goals, track streaks, and export a shareable skills card as a PNG.
+5. **Progress Dashboard** — A skills radar chart tracks growth across your role's relevant dimensions with animated before/after comparison. Set learning goals, track streaks, and export a shareable skills card as a PNG.
 
 ---
 
@@ -95,7 +95,7 @@ The platform tracks learner growth across five competency areas:
 - **Evaluation & Testing** — Evaluator-optimizer patterns and systematic evals
 - **Production Deployment** — Shipping AI to production with safety and reliability
 
-Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *Advanced*.
+Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *Advanced*. Dimensions are filtered by role — developers and students see all five, while product managers, designers, and business users see only the three dimensions (Prompt Engineering, Evaluation & Testing, Production Deployment) reachable through their learning path.
 
 ---
 
@@ -104,7 +104,7 @@ Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *
 ```
 claude-learn/
 ├── app/
-│   ├── api/chat/route.ts              # Single API endpoint (3 modes: assessment, feedback, companion)
+│   ├── api/chat/route.ts              # Single API endpoint (5 modes: assessment, feedback, companion, playground, adapt)
 │   ├── assess/page.tsx                # Multi-step assessment (role → experience → conversation → skills reveal)
 │   ├── path/page.tsx                  # Personalized learning path with module recommendations
 │   ├── learn/[moduleId]/page.tsx      # Module viewer with exercises, code blocks, companion
