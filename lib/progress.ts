@@ -1,4 +1,4 @@
-import { LearnerProfile, DEFAULT_SKILLS } from './types';
+import { LearnerProfile, LearnerRole, getDefaultSkills, ROLE_SKILL_DIMENSIONS } from './types';
 
 const STORAGE_KEY = 'claude-learn-profile';
 
@@ -6,7 +6,7 @@ export function getDefaultProfile(): LearnerProfile {
   return {
     role: null,
     experienceLevel: null,
-    skills: { ...DEFAULT_SKILLS },
+    skills: getDefaultSkills(null),
     initialSkills: null,
     completedModules: [],
     moduleProgress: {},
@@ -34,6 +34,21 @@ export function loadProfile(): LearnerProfile {
     if (profile.currentSessionStart === undefined) profile.currentSessionStart = null;
     if (!profile.learningGoals) profile.learningGoals = [];
     if (!profile.reviews) profile.reviews = [];
+
+    // Migrate 'student' role to 'getting-started'
+    if ((profile.role as string) === 'student') {
+      profile.role = 'getting-started' as LearnerRole;
+    }
+
+    // Migrate skills to role-specific dimensions
+    if (profile.role) {
+      const requiredDims = ROLE_SKILL_DIMENSIONS[profile.role].map((d) => d.id);
+      for (const dimId of requiredDims) {
+        if (!(dimId in profile.skills)) {
+          profile.skills[dimId] = 'foundations';
+        }
+      }
+    }
 
     // Migrate moduleProgress entries that lack exerciseFeedback
     for (const key of Object.keys(profile.moduleProgress)) {

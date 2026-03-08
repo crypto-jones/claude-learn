@@ -14,18 +14,18 @@ import {
   SkillLevel,
   LEARNER_ROLES,
   EXPERIENCE_LEVELS,
-  SKILL_DIMENSIONS,
+  ROLE_SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
   ChatMessage,
 } from '@/lib/types';
 import { streamChat, extractAssessmentResult, generateLearningPath } from '@/lib/claude';
-import { getReachableDimensions } from '@/lib/modules';
+import { getDimensionsForRole } from '@/lib/modules';
 import {
   Code2,
   BarChart3,
   Palette,
   Briefcase,
-  GraduationCap,
+  Compass,
   ArrowRight,
   Send,
   Loader2,
@@ -38,7 +38,7 @@ const roleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
   Palette,
   Briefcase,
-  GraduationCap,
+  Compass,
 };
 
 type Step = 'role' | 'experience' | 'conversation' | 'results';
@@ -285,23 +285,13 @@ export default function AssessPage() {
         if (result) {
           const skills = result.skills as unknown as SkillsProfile;
           const validLevels: SkillLevel[] = ['foundations', 'practitioner', 'advanced'];
-          const validatedSkills: SkillsProfile = {
-            'prompt-engineering': validLevels.includes(skills['prompt-engineering'])
-              ? skills['prompt-engineering']
-              : 'foundations',
-            'api-integration': validLevels.includes(skills['api-integration'])
-              ? skills['api-integration']
-              : 'foundations',
-            'agent-design': validLevels.includes(skills['agent-design'])
-              ? skills['agent-design']
-              : 'foundations',
-            evaluation: validLevels.includes(skills['evaluation'])
-              ? skills['evaluation']
-              : 'foundations',
-            production: validLevels.includes(skills['production'])
-              ? skills['production']
-              : 'foundations',
-          };
+          const roleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
+          const validatedSkills: SkillsProfile = {};
+          for (const dim of roleDims) {
+            validatedSkills[dim.id] = validLevels.includes(skills[dim.id])
+              ? skills[dim.id]
+              : 'foundations';
+          }
 
           const path = generateLearningPath(
             validatedSkills as unknown as Record<string, string>,
@@ -310,18 +300,21 @@ export default function AssessPage() {
           setAssessmentResult({
             skills: validatedSkills,
             summary: result.summary,
-            reachableDimensions: getReachableDimensions(path),
+            reachableDimensions: getDimensionsForRole(selectedRole || null),
           });
           setTimeout(() => setStep('results'), 1500);
         } else if (newCount >= MAX_ASSESSMENT_TURNS) {
           // Force completion with experience-based defaults
-          const fallbackSkills: SkillsProfile = {
-            'prompt-engineering': selectedExperience === 'building' ? 'practitioner' : selectedExperience === 'familiar' ? 'practitioner' : 'foundations',
-            'api-integration': selectedExperience === 'building' ? 'practitioner' : 'foundations',
-            'agent-design': 'foundations',
-            evaluation: 'foundations',
-            production: selectedExperience === 'building' ? 'foundations' : 'foundations',
-          };
+          const fallbackRoleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
+          const fallbackSkills: SkillsProfile = {};
+          for (const dim of fallbackRoleDims) {
+            // Give prompt-engineering a boost for experienced learners
+            if (dim.id === 'prompt-engineering' && (selectedExperience === 'building' || selectedExperience === 'familiar')) {
+              fallbackSkills[dim.id] = 'practitioner';
+            } else {
+              fallbackSkills[dim.id] = 'foundations';
+            }
+          }
           const fallbackPath = generateLearningPath(
             fallbackSkills as unknown as Record<string, string>,
             selectedRole || 'developer'
@@ -329,7 +322,7 @@ export default function AssessPage() {
           setAssessmentResult({
             skills: fallbackSkills,
             summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
-            reachableDimensions: getReachableDimensions(fallbackPath),
+            reachableDimensions: getDimensionsForRole(selectedRole || null),
           });
           setTimeout(() => setStep('results'), 1500);
         }
@@ -600,9 +593,7 @@ export default function AssessPage() {
 
             <Card className="p-6 mb-8">
               <div className="space-y-4">
-                {SKILL_DIMENSIONS.filter(
-                  (d) => !assessmentResult.reachableDimensions || assessmentResult.reachableDimensions.includes(d.id)
-                ).map((dim, idx) => {
+                {ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'].map((dim, idx) => {
                   const level = assessmentResult.skills[dim.id];
                   const value = SKILL_LEVEL_VALUES[level];
                   const percent = (value / 3) * 100;

@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import {
   SkillsProfile,
   SkillDimension,
-  SKILL_DIMENSIONS,
+  ALL_SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
   LearnerRole,
   LEARNER_ROLES,
@@ -48,8 +48,8 @@ function MiniRadar({ skills, colors, dimensions: dimensionFilter }: { skills: Sk
   const cy = 100;
   const maxR = 75;
   const dims = dimensionFilter
-    ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
-    : SKILL_DIMENSIONS;
+    ? ALL_SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
+    : ALL_SKILL_DIMENSIONS;
 
   const gridRings = [1, 2, 3].map((level) => {
     const pts = dims.map((_, i) => {
@@ -195,7 +195,7 @@ export const ShareableSkillsCard = React.forwardRef<HTMLDivElement, ShareableSki
 
         {/* Skill levels */}
         <div style={{ marginBottom: 20 }}>
-          {(dimensionFilter ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id)) : SKILL_DIMENSIONS).map((dim) => (
+          {(dimensionFilter ? ALL_SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id)) : ALL_SKILL_DIMENSIONS).map((dim) => (
             <div
               key={dim.id}
               style={{

@@ -7,7 +7,7 @@
   "estimatedMinutes": 15,
   "difficulty": "intermediate",
   "prerequisites": ["prompt-engineering"],
-  "skillDimension": "prompt-engineering",
+  "skillDimension": "workflow-automation",
   "targetRoles": ["business"],
   "learningObjectives": [
     "Identify high-value automation opportunities in existing business workflows",

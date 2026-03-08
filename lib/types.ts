@@ -1,18 +1,31 @@
-// Skill dimensions
+// Skill dimensions — 18 unique across all roles
 export type SkillDimension =
+  // Shared
   | 'prompt-engineering'
+  | 'evaluation'
+  // Developer
   | 'api-integration'
   | 'agent-design'
-  | 'evaluation'
-  | 'production';
+  | 'production'
+  // PM
+  | 'ai-strategy'
+  | 'stakeholder-comms'
+  | 'ai-governance'
+  // Designer
+  | 'ai-ux-design'
+  | 'conversational-design'
+  | 'ai-research'
+  | 'design-prototyping'
+  // Business
+  | 'workflow-automation'
+  | 'content-communication'
+  // Getting Started
+  | 'ai-fundamentals'
+  | 'practical-applications'
+  | 'critical-thinking'
+  | 'ai-ethics';
 
-export const SKILL_DIMENSIONS: { id: SkillDimension; label: string; shortLabel: string }[] = [
-  { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
-  { id: 'api-integration', label: 'API Integration', shortLabel: 'API' },
-  { id: 'agent-design', label: 'Agent Design', shortLabel: 'Agents' },
-  { id: 'evaluation', label: 'Evaluation & Testing', shortLabel: 'Evaluation' },
-  { id: 'production', label: 'Production Deployment', shortLabel: 'Production' },
-];
+export type SkillDimensionInfo = { id: SkillDimension; label: string; shortLabel: string };
 
 // Skill levels
 export type SkillLevel = 'foundations' | 'practitioner' | 'advanced';
@@ -29,7 +42,7 @@ export type LearnerRole =
   | 'product-manager'
   | 'designer'
   | 'business'
-  | 'student';
+  | 'getting-started';
 
 export const LEARNER_ROLES: {
   id: LearnerRole;
@@ -62,12 +75,83 @@ export const LEARNER_ROLES: {
     icon: 'Briefcase',
   },
   {
-    id: 'student',
-    label: 'Student',
-    description: 'Learning about AI and Claude',
-    icon: 'GraduationCap',
+    id: 'getting-started',
+    label: 'Getting Started',
+    description: 'Explore what AI can do and find your path',
+    icon: 'Compass',
   },
 ];
+
+// Role-specific skill dimensions — each role has exactly 5
+export const ROLE_SKILL_DIMENSIONS: Record<LearnerRole, SkillDimensionInfo[]> = {
+  developer: [
+    { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+    { id: 'api-integration', label: 'API Integration', shortLabel: 'API' },
+    { id: 'agent-design', label: 'Agent Design', shortLabel: 'Agents' },
+    { id: 'evaluation', label: 'Evaluation & Testing', shortLabel: 'Evaluation' },
+    { id: 'production', label: 'Production Deployment', shortLabel: 'Production' },
+  ],
+  'product-manager': [
+    { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+    { id: 'ai-strategy', label: 'AI Product Strategy', shortLabel: 'Strategy' },
+    { id: 'evaluation', label: 'Evaluation & Metrics', shortLabel: 'Metrics' },
+    { id: 'stakeholder-comms', label: 'Stakeholder Communication', shortLabel: 'Stakeholders' },
+    { id: 'ai-governance', label: 'AI Governance', shortLabel: 'Governance' },
+  ],
+  designer: [
+    { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+    { id: 'ai-ux-design', label: 'AI UX Design', shortLabel: 'UX Design' },
+    { id: 'conversational-design', label: 'Conversational Design', shortLabel: 'Conversational' },
+    { id: 'ai-research', label: 'AI Research & Synthesis', shortLabel: 'Research' },
+    { id: 'design-prototyping', label: 'Design Prototyping', shortLabel: 'Prototyping' },
+  ],
+  business: [
+    { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+    { id: 'workflow-automation', label: 'Workflow Automation', shortLabel: 'Automation' },
+    { id: 'content-communication', label: 'Content & Communication', shortLabel: 'Content' },
+    { id: 'evaluation', label: 'Measuring AI Impact', shortLabel: 'Impact' },
+    { id: 'ai-governance', label: 'AI Governance', shortLabel: 'Governance' },
+  ],
+  'getting-started': [
+    { id: 'ai-fundamentals', label: 'AI Fundamentals', shortLabel: 'Fundamentals' },
+    { id: 'prompt-engineering', label: 'Prompt Basics', shortLabel: 'Prompting' },
+    { id: 'practical-applications', label: 'Practical Applications', shortLabel: 'Applications' },
+    { id: 'critical-thinking', label: 'Critical Thinking', shortLabel: 'Thinking' },
+    { id: 'ai-ethics', label: 'AI Ethics & Safety', shortLabel: 'Ethics' },
+  ],
+};
+
+// Flat deduped list of all dimensions (for fallback lookups)
+export const ALL_SKILL_DIMENSIONS: SkillDimensionInfo[] = [
+  { id: 'prompt-engineering', label: 'Prompt Engineering', shortLabel: 'Prompting' },
+  { id: 'evaluation', label: 'Evaluation & Testing', shortLabel: 'Evaluation' },
+  { id: 'api-integration', label: 'API Integration', shortLabel: 'API' },
+  { id: 'agent-design', label: 'Agent Design', shortLabel: 'Agents' },
+  { id: 'production', label: 'Production Deployment', shortLabel: 'Production' },
+  { id: 'ai-strategy', label: 'AI Product Strategy', shortLabel: 'Strategy' },
+  { id: 'stakeholder-comms', label: 'Stakeholder Communication', shortLabel: 'Stakeholders' },
+  { id: 'ai-governance', label: 'AI Governance', shortLabel: 'Governance' },
+  { id: 'ai-ux-design', label: 'AI UX Design', shortLabel: 'UX Design' },
+  { id: 'conversational-design', label: 'Conversational Design', shortLabel: 'Conversational' },
+  { id: 'ai-research', label: 'AI Research & Synthesis', shortLabel: 'Research' },
+  { id: 'design-prototyping', label: 'Design Prototyping', shortLabel: 'Prototyping' },
+  { id: 'workflow-automation', label: 'Workflow Automation', shortLabel: 'Automation' },
+  { id: 'content-communication', label: 'Content & Communication', shortLabel: 'Content' },
+  { id: 'ai-fundamentals', label: 'AI Fundamentals', shortLabel: 'Fundamentals' },
+  { id: 'practical-applications', label: 'Practical Applications', shortLabel: 'Applications' },
+  { id: 'critical-thinking', label: 'Critical Thinking', shortLabel: 'Thinking' },
+  { id: 'ai-ethics', label: 'AI Ethics & Safety', shortLabel: 'Ethics' },
+];
+
+/** Look up a dimension's label, optionally using role-specific label */
+export function getDimensionLabel(dimId: string, role?: LearnerRole | null): string {
+  if (role) {
+    const roleDim = ROLE_SKILL_DIMENSIONS[role]?.find((d) => d.id === dimId);
+    if (roleDim) return roleDim.label;
+  }
+  const found = ALL_SKILL_DIMENSIONS.find((d) => d.id === dimId);
+  return found ? found.label : dimId;
+}
 
 // Experience levels
 export type ExperienceLevel = 'new' | 'familiar' | 'building';
@@ -94,8 +178,8 @@ export const EXPERIENCE_LEVELS: {
   },
 ];
 
-// Skills profile
-export type SkillsProfile = Record<SkillDimension, SkillLevel>;
+// Skills profile — keys are role-specific dimension IDs
+export type SkillsProfile = Record<string, SkillLevel>;
 
 // Module section types
 export interface ModuleExercise {
@@ -227,11 +311,12 @@ export interface ChatRequest {
   };
 }
 
-// Default skills profile
-export const DEFAULT_SKILLS: SkillsProfile = {
-  'prompt-engineering': 'foundations',
-  'api-integration': 'foundations',
-  'agent-design': 'foundations',
-  evaluation: 'foundations',
-  production: 'foundations',
-};
+/** Build a default skills profile for a role (all dimensions set to 'foundations') */
+export function getDefaultSkills(role: LearnerRole | null): SkillsProfile {
+  const dims = role ? ROLE_SKILL_DIMENSIONS[role] : ROLE_SKILL_DIMENSIONS['getting-started'];
+  const skills: SkillsProfile = {};
+  for (const dim of dims) {
+    skills[dim.id] = 'foundations';
+  }
+  return skills;
+}

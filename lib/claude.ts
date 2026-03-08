@@ -86,10 +86,10 @@ export function generateLearningPath(
   // Role-specific track priority determines module ordering
   const roleTrackPriority: Record<string, string[]> = {
     developer: ['fundamentals', 'api', 'agents', 'claude-code', 'production'],
-    'product-manager': ['fundamentals', 'production', 'agents'],
-    designer: ['fundamentals'],
-    business: ['fundamentals'],
-    student: ['fundamentals', 'api', 'agents', 'production'],
+    'product-manager': ['fundamentals', 'strategy', 'evaluation', 'stakeholders', 'governance'],
+    designer: ['fundamentals', 'ux-design', 'conversational', 'research', 'prototyping'],
+    business: ['fundamentals', 'automation', 'content', 'impact', 'governance'],
+    'getting-started': ['fundamentals', 'prompting', 'applications', 'thinking', 'ethics'],
   };
 
   const trackPriority = roleTrackPriority[role] || ['fundamentals'];

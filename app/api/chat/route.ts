@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest } from 'next/server';
-import { ChatRequest, SKILL_DIMENSIONS, LearnerRole } from '@/lib/types';
+import { ChatRequest, ROLE_SKILL_DIMENSIONS, LearnerRole } from '@/lib/types';
 import { getModulesByRole } from '@/lib/modules';
 
 const anthropic = new Anthropic();
@@ -36,15 +36,25 @@ const DIMENSION_DESCRIPTIONS: Record<string, string> = {
   'agent-design': 'Agent Design - Knowledge of agentic workflows and tool use',
   evaluation: 'Evaluation & Testing - Understanding of how to evaluate AI outputs',
   production: 'Production Deployment - Knowledge of shipping AI to production',
+  'ai-strategy': 'AI Product Strategy - Ability to identify and prioritize AI features',
+  'stakeholder-comms': 'Stakeholder Communication - Skill in communicating AI value and capabilities',
+  'ai-governance': 'AI Governance - Understanding of AI risk, compliance, and ethics',
+  'ai-ux-design': 'AI UX Design - Ability to design AI-powered user experiences',
+  'conversational-design': 'Conversational Design - Skill in designing chatbot and dialog interfaces',
+  'ai-research': 'AI Research & Synthesis - Using AI for user research and design insights',
+  'design-prototyping': 'Design Prototyping - Rapid prototyping with AI tools',
+  'workflow-automation': 'Workflow Automation - Automating business processes with AI',
+  'content-communication': 'Content & Communication - AI-powered writing and reporting',
+  'ai-fundamentals': 'AI Fundamentals - Understanding what AI is and how it works',
+  'practical-applications': 'Practical Applications - Using AI for everyday tasks',
+  'critical-thinking': 'Critical Thinking - Evaluating AI outputs for accuracy and bias',
+  'ai-ethics': 'AI Ethics & Safety - Responsible and ethical AI use',
 };
 
-function getReachableDimensionsForRole(role: string): string[] {
-  const modules = getModulesByRole(role as LearnerRole);
-  const reachable = new Set<string>();
-  for (const mod of modules) {
-    reachable.add(mod.skillDimension);
-  }
-  return SKILL_DIMENSIONS.filter((d) => reachable.has(d.id)).map((d) => d.id);
+function getDimensionsForRole(role: string): string[] {
+  const roleDims = ROLE_SKILL_DIMENSIONS[role as LearnerRole];
+  if (roleDims) return roleDims.map((d) => d.id);
+  return ROLE_SKILL_DIMENSIONS['getting-started'].map((d) => d.id);
 }
 
 function getSystemPrompt(request: ChatRequest): string {
@@ -53,7 +63,7 @@ function getSystemPrompt(request: ChatRequest): string {
   switch (mode) {
     case 'assessment': {
       const role = context.role || 'developer';
-      const dims = getReachableDimensionsForRole(role);
+      const dims = getDimensionsForRole(role);
       const dimList = dims.map((id, i) => `${i + 1}. ${DIMENSION_DESCRIPTIONS[id]}`).join('\n');
       const skillsJson = dims.map((id) => `    "${id}": "foundations|practitioner|advanced"`).join(',\n');
 
@@ -67,7 +77,7 @@ For developers: Ask them to write prompts, design API calls, or solve practical 
 For product managers: Ask about evaluation strategies, use case identification, and AI product thinking.
 For designers: Ask about designing AI-powered experiences and understanding AI capabilities for UX.
 For business/operations: Ask about identifying automation opportunities and evaluating AI ROI.
-For students: Ask about their understanding of AI concepts and practical applications.
+For getting-started learners: Ask about their understanding of AI concepts, practical uses, and how they evaluate AI outputs.
 
 You are evaluating skills across these dimensions (ONLY these — do not evaluate other dimensions):
 ${dimList}
@@ -178,7 +188,7 @@ Role-specific context:
 - product-manager: AI feature evaluation, PRDs, stakeholder communication, roadmap planning
 - designer: UX design, prototyping, user research, design systems, conversational UI
 - business: Process automation, document analysis, reporting, ROI measurement
-- student: Learning scenarios, academic research, study aids, project work
+- getting-started: Exploring AI capabilities, everyday use cases, evaluating AI outputs, understanding limitations
 
 Format: Write ONLY the example text — no labels, no headers, no markdown formatting. Keep it under 75 words. Be specific and practical, not generic.`;
 

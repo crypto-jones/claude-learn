@@ -16,10 +16,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   SkillDimension,
   SkillLevel,
-  SKILL_DIMENSIONS,
+  ROLE_SKILL_DIMENSIONS,
+  ALL_SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
 } from '@/lib/types';
-import { moduleMap, getReachableDimensions } from '@/lib/modules';
+import { moduleMap } from '@/lib/modules';
 import {
   ArrowRight,
   ArrowUp,
@@ -141,9 +142,13 @@ export default function DashboardPage() {
   ).length;
   const overallProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
 
-  // Filter skill dimensions to only those reachable from the learning path
-  const activeDimensions = getReachableDimensions(profile.learningPath);
-  const activeDims = SKILL_DIMENSIONS.filter((d) => activeDimensions.includes(d.id));
+  // Use role-specific dimensions
+  const activeDimensions = profile.role
+    ? ROLE_SKILL_DIMENSIONS[profile.role].map((d) => d.id)
+    : [];
+  const activeDims = profile.role
+    ? ROLE_SKILL_DIMENSIONS[profile.role]
+    : [];
 
   // Find next recommended module
   const nextModuleId = profile.learningPath?.find(
@@ -442,7 +447,7 @@ export default function DashboardPage() {
           {profile.learningGoals.length > 0 ? (
             <div className="space-y-3">
               {profile.learningGoals.map((goal) => {
-                const dim = SKILL_DIMENSIONS.find((d) => d.id === goal.skillDimension);
+                const dim = ALL_SKILL_DIMENSIONS.find((d) => d.id === goal.skillDimension);
                 const currentLevel = profile.skills[goal.skillDimension];
                 const currentValue = SKILL_LEVEL_VALUES[currentLevel];
                 const targetValue = SKILL_LEVEL_VALUES[goal.targetLevel];

@@ -7,7 +7,7 @@
   "estimatedMinutes": 15,
   "difficulty": "intermediate",
   "prerequisites": ["prompt-engineering"],
-  "skillDimension": "prompt-engineering",
+  "skillDimension": "ai-ux-design",
   "targetRoles": ["designer"],
   "learningObjectives": [
     "Use Claude to synthesize UX research data and generate actionable design insights",

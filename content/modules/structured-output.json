@@ -8,7 +8,7 @@
   "difficulty": "intermediate",
   "prerequisites": ["first-api-call"],
   "skillDimension": "api-integration",
-  "targetRoles": ["developer", "student"],
+  "targetRoles": ["developer"],
   "learningObjectives": [
     "Get Claude to reliably output valid JSON",
     "Define and enforce output schemas",

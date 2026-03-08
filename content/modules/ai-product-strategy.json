@@ -7,7 +7,7 @@
   "estimatedMinutes": 15,
   "difficulty": "intermediate",
   "prerequisites": ["evaluating-ai-use-cases"],
-  "skillDimension": "evaluation",
+  "skillDimension": "ai-strategy",
   "targetRoles": ["product-manager"],
   "learningObjectives": [
     "Build and prioritize an AI feature roadmap grounded in real user value and engineering feasibility",

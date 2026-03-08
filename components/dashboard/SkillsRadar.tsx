@@ -10,7 +10,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
-import { SkillsProfile, SkillDimension, SKILL_DIMENSIONS, SKILL_LEVEL_VALUES } from '@/lib/types';
+import { SkillsProfile, SkillDimension, ALL_SKILL_DIMENSIONS, SKILL_LEVEL_VALUES } from '@/lib/types';
 
 interface SkillsRadarProps {
   skills: SkillsProfile;
@@ -86,8 +86,8 @@ export function SkillsRadar({ skills, initialSkills, dimensions: dimensionFilter
   }, []);
 
   const dims = dimensionFilter
-    ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
-    : SKILL_DIMENSIONS;
+    ? ALL_SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
+    : ALL_SKILL_DIMENSIONS;
 
   const data = dims.map((dim) => ({
     skill: dim.shortLabel,

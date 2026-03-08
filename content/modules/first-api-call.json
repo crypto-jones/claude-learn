@@ -8,7 +8,7 @@
   "difficulty": "beginner",
   "prerequisites": ["prompt-engineering"],
   "skillDimension": "api-integration",
-  "targetRoles": ["developer", "student"],
+  "targetRoles": ["developer"],
   "learningObjectives": [
     "Understand the Claude Messages API structure",
     "Construct a well-formed API request",

@@ -15,7 +15,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Module, ModuleSection, ExerciseFeedback, ChatMessage, SKILL_DIMENSIONS } from '@/lib/types';
+import { Module, ModuleSection, ExerciseFeedback, ChatMessage, ALL_SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { moduleMap, allModuleIds } from '@/lib/modules';
 import { injectConceptLinks } from '@/lib/concepts';
@@ -953,7 +953,7 @@ export default function ModulePage() {
                     <div>
                       <h3 className="font-semibold text-foreground">Module Completed!</h3>
                       <p className="text-sm text-muted-foreground">
-                        Your {SKILL_DIMENSIONS.find((d) => d.id === moduleData.skillDimension)?.label || moduleData.skillDimension} skill leveled up to{' '}
+                        Your {ALL_SKILL_DIMENSIONS.find((d) => d.id === moduleData.skillDimension)?.label || moduleData.skillDimension} skill leveled up to{' '}
                         <span className="font-medium text-primary">
                           {profile.skills[moduleData.skillDimension] || 'Practitioner'}
                         </span>

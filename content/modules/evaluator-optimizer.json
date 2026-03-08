@@ -6,7 +6,7 @@
   "trackTitle": "Tool Use & Agents",
   "estimatedMinutes": 15,
   "difficulty": "intermediate",
-  "prerequisites": ["tool-use-intro"],
+  "prerequisites": ["evaluating-ai-use-cases"],
   "skillDimension": "evaluation",
   "targetRoles": ["developer", "product-manager"],
   "learningObjectives": [

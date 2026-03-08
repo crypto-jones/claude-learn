@@ -13,9 +13,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   Module,
   SkillDimension,
-  SKILL_DIMENSIONS,
+  ROLE_SKILL_DIMENSIONS,
+  ALL_SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
   LEARNER_ROLES,
+  getDimensionLabel,
 } from '@/lib/types';
 import { moduleMap, getModulesByRole } from '@/lib/modules';
 import {
@@ -38,15 +40,16 @@ const difficultyColors: Record<string, string> = {
 // Map skill dimensions to a human-friendly recommendation reason
 function getRecommendationReason(
   module: Module,
-  skills: Record<SkillDimension, string>
+  skills: Record<string, string>,
+  role?: string | null
 ): string | null {
   const level = skills[module.skillDimension];
   if (level === 'foundations') {
-    const dimLabel = SKILL_DIMENSIONS.find((d) => d.id === module.skillDimension)?.label;
+    const dimLabel = getDimensionLabel(module.skillDimension, role as any);
     return `You scored Foundations on ${dimLabel} — this module builds that skill`;
   }
   if (level === 'practitioner') {
-    const dimLabel = SKILL_DIMENSIONS.find((d) => d.id === module.skillDimension)?.label;
+    const dimLabel = getDimensionLabel(module.skillDimension, role as any);
     return `Strengthen your ${dimLabel} skills from Practitioner toward Advanced`;
   }
   return null;
@@ -58,7 +61,7 @@ const roleSubtitles: Record<string, string> = {
   'product-manager': 'Evaluate AI opportunities, define success metrics, and lead AI product strategy.',
   designer: 'Design AI-powered experiences and integrate Claude into creative workflows.',
   business: 'Automate workflows, analyze documents, and measure AI ROI.',
-  student: 'Build a strong foundation in AI concepts and practical Claude skills.',
+  'getting-started': 'Explore what AI can do, build practical skills, and find your path.',
 };
 
 // Focus areas for dynamic reordering — adapted per role
@@ -70,7 +73,7 @@ function getFocusAreas(role: string | null): FocusAreaItem[] {
     { id: 'fundamentals', label: 'Fundamentals First', description: 'Start with core concepts' },
   ];
 
-  if (role === 'developer' || role === 'student') {
+  if (role === 'developer') {
     base.push(
       { id: 'api', label: 'API & Integration', description: 'Focus on building with the API' },
       { id: 'agents', label: 'Agents & Tools', description: 'Focus on agentic workflows' },
@@ -79,6 +82,11 @@ function getFocusAreas(role: string | null): FocusAreaItem[] {
   if (role === 'product-manager') {
     base.push(
       { id: 'production', label: 'Evaluation & Strategy', description: 'Focus on evals and AI strategy' },
+    );
+  }
+  if (role === 'getting-started') {
+    base.push(
+      { id: 'applications', label: 'Practical Uses', description: 'Focus on everyday AI applications' },
     );
   }
   return base;
@@ -253,8 +261,8 @@ export default function PathPage() {
             </span>
           </div>
           <div className="grid grid-cols-5 gap-3">
-            {SKILL_DIMENSIONS.map((dim) => {
-              const level = profile.skills[dim.id];
+            {(profile.role ? ROLE_SKILL_DIMENSIONS[profile.role] : []).map((dim) => {
+              const level = profile.skills[dim.id] || 'foundations';
               const value = SKILL_LEVEL_VALUES[level];
               return (
                 <div key={dim.id} className="text-center">
@@ -313,7 +321,7 @@ export default function PathPage() {
           {modules.map((module, index) => {
             const isCompleted = profile.completedModules.includes(module.id);
             const isStarted = profile.moduleProgress[module.id]?.started;
-            const recommendation = getRecommendationReason(module, profile.skills);
+            const recommendation = getRecommendationReason(module, profile.skills, profile.role);
 
             // Check prerequisites
             const prereqsMet = module.prerequisites.every((preId) =>
