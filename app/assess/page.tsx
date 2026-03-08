@@ -42,7 +42,61 @@ const roleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 type Step = 'role' | 'experience' | 'conversation' | 'results';
 
-const MAX_ASSESSMENT_TURNS = 5;
+function stripAssessmentJson(text: string): string {
+  return text.replace(/```json[\s\S]*?```/g, '').trim();
+}
+
+function renderChatMarkdown(text: string): React.ReactNode[] {
+  // Split into lines and process each
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    if (i > 0) elements.push(<br key={`br-${i}`} />);
+    const line = lines[i];
+
+    // Process inline formatting: bold, italic, inline code
+    const parts: React.ReactNode[] = [];
+    // Match **bold**, *italic*, `code`
+    const regex = /(\*\*(.+?)\*\*)|(\*(.+?)\*)|(`(.+?)`)/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(line)) !== null) {
+      // Add text before match
+      if (match.index > lastIndex) {
+        parts.push(line.slice(lastIndex, match.index));
+      }
+      if (match[1]) {
+        // **bold**
+        parts.push(<strong key={`b-${i}-${match.index}`}>{match[2]}</strong>);
+      } else if (match[3]) {
+        // *italic*
+        parts.push(<em key={`i-${i}-${match.index}`}>{match[4]}</em>);
+      } else if (match[5]) {
+        // `code`
+        parts.push(
+          <code
+            key={`c-${i}-${match.index}`}
+            className="px-1.5 py-0.5 rounded bg-foreground/10 text-[0.85em] font-mono"
+          >
+            {match[6]}
+          </code>
+        );
+      }
+      lastIndex = match.index + match[0].length;
+    }
+    // Add remaining text
+    if (lastIndex < line.length) {
+      parts.push(line.slice(lastIndex));
+    }
+    elements.push(...parts);
+  }
+
+  return elements;
+}
+
+const MAX_ASSESSMENT_TURNS = 4;
 
 export default function AssessPage() {
   const router = useRouter();
@@ -240,7 +294,7 @@ export default function AssessPage() {
       : step === 'experience'
         ? 25
         : step === 'conversation'
-          ? 25 + Math.min(questionCount * 15, 60)
+          ? 25 + Math.min(questionCount * 18, 60)
           : 100;
 
   return (
@@ -391,11 +445,11 @@ export default function AssessPage() {
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    <div className="text-sm leading-relaxed">
                       {msg.role === 'assistant'
-                        ? msg.content.replace(/```json[\s\S]*?```/, '').trim()
+                        ? renderChatMarkdown(stripAssessmentJson(msg.content))
                         : msg.content}
-                    </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -403,9 +457,9 @@ export default function AssessPage() {
               {isStreaming && streamingContent && (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-muted text-foreground">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {streamingContent.replace(/```json[\s\S]*?```/, '').trim()}
-                    </p>
+                    <div className="text-sm leading-relaxed">
+                      {renderChatMarkdown(stripAssessmentJson(streamingContent))}
+                    </div>
                   </div>
                 </div>
               )}

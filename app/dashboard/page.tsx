@@ -135,8 +135,10 @@ export default function DashboardPage() {
     );
   }
 
-  const totalModules = Object.keys(moduleMap).length;
-  const completedModules = profile.completedModules.length;
+  const totalModules = profile.learningPath.length || Object.keys(moduleMap).length;
+  const completedModules = profile.completedModules.filter(
+    (id) => profile.learningPath.length === 0 || profile.learningPath.includes(id)
+  ).length;
   const overallProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
 
   // Find next recommended module
