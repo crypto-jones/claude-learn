@@ -106,8 +106,16 @@ function SectionContent({ content, moduleId, sectionId }: { content: string; mod
                 );
               }
 
-              if (trimmed.match(/^[-*]\s/m)) {
-                const items = trimmed.split('\n').filter((l) => l.trim());
+              if (trimmed.match(/^\*\*[^*]+\*\*$/)) {
+                return (
+                  <h3 key={j} className="text-lg font-medium mt-6 mb-2 text-foreground">
+                    {trimmed.replace(/^\*\*/, '').replace(/\*\*$/, '')}
+                  </h3>
+                );
+              }
+
+              if (trimmed.match(/^[-*•]\s/m)) {
+                const items = trimmed.split(/\n(?=[-*•]\s)/).filter((l) => l.trim());
                 return (
                   <ul key={j} className="mb-4 ml-6 space-y-1.5 list-disc text-muted-foreground">
                     {items.map((item, k) => (
@@ -116,7 +124,7 @@ function SectionContent({ content, moduleId, sectionId }: { content: string; mod
                         className="leading-7"
                         dangerouslySetInnerHTML={{
                           __html: formatInlineText(
-                            item.replace(/^[-*]\s+/, '').replace(/^\d+[.)]\s+/, ''),
+                            item.replace(/^[-*•]\s+/, '').replace(/^\d+[.)]\s+/, ''),
                             moduleId,
                             sectionId,
                           ),
@@ -912,9 +920,21 @@ export default function ModulePage() {
                         <Lightbulb className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                         <div>
                           <h3 className="font-semibold text-foreground mb-1 text-sm">Key Takeaway</h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {section.content}
-                          </p>
+                          <div className="text-sm text-muted-foreground leading-relaxed space-y-2">
+                            {section.content.split('\n\n').map((para, i) => {
+                              const trimmed = para.trim();
+                              if (!trimmed) return null;
+                              if (trimmed.startsWith('• ') || trimmed.startsWith('- ')) {
+                                return (
+                                  <div key={i} className="flex gap-2">
+                                    <span className="shrink-0 mt-0.5">•</span>
+                                    <span dangerouslySetInnerHTML={{ __html: formatInlineText(trimmed.replace(/^[•\-]\s*/, '')) }} />
+                                  </div>
+                                );
+                              }
+                              return <p key={i} dangerouslySetInnerHTML={{ __html: formatInlineText(trimmed) }} />;
+                            })}
+                          </div>
                         </div>
                       </div>
                       {!completedSections.has(section.id) && (

@@ -292,7 +292,7 @@ export default function Home() {
                   className="flex-1 min-w-0 gap-1 py-2 px-1.5 sm:px-2 text-[11px] sm:text-sm whitespace-nowrap"
                 >
                   {Icon && <Icon className="h-4 w-4 hidden sm:block" />}
-                  <span className="sm:hidden">{{ 'getting-started': 'Beginner', 'developer': 'Dev', 'product-manager': 'PM', 'designer': 'Designer', 'business': 'Business' }[role.id] ?? role.label}</span>
+                  <span className="sm:hidden">{({ 'getting-started': 'Beginner', 'developer': 'Dev', 'product-manager': 'PM', 'designer': 'Designer', 'business': 'Business' } as Record<string, string>)[role.id] ?? role.label}</span>
                   <span className="hidden sm:inline">{role.label}</span>
                 </TabsTrigger>
               );
@@ -346,7 +346,7 @@ export default function Home() {
                     </div>
                     <Link href={`/assess?role=${role.id}`}>
                       <Button variant="outline" size="sm" className="gap-1.5 whitespace-nowrap shrink-0">
-                        <span>Start as <span className="sm:hidden">{{ 'business': 'Business', 'getting-started': 'Beginner', 'product-manager': 'PM' }[role.id] ?? role.label}</span><span className="hidden sm:inline">{{ 'business': 'Business', 'getting-started': 'Beginner' }[role.id] ?? role.label}</span></span>
+                        <span>Start as <span className="sm:hidden">{({ 'business': 'Business', 'getting-started': 'Beginner', 'product-manager': 'PM' } as Record<string, string>)[role.id] ?? role.label}</span><span className="hidden sm:inline">{({ 'business': 'Business', 'getting-started': 'Beginner' } as Record<string, string>)[role.id] ?? role.label}</span></span>
                         <ChevronRight className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
@@ -362,7 +362,7 @@ export default function Home() {
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
         <div className="text-center mb-14">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
-            Three minutes to your personalized path
+            3 minutes to your personalized path
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
             No signup forms. No configuration wizards. Just a conversation.
