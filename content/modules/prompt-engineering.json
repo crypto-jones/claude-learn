@@ -1,12 +1,14 @@
 {
   "id": "prompt-engineering",
   "title": "Prompt Engineering Essentials",
-  "description": "Master the core techniques for crafting effective prompts — from system prompts and few-shot examples to chain-of-thought reasoning.",
+  "description": "Master the core techniques for crafting effective prompts \u2014 from system prompts and few-shot examples to chain-of-thought reasoning.",
   "track": "fundamentals",
   "trackTitle": "Claude Fundamentals",
   "estimatedMinutes": 15,
   "difficulty": "beginner",
-  "prerequisites": ["how-claude-thinks"],
+  "prerequisites": [
+    "how-claude-thinks"
+  ],
   "skillDimension": "prompt-engineering",
   "targetRoles": [],
   "learningObjectives": [
@@ -50,7 +52,7 @@
       "id": "few-shot",
       "type": "concept",
       "title": "Few-Shot Examples",
-      "content": "**Few-shot prompting** means giving Claude examples of the input-output pattern you want before asking it to handle new input.\n\nThis is one of the most powerful and reliable prompting techniques. Instead of describing what you want in abstract terms, you show Claude exactly what good looks like.\n\n```\nClassify the following customer feedback as Positive, Negative, or Neutral.\n\nFeedback: \"The new dashboard is so much faster!\"\nClassification: Positive\n\nFeedback: \"I can't find the export button anywhere.\"\nClassification: Negative\n\nFeedback: \"I updated my profile settings.\"\nClassification: Neutral\n\nFeedback: \"Your API documentation saved me hours of debugging.\"\nClassification:\n```\n\nWhen using few-shot examples:\n- **Use 2-5 examples** — enough to establish the pattern, not so many that you waste context\n- **Include edge cases** — show Claude how to handle tricky inputs\n- **Be consistent** — use the exact same format in every example\n- **Match the difficulty** — your examples should be similar in complexity to the real inputs",
+      "content": "**Few-shot prompting** means giving Claude examples of the input-output pattern you want before asking it to handle new input.\n\nThis is one of the most powerful and reliable prompting techniques. Instead of describing what you want in abstract terms, you show Claude exactly what good looks like.\n\n```\nClassify the following customer feedback as Positive, Negative, or Neutral.\n\nFeedback: \"The new dashboard is so much faster!\"\nClassification: Positive\n\nFeedback: \"I can't find the export button anywhere.\"\nClassification: Negative\n\nFeedback: \"I updated my profile settings.\"\nClassification: Neutral\n\nFeedback: \"Your API documentation saved me hours of debugging.\"\nClassification:\n```\n\nWhen using few-shot examples:\n- **Use 2-5 examples** \u2014 enough to establish the pattern, not so many that you waste context\n- **Include edge cases** \u2014 show Claude how to handle tricky inputs\n- **Be consistent** \u2014 use the exact same format in every example\n- **Match the difficulty** \u2014 your examples should be similar in complexity to the real inputs",
       "playground": {
         "description": "Try few-shot prompting to control Claude's output format. Modify the examples or add edge cases to see how it affects classification.",
         "systemPrompt": "You are a text classifier. Classify the input using only the format shown in the examples. Respond with only the classification, nothing else.",
@@ -79,16 +81,10 @@
           "Start with defining who Claude is in this context",
           "Include all the rules as explicit constraints",
           "Consider what format the responses should take",
-          "Think about edge cases — what if the customer doesn't have an order number?"
+          "Think about edge cases \u2014 what if the customer doesn't have an order number?"
         ],
         "evaluationCriteria": "The response should include: (1) a clear role definition (customer support agent for DataFlow), (2) explicit constraints about the $500 threshold and escalation, (3) information gathering requirements (email, order number), (4) tone guidance (empathetic, helpful), (5) the timeline constraint about not promising specific dates. Bonus points for handling edge cases, specifying response format, and including an escalation message template."
       }
-    },
-    {
-      "id": "takeaway",
-      "type": "takeaway",
-      "title": "Key Takeaway",
-      "content": "Effective prompts are specific, structured, and include examples when possible. System prompts define the rules, few-shot examples show the pattern, and chain-of-thought reasoning improves accuracy on complex tasks."
     },
     {
       "id": "check",
@@ -99,6 +95,12 @@
         "prompt": "You need Claude to extract structured data from restaurant menus (dish name, price, dietary tags like vegetarian/vegan/gluten-free). Which prompting techniques would you combine, and why? Describe your approach.",
         "evaluationCriteria": "A strong response should mention: (1) using a system prompt to define the extraction task and output format (JSON), (2) few-shot examples showing how to handle different menu formats and edge cases (items without prices, ambiguous dietary info), (3) possibly chain-of-thought for ambiguous items. Should demonstrate understanding of when to use each technique and how they complement each other."
       }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Effective prompts are specific, structured, and include examples when possible. System prompts define the rules, few-shot examples show the pattern, and chain-of-thought reasoning improves accuracy on complex tasks."
     }
   ]
 }

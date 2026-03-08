@@ -1,14 +1,18 @@
 {
   "id": "structured-output",
   "title": "Structured Output",
-  "description": "Learn how to reliably get Claude to return JSON and other structured data formats — essential for building real applications.",
+  "description": "Learn how to reliably get Claude to return JSON and other structured data formats \u2014 essential for building real applications.",
   "track": "api",
   "trackTitle": "Building with the API",
   "estimatedMinutes": 12,
   "difficulty": "intermediate",
-  "prerequisites": ["first-api-call"],
+  "prerequisites": [
+    "first-api-call"
+  ],
   "skillDimension": "api-integration",
-  "targetRoles": ["developer"],
+  "targetRoles": [
+    "developer"
+  ],
   "learningObjectives": [
     "Get Claude to reliably output valid JSON",
     "Define and enforce output schemas",
@@ -19,13 +23,13 @@
       "id": "why-structured",
       "type": "concept",
       "title": "Why Structured Output Matters",
-      "content": "When you're building applications with Claude, you almost always need structured data — not free-form text. You need JSON you can parse, arrays you can iterate over, or objects you can store in a database.\n\nThe challenge is that Claude is fundamentally a text generator. Left to its own devices, it'll give you a nicely formatted explanation when you really need parseable JSON. Getting reliable structured output requires deliberate prompting strategies.\n\nThere are several approaches, from simple to robust:\n1. **Prompting for JSON** — Tell Claude to respond in JSON format\n2. **Schema-guided output** — Provide the exact schema you expect\n3. **Prefilling** — Start Claude's response with `{` to force JSON mode\n4. **Tool use for structure** — Define a tool whose input schema matches your desired output"
+      "content": "When you're building applications with Claude, you almost always need structured data \u2014 not free-form text. You need JSON you can parse, arrays you can iterate over, or objects you can store in a database.\n\nThe challenge is that Claude is fundamentally a text generator. Left to its own devices, it'll give you a nicely formatted explanation when you really need parseable JSON. Getting reliable structured output requires deliberate prompting strategies.\n\nThere are several approaches, from simple to robust:\n1. **Prompting for JSON** \u2014 Tell Claude to respond in JSON format\n2. **Schema-guided output** \u2014 Provide the exact schema you expect\n3. **Prefilling** \u2014 Start Claude's response with `{` to force JSON mode\n4. **Tool use for structure** \u2014 Define a tool whose input schema matches your desired output"
     },
     {
       "id": "prompting-json",
       "type": "concept",
       "title": "Prompting for JSON",
-      "content": "The simplest approach is to explicitly tell Claude to respond in JSON:\n\n```\nExtract the following information from this product review\nand return it as JSON:\n\n- product_name (string)\n- rating (number, 1-5)\n- pros (array of strings)\n- cons (array of strings)\n- would_recommend (boolean)\n\nReview: \"The XR-500 headphones are amazing! Great sound\nquality and comfortable for long sessions. Battery life\ncould be better though. Solid 4 out of 5.\"\n\nRespond with only the JSON object, no other text.\n```\n\nTwo key tips for reliable JSON output:\n\n1. **\"Respond with only the JSON object, no other text\"** — This prevents Claude from adding explanations before or after the JSON.\n\n2. **Specify the exact field names and types** — Don't leave Claude guessing what to call things. Be explicit about `string`, `number`, `boolean`, and `array` types.\n\nYou can make this even more reliable by providing an example of the exact output format you expect.",
+      "content": "The simplest approach is to explicitly tell Claude to respond in JSON:\n\n```\nExtract the following information from this product review\nand return it as JSON:\n\n- product_name (string)\n- rating (number, 1-5)\n- pros (array of strings)\n- cons (array of strings)\n- would_recommend (boolean)\n\nReview: \"The XR-500 headphones are amazing! Great sound\nquality and comfortable for long sessions. Battery life\ncould be better though. Solid 4 out of 5.\"\n\nRespond with only the JSON object, no other text.\n```\n\nTwo key tips for reliable JSON output:\n\n1. **\"Respond with only the JSON object, no other text\"** \u2014 This prevents Claude from adding explanations before or after the JSON.\n\n2. **Specify the exact field names and types** \u2014 Don't leave Claude guessing what to call things. Be explicit about `string`, `number`, `boolean`, and `array` types.\n\nYou can make this even more reliable by providing an example of the exact output format you expect.",
       "playground": {
         "description": "Try getting Claude to output valid JSON. Experiment with how you specify the fields and types.",
         "systemPrompt": "You extract structured data from text. Always respond with only a JSON object, no other text.",
@@ -36,7 +40,7 @@
       "id": "schema-approach",
       "type": "concept",
       "title": "Schema-Guided Output",
-      "content": "For production applications, provide a JSON schema or TypeScript type definition in your prompt:\n\n```\nExtract event information from the text below.\n\nReturn a JSON object matching this TypeScript type:\n\ntype Event = {\n  name: string;\n  date: string; // ISO 8601 format\n  location: {\n    venue: string;\n    city: string;\n    state: string;\n  };\n  ticketPrice: number | null;\n  categories: string[];\n}\n\nIf information is not available, use null for optional\nfields and empty arrays for list fields.\n\nText: ...\n```\n\nProviding a schema has several advantages:\n- Claude knows exactly what structure to produce\n- You can specify how to handle missing data\n- Nested objects are clearly defined\n- You can validate the output against the same schema\n\n**Prefilling trick:** When using the API, you can set the assistant's response to start with `{` — this forces Claude into JSON mode:\n\n```json\n\"messages\": [\n  { \"role\": \"user\", \"content\": \"Extract event info...\" },\n  { \"role\": \"assistant\", \"content\": \"{\" }\n]\n```\n\nClaude will then continue from that `{` and produce valid JSON.",
+      "content": "For production applications, provide a JSON schema or TypeScript type definition in your prompt:\n\n```\nExtract event information from the text below.\n\nReturn a JSON object matching this TypeScript type:\n\ntype Event = {\n  name: string;\n  date: string; // ISO 8601 format\n  location: {\n    venue: string;\n    city: string;\n    state: string;\n  };\n  ticketPrice: number | null;\n  categories: string[];\n}\n\nIf information is not available, use null for optional\nfields and empty arrays for list fields.\n\nText: ...\n```\n\nProviding a schema has several advantages:\n- Claude knows exactly what structure to produce\n- You can specify how to handle missing data\n- Nested objects are clearly defined\n- You can validate the output against the same schema\n\n**Prefilling trick:** When using the API, you can set the assistant's response to start with `{` \u2014 this forces Claude into JSON mode:\n\n```json\n\"messages\": [\n  { \"role\": \"user\", \"content\": \"Extract event info...\" },\n  { \"role\": \"assistant\", \"content\": \"{\" }\n]\n```\n\nClaude will then continue from that `{` and produce valid JSON.",
       "playground": {
         "description": "Try providing a TypeScript schema to get reliable structured output. Experiment with adding or removing fields.",
         "systemPrompt": "You extract event information from text. Return a JSON object matching the provided schema exactly. Respond with only the JSON, no other text.",
@@ -60,20 +64,20 @@
       }
     },
     {
-      "id": "takeaway",
-      "type": "takeaway",
-      "title": "Key Takeaway",
-      "content": "Reliable structured output requires explicit instructions: define your schema, specify field types, handle edge cases, and tell Claude to respond with only the structured data. For maximum reliability, use the prefilling trick or tool use to enforce JSON output."
-    },
-    {
       "id": "check",
       "type": "check",
       "title": "Check Your Understanding",
       "content": "Think about the trade-offs between different structured output approaches.",
       "exercise": {
         "prompt": "What are the advantages of using tool use (function calling) for structured output compared to prompting for JSON directly? When would you choose one approach over the other?",
-        "evaluationCriteria": "Should explain that tool use provides: (1) schema validation — the API enforces the schema, (2) more reliable structure — Claude is trained to follow tool schemas precisely, (3) type safety — you define the schema with proper types. Prompting for JSON is simpler and works well for straightforward extractions. Tool use is better when you need guaranteed schema compliance, are building production systems, or need complex nested structures. Should demonstrate understanding of both approaches."
+        "evaluationCriteria": "Should explain that tool use provides: (1) schema validation \u2014 the API enforces the schema, (2) more reliable structure \u2014 Claude is trained to follow tool schemas precisely, (3) type safety \u2014 you define the schema with proper types. Prompting for JSON is simpler and works well for straightforward extractions. Tool use is better when you need guaranteed schema compliance, are building production systems, or need complex nested structures. Should demonstrate understanding of both approaches."
       }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Reliable structured output requires explicit instructions: define your schema, specify field types, handle edge cases, and tell Claude to respond with only the structured data. For maximum reliability, use the prefilling trick or tool use to enforce JSON output."
     }
   ]
 }

@@ -1,14 +1,18 @@
 {
   "id": "first-api-call",
   "title": "Your First API Call",
-  "description": "Get started with the Claude Messages API — from authentication to making your first request and understanding the response format.",
+  "description": "Get started with the Claude Messages API \u2014 from authentication to making your first request and understanding the response format.",
   "track": "api",
   "trackTitle": "Building with the API",
   "estimatedMinutes": 12,
   "difficulty": "beginner",
-  "prerequisites": ["prompt-engineering"],
+  "prerequisites": [
+    "prompt-engineering"
+  ],
   "skillDimension": "api-integration",
-  "targetRoles": ["developer"],
+  "targetRoles": [
+    "developer"
+  ],
   "learningObjectives": [
     "Understand the Claude Messages API structure",
     "Construct a well-formed API request",
@@ -19,13 +23,13 @@
       "id": "messages-api",
       "type": "concept",
       "title": "The Messages API",
-      "content": "The Claude Messages API is Anthropic's primary interface for integrating Claude into your applications. Every interaction with Claude through the API follows a simple pattern: you send a list of messages and get a response back.\n\nThe API endpoint is:\n```\nPOST https://api.anthropic.com/v1/messages\n```\n\nEvery request you send must include three required fields. The **model** field specifies which Claude model to use, such as `claude-sonnet-4-20250514`. The **max_tokens** field sets a ceiling on how many tokens Claude can generate in its response — this is required because it prevents runaway responses and helps you manage costs. Finally, the **messages** field contains an array of conversation messages that form the input to Claude.\n\nBeyond these three essentials, several optional fields give you finer control over Claude's behavior. The **system** field accepts a system prompt that shapes how Claude approaches its responses — think of it as stage directions for the conversation. The **temperature** field controls the randomness of Claude's output, where 0 produces near-deterministic responses and 1 encourages more creative variation. You can also set **stream** to true if you want to receive the response token by token rather than waiting for the complete output.\n\nTo authenticate your requests, pass your API key in the `x-api-key` header. This key identifies your account and is the only credential you need to start making calls."
+      "content": "The Claude Messages API is Anthropic's primary interface for integrating Claude into your applications. Every interaction with Claude through the API follows a simple pattern: you send a list of messages and get a response back.\n\nThe API endpoint is:\n```\nPOST https://api.anthropic.com/v1/messages\n```\n\nEvery request you send must include three required fields. The **model** field specifies which Claude model to use, such as `claude-sonnet-4-20250514`. The **max_tokens** field sets a ceiling on how many tokens Claude can generate in its response \u2014 this is required because it prevents runaway responses and helps you manage costs. Finally, the **messages** field contains an array of conversation messages that form the input to Claude.\n\nBeyond these three essentials, several optional fields give you finer control over Claude's behavior. The **system** field accepts a system prompt that shapes how Claude approaches its responses \u2014 think of it as stage directions for the conversation. The **temperature** field controls the randomness of Claude's output, where 0 produces near-deterministic responses and 1 encourages more creative variation. You can also set **stream** to true if you want to receive the response token by token rather than waiting for the complete output.\n\nTo authenticate your requests, pass your API key in the `x-api-key` header. This key identifies your account and is the only credential you need to start making calls."
     },
     {
       "id": "request-format",
       "type": "concept",
       "title": "Constructing a Request",
-      "content": "Here's the anatomy of a Claude API request:\n\n```json\n{\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 1024,\n  \"system\": \"You are a helpful assistant that responds concisely.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is the Messages API?\"\n    }\n  ]\n}\n```\n\nThe heart of every request is the **messages** array. Each message is an object with two properties: a **role** that is either `\"user\"` or `\"assistant\"`, and **content** that holds the actual text. The content can be a simple string for text-only inputs, or an array of content blocks when you need to send multimodal inputs like images alongside text.\n\nThere are two important structural rules to keep in mind. Messages must alternate between user and assistant roles — you cannot have two user messages in a row. And every conversation must begin with a user message, since Claude always responds rather than initiates.\n\nUsing the Anthropic Python SDK:\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\nmessage = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=1024,\n    system=\"You are a helpful assistant.\",\n    messages=[\n        {\"role\": \"user\", \"content\": \"Hello, Claude!\"}\n    ]\n)\n\nprint(message.content[0].text)\n```\n\nOr with the TypeScript SDK:\n\n```typescript\nimport Anthropic from '@anthropic-ai/sdk';\n\nconst client = new Anthropic();\n\nconst message = await client.messages.create({\n  model: 'claude-sonnet-4-20250514',\n  max_tokens: 1024,\n  system: 'You are a helpful assistant.',\n  messages: [\n    { role: 'user', content: 'Hello, Claude!' }\n  ],\n});\n\nconsole.log(message.content[0].text);\n```"
+      "content": "Here's the anatomy of a Claude API request:\n\n```json\n{\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 1024,\n  \"system\": \"You are a helpful assistant that responds concisely.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is the Messages API?\"\n    }\n  ]\n}\n```\n\nThe heart of every request is the **messages** array. Each message is an object with two properties: a **role** that is either `\"user\"` or `\"assistant\"`, and **content** that holds the actual text. The content can be a simple string for text-only inputs, or an array of content blocks when you need to send multimodal inputs like images alongside text.\n\nThere are two important structural rules to keep in mind. Messages must alternate between user and assistant roles \u2014 you cannot have two user messages in a row. And every conversation must begin with a user message, since Claude always responds rather than initiates.\n\nUsing the Anthropic Python SDK:\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\nmessage = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=1024,\n    system=\"You are a helpful assistant.\",\n    messages=[\n        {\"role\": \"user\", \"content\": \"Hello, Claude!\"}\n    ]\n)\n\nprint(message.content[0].text)\n```\n\nOr with the TypeScript SDK:\n\n```typescript\nimport Anthropic from '@anthropic-ai/sdk';\n\nconst client = new Anthropic();\n\nconst message = await client.messages.create({\n  model: 'claude-sonnet-4-20250514',\n  max_tokens: 1024,\n  system: 'You are a helpful assistant.',\n  messages: [\n    { role: 'user', content: 'Hello, Claude!' }\n  ],\n});\n\nconsole.log(message.content[0].text);\n```"
     },
     {
       "id": "response-format",
@@ -41,19 +45,13 @@
       "exercise": {
         "prompt": "You're building a feature that summarizes customer feedback emails into structured data. Write out the complete API request body (as JSON) that you would send to the Claude Messages API. The request should:\n\n1. Use an appropriate model\n2. Include a system prompt that instructs Claude to extract: sentiment (positive/negative/neutral), main topics (array), urgency level (low/medium/high), and a one-line summary\n3. Include a sample user message with a fictional customer email\n4. Set appropriate max_tokens\n\nWrite the full JSON request body.",
         "hints": [
-          "Choose a model that balances cost and capability — claude-sonnet-4-20250514 is a good default",
+          "Choose a model that balances cost and capability \u2014 claude-sonnet-4-20250514 is a good default",
           "Your system prompt should specify the exact JSON output format you want",
           "Include an example of what the output should look like in the system prompt",
           "Think about what max_tokens you need for a structured JSON response"
         ],
         "evaluationCriteria": "The response should be a valid JSON request body with: (1) a model field with a real Claude model name, (2) a system prompt that clearly defines the extraction task and output format, (3) a messages array with at least one user message containing a realistic customer email, (4) reasonable max_tokens (256-1024 for this task). Bonus for including temperature (low for structured extraction) and specifying JSON output format in the system prompt."
       }
-    },
-    {
-      "id": "takeaway",
-      "type": "takeaway",
-      "title": "Key Takeaway",
-      "content": "The Claude Messages API follows a simple request-response pattern: send messages, get a response. Every request needs three things — a model, a max_tokens limit, and a messages array. Use system prompts to shape Claude's behavior for your specific use case, and always check the stop_reason in the response to confirm you received a complete answer rather than a truncated one."
     },
     {
       "id": "check",
@@ -64,6 +62,12 @@
         "prompt": "You're building a multi-turn chatbot. After the user sends their third message, the API returns a response with stop_reason: \"max_tokens\". What happened, what are the consequences, and how would you fix it?",
         "evaluationCriteria": "Should explain that: (1) Claude's response was truncated because it hit the max_tokens limit, (2) the user received an incomplete response, (3) solutions include increasing max_tokens, instructing Claude to be more concise in the system prompt, or implementing a continuation strategy where you send the truncated response back and ask Claude to continue. Bonus for mentioning that in multi-turn conversations, the accumulated context (all previous messages) counts toward understanding why this might happen later in a conversation."
       }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "The Claude Messages API follows a simple request-response pattern: send messages, get a response. Every request needs three things \u2014 a model, a max_tokens limit, and a messages array. Use system prompts to shape Claude's behavior for your specific use case, and always check the stop_reason in the response to confirm you received a complete answer rather than a truncated one."
     }
   ]
 }

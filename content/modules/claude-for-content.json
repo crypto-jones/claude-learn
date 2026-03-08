@@ -6,7 +6,9 @@
   "trackTitle": "Claude Fundamentals",
   "estimatedMinutes": 12,
   "difficulty": "beginner",
-  "prerequisites": ["prompt-engineering"],
+  "prerequisites": [
+    "prompt-engineering"
+  ],
   "skillDimension": "prompt-engineering",
   "targetRoles": [],
   "learningObjectives": [
@@ -66,12 +68,6 @@
       }
     },
     {
-      "id": "takeaway",
-      "type": "takeaway",
-      "title": "Key Takeaway",
-      "content": "Claude's deepest value is not in generating text -- it is in making your thinking more rigorous. Use it to analyze documents with a specific critical frame rather than just summarizing them. Synthesize across multiple sources to find patterns, contradictions, and gaps that no single source reveals. Apply structured reasoning frameworks -- assumption audits, pre-mortems, stakeholder mapping, devil's advocacy -- to stress-test your plans before they meet reality. The goal is not to delegate your thinking to Claude, but to think alongside it, bringing your expertise and judgment while Claude brings structured process and the patience to be thorough."
-    },
-    {
       "id": "check",
       "type": "check",
       "title": "Check Your Understanding",
@@ -80,6 +76,12 @@
         "prompt": "Think of a real decision, analysis, or research task you have faced recently (or are facing now). It might be evaluating a vendor, deciding on a strategic direction, analyzing customer feedback, or investigating a complex problem.\n\nDescribe:\n\n1. What was the decision or analysis, and what made it complex?\n2. What information did you have, and what were you unsure about?\n3. Write two different prompts you could give Claude for this situation:\n   - A **weak prompt** that would only get you surface-level output (summary, generic advice)\n   - A **strong prompt** that would make Claude a genuine thinking partner (using techniques from this module like analytical framing, synthesis, assumption audits, or pre-mortem analysis)\n4. Explain what makes the strong prompt better -- what specific cognitive work is it asking Claude to do that the weak prompt misses?",
         "evaluationCriteria": "The response should demonstrate understanding of the difference between using Claude for content generation versus cognitive partnership. The weak prompt should be recognizably surface-level (e.g., 'summarize this' or 'what should I do about X'). The strong prompt should apply at least one technique from the module: a specific analytical frame, cross-source synthesis, assumption audit, pre-mortem, stakeholder mapping, or devil's advocacy. The explanation should articulate why the strong prompt produces deeper thinking -- not just better writing -- and should identify the specific cognitive work (pattern recognition, gap identification, assumption challenging, perspective-taking) that the strong prompt enables. Strong responses will use a genuinely complex real-world scenario, not a trivially simple one."
       }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Claude's deepest value is not in generating text -- it is in making your thinking more rigorous. Use it to analyze documents with a specific critical frame rather than just summarizing them. Synthesize across multiple sources to find patterns, contradictions, and gaps that no single source reveals. Apply structured reasoning frameworks -- assumption audits, pre-mortems, stakeholder mapping, devil's advocacy -- to stress-test your plans before they meet reality. The goal is not to delegate your thinking to Claude, but to think alongside it, bringing your expertise and judgment while Claude brings structured process and the patience to be thorough."
     }
   ]
 }

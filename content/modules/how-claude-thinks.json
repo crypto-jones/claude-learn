@@ -1,7 +1,7 @@
 {
   "id": "how-claude-thinks",
   "title": "How Claude Thinks",
-  "description": "Build a mental model for working with Claude effectively — understanding what it does well, where it struggles, and how to think about it as a tool.",
+  "description": "Build a mental model for working with Claude effectively \u2014 understanding what it does well, where it struggles, and how to think about it as a tool.",
   "track": "fundamentals",
   "trackTitle": "Claude Fundamentals",
   "estimatedMinutes": 12,
@@ -19,13 +19,13 @@
       "id": "what-is-claude",
       "type": "concept",
       "title": "What Is Claude?",
-      "content": "Claude is a large language model (LLM) built by Anthropic. At its core, Claude works by predicting what text should come next given the context you provide.\n\nBut that simple description undersells what's happening. Claude has been trained on a vast corpus of text and then refined through techniques like RLHF (Reinforcement Learning from Human Feedback) to be helpful, harmless, and honest.\n\nHere's the key mental model: **Claude doesn't \"know\" things the way you do.** It doesn't have a database of facts it looks up. Instead, it has learned patterns from training data that let it generate relevant, coherent responses. This distinction matters because it explains both Claude's impressive capabilities and its limitations.\n\nWhen you give Claude a prompt, it processes your entire input as context and generates a response token by token. Each token it produces becomes part of the context for the next token. This is why the way you frame your prompt matters so much — you're literally shaping the context that determines Claude's output."
+      "content": "Claude is a large language model (LLM) built by Anthropic. At its core, Claude works by predicting what text should come next given the context you provide.\n\nBut that simple description undersells what's happening. Claude has been trained on a vast corpus of text and then refined through techniques like RLHF (Reinforcement Learning from Human Feedback) to be helpful, harmless, and honest.\n\nHere's the key mental model: **Claude doesn't \"know\" things the way you do.** It doesn't have a database of facts it looks up. Instead, it has learned patterns from training data that let it generate relevant, coherent responses. This distinction matters because it explains both Claude's impressive capabilities and its limitations.\n\nWhen you give Claude a prompt, it processes your entire input as context and generates a response token by token. Each token it produces becomes part of the context for the next token. This is why the way you frame your prompt matters so much \u2014 you're literally shaping the context that determines Claude's output."
     },
     {
       "id": "context-window",
       "type": "concept",
       "title": "The Context Window",
-      "content": "Claude has a **context window** — a limit on how much text it can consider at once. Think of it as Claude's working memory for a single conversation.\n\nClaude's context window is 200,000 tokens (roughly 150,000 words, or about 500 pages of text). This is large enough to process entire codebases, long documents, or extended conversations.\n\nImportant things to understand about the context window:\n\n- **Everything in the conversation counts.** Your system prompt, all previous messages, and Claude's own responses all consume context.\n- **There's no memory between conversations.** Each new conversation starts fresh. Claude doesn't remember what you discussed yesterday.\n- **Position matters.** Claude tends to pay more attention to content at the beginning and end of the context window. Content in the middle of very long contexts may receive less attention.\n- **Quality over quantity.** Stuffing the context with irrelevant information can actually hurt performance. Give Claude what it needs, not everything you have.",
+      "content": "Claude has a **context window** \u2014 a limit on how much text it can consider at once. Think of it as Claude's working memory for a single conversation.\n\nClaude's context window is 200,000 tokens (roughly 150,000 words, or about 500 pages of text). This is large enough to process entire codebases, long documents, or extended conversations.\n\nImportant things to understand about the context window:\n\n- **Everything in the conversation counts.** Your system prompt, all previous messages, and Claude's own responses all consume context.\n- **There's no memory between conversations.** Each new conversation starts fresh. Claude doesn't remember what you discussed yesterday.\n- **Position matters.** Claude tends to pay more attention to content at the beginning and end of the context window. Content in the middle of very long contexts may receive less attention.\n- **Quality over quantity.** Stuffing the context with irrelevant information can actually hurt performance. Give Claude what it needs, not everything you have.",
       "playground": {
         "description": "See how giving Claude more context changes its response. Try adding details like the language, framework, or environment to the user message.",
         "systemPrompt": "You are a helpful coding assistant. Be specific and thorough in your code reviews.",
@@ -53,13 +53,13 @@
       "id": "strengths",
       "type": "concept",
       "title": "Where Claude Excels",
-      "content": "Claude is exceptionally good at several categories of tasks:\n\n**Reasoning and Analysis** — Claude can break down complex problems, analyze arguments, compare options, and work through multi-step logic. It's particularly strong at explaining its reasoning.\n\n**Writing and Communication** — From technical documentation to creative fiction, Claude produces clear, well-structured prose. It can match tone, style, and format requirements.\n\n**Code Generation and Review** — Claude can write, debug, explain, and refactor code across many languages. It understands software architecture patterns and can reason about code behavior.\n\n**Data Extraction and Transformation** — Given unstructured text, Claude can extract structured information, summarize key points, and transform data between formats.\n\n**Following Complex Instructions** — Claude is good at following multi-step instructions with specific constraints. The more precise your instructions, the better it performs."
+      "content": "Claude is exceptionally good at several categories of tasks:\n\n**Reasoning and Analysis** \u2014 Claude can break down complex problems, analyze arguments, compare options, and work through multi-step logic. It's particularly strong at explaining its reasoning.\n\n**Writing and Communication** \u2014 From technical documentation to creative fiction, Claude produces clear, well-structured prose. It can match tone, style, and format requirements.\n\n**Code Generation and Review** \u2014 Claude can write, debug, explain, and refactor code across many languages. It understands software architecture patterns and can reason about code behavior.\n\n**Data Extraction and Transformation** \u2014 Given unstructured text, Claude can extract structured information, summarize key points, and transform data between formats.\n\n**Following Complex Instructions** \u2014 Claude is good at following multi-step instructions with specific constraints. The more precise your instructions, the better it performs."
     },
     {
       "id": "limitations",
       "type": "concept",
       "title": "Where Claude Struggles",
-      "content": "Understanding Claude's limitations is just as important as knowing its strengths:\n\n**Hallucination** — Claude can generate plausible-sounding but incorrect information. It doesn't \"know\" when it's wrong. Always verify critical facts, especially specific numbers, dates, URLs, or claims about real people.\n\n**Knowledge Cutoff** — Claude's training data has a cutoff date. It won't know about recent events, newly released APIs, or changes made after its training.\n\n**Math and Precise Computation** — While Claude can reason about math conceptually, it can make arithmetic errors. For precise calculations, use tool use to call a calculator or code interpreter.\n\n**Real-time Information** — Claude can't browse the web, check current prices, or access live data on its own. It needs tools or retrieval systems to get current information.\n\n**Consistency Across Long Outputs** — In very long responses, Claude may lose track of constraints or contradict itself. Breaking complex tasks into smaller steps helps."
+      "content": "Understanding Claude's limitations is just as important as knowing its strengths:\n\n**Hallucination** \u2014 Claude can generate plausible-sounding but incorrect information. It doesn't \"know\" when it's wrong. Always verify critical facts, especially specific numbers, dates, URLs, or claims about real people.\n\n**Knowledge Cutoff** \u2014 Claude's training data has a cutoff date. It won't know about recent events, newly released APIs, or changes made after its training.\n\n**Math and Precise Computation** \u2014 While Claude can reason about math conceptually, it can make arithmetic errors. For precise calculations, use tool use to call a calculator or code interpreter.\n\n**Real-time Information** \u2014 Claude can't browse the web, check current prices, or access live data on its own. It needs tools or retrieval systems to get current information.\n\n**Consistency Across Long Outputs** \u2014 In very long responses, Claude may lose track of constraints or contradict itself. Breaking complex tasks into smaller steps helps."
     },
     {
       "id": "exercise-mental-model",
@@ -73,14 +73,8 @@
           "Consider which tasks require capabilities Claude doesn't have (real-time data, computation)",
           "For tasks that aren't a direct fit, think about tool use and system design"
         ],
-        "evaluationCriteria": "The response should correctly identify that: (1) ticket categorization is an excellent fit — Claude excels at text classification and can handle nuanced categorization; (2) real-time stock alerts are NOT a direct fit because Claude can't access live data, but could work with a data feed + Claude for analysis; (3) meeting transcript summarization is a great fit — this plays directly to Claude's strengths in text analysis and extraction. Award bonus points for mentioning specific implementation considerations."
+        "evaluationCriteria": "The response should correctly identify that: (1) ticket categorization is an excellent fit \u2014 Claude excels at text classification and can handle nuanced categorization; (2) real-time stock alerts are NOT a direct fit because Claude can't access live data, but could work with a data feed + Claude for analysis; (3) meeting transcript summarization is a great fit \u2014 this plays directly to Claude's strengths in text analysis and extraction. Award bonus points for mentioning specific implementation considerations."
       }
-    },
-    {
-      "id": "takeaway",
-      "type": "takeaway",
-      "title": "Key Takeaway",
-      "content": "Claude is a powerful reasoning and language engine, not an omniscient oracle. The best results come from playing to its strengths (analysis, writing, code, extraction) while designing around its limitations (no memory, possible hallucination, no real-time data)."
     },
     {
       "id": "check",
@@ -91,6 +85,12 @@
         "prompt": "In your own words, explain why Claude sometimes generates incorrect information (hallucination), and describe one strategy you would use to mitigate this risk in a production application.",
         "evaluationCriteria": "The response should demonstrate understanding that hallucination occurs because Claude generates text based on learned patterns rather than looking up verified facts. Good mitigation strategies include: using retrieval-augmented generation (RAG), implementing human review for critical outputs, asking Claude to cite sources and then verifying them, using tool use for factual lookups, or breaking complex reasoning into verifiable steps."
       }
+    },
+    {
+      "id": "takeaway",
+      "type": "takeaway",
+      "title": "Key Takeaway",
+      "content": "Claude is a powerful reasoning and language engine, not an omniscient oracle. The best results come from playing to its strengths (analysis, writing, code, extraction) while designing around its limitations (no memory, possible hallucination, no real-time data)."
     }
   ]
 }
