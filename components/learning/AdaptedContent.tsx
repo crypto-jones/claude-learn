@@ -101,7 +101,7 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
             )}
             <div className="min-w-0">
               <span className="text-xs font-medium text-primary">
-                For you as a {roleLabel}
+                {role === 'getting-started' ? 'Real-world example' : `For you as a ${roleLabel}`}
               </span>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                 {content || 'Generating a role-specific example...'}
