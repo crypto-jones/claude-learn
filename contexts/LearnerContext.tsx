@@ -10,6 +10,7 @@ import {
   SkillDimension,
   ModuleProgress,
   ExerciseFeedback,
+  ChatMessage,
   LearningGoal,
   ReviewItem,
 } from '@/lib/types';
@@ -26,6 +27,7 @@ interface LearnerContextType {
   updateModuleProgress: (moduleId: string, progress: Partial<ModuleProgress>) => void;
   completeModule: (moduleId: string, skillDimension: SkillDimension) => void;
   saveExerciseFeedback: (moduleId: string, sectionId: string, fb: ExerciseFeedback) => void;
+  updateExerciseFeedback: (moduleId: string, sectionId: string, conversation: ChatMessage[]) => void;
   setLearningPath: (path: string[]) => void;
   addLearningGoal: (goal: LearningGoal) => void;
   removeLearningGoal: (skillDimension: SkillDimension) => void;
@@ -247,6 +249,38 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const updateExerciseFeedback = useCallback(
+    (moduleId: string, sectionId: string, conversation: ChatMessage[]) => {
+      setProfile((prev) => {
+        const existing = prev.moduleProgress[moduleId];
+        if (!existing) return prev;
+        const feedbackArr = existing.exerciseFeedback?.[sectionId];
+        if (!feedbackArr || feedbackArr.length === 0) return prev;
+        const updatedFeedback = [...feedbackArr];
+        updatedFeedback[updatedFeedback.length - 1] = {
+          ...updatedFeedback[updatedFeedback.length - 1],
+          conversation,
+        };
+        const updated = {
+          ...prev,
+          moduleProgress: {
+            ...prev.moduleProgress,
+            [moduleId]: {
+              ...existing,
+              exerciseFeedback: {
+                ...existing.exerciseFeedback,
+                [sectionId]: updatedFeedback,
+              },
+            },
+          },
+        };
+        saveProfile(updated);
+        return updated;
+      });
+    },
+    []
+  );
+
   const setLearningPath = useCallback(
     (path: string[]) => updateProfile({ learningPath: path }),
     [updateProfile]
@@ -342,6 +376,7 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
         updateModuleProgress,
         completeModule,
         saveExerciseFeedback,
+        updateExerciseFeedback,
         setLearningPath,
         addLearningGoal,
         removeLearningGoal,

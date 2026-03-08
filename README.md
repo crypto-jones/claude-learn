@@ -18,7 +18,7 @@ The platform serves multiple audiences — developers building with the API, pro
 
 2. **Personalized Learning Path** — Based on assessment results, the platform generates a recommended sequence of modules tailored to your skill gaps. A developer building with the API gets a different path than a product manager evaluating AI features.
 
-3. **Interactive Modules** — Each module combines concept explanations with hands-on exercises. You write real prompts, design real tool schemas, and build real patterns — then Claude evaluates your work against specific rubrics and gives streaming, actionable feedback.
+3. **Interactive Modules** — Each module combines concept explanations with hands-on exercises. You write real prompts, design real tool schemas, and build real patterns — then Claude evaluates your work against specific rubrics and gives streaming, actionable feedback. After initial feedback, you can continue the conversation: ask follow-up questions, submit revised thinking, and get deeper coaching from Claude in a natural dialogue.
 
 4. **AI Learning Companion** — A context-aware sidebar assistant that knows which module you're in, which section you're reading, and your skill profile. It answers questions, offers encouragement, and helps you connect concepts across the curriculum.
 
@@ -28,6 +28,7 @@ The platform serves multiple audiences — developers building with the API, pro
 
 ## Features
 
+- **Iterative exercise conversations** — After structured feedback, exercises become dialogues — ask follow-up questions, revise your answer, and get conversational coaching that pushes you deeper
 - **Role-adaptive content** — Examples and explanations adjust based on whether you're a developer, PM, designer, or business user
 - **Live prompt playground** — Test prompts against the Claude API directly within module pages, with streaming responses
 - **Prerequisite soft-gates** — Modules suggest (but don't require) prerequisite completion, with direct links

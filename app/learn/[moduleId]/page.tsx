@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Fragment } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
@@ -15,7 +15,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Module, ModuleSection, ExerciseFeedback, SKILL_DIMENSIONS } from '@/lib/types';
+import { Module, ModuleSection, ExerciseFeedback, ChatMessage, SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { moduleMap, allModuleIds } from '@/lib/modules';
 import { injectConceptLinks } from '@/lib/concepts';
@@ -174,7 +174,7 @@ function ExerciseBlock({
   moduleData: Module;
   onComplete: (sectionId: string, response: string) => void;
 }) {
-  const { profile, saveExerciseFeedback } = useLearner();
+  const { profile, saveExerciseFeedback, updateExerciseFeedback } = useLearner();
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -182,7 +182,24 @@ function ExerciseBlock({
   const [showHints, setShowHints] = useState(false);
   const [attemptNumber, setAttemptNumber] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
+  const [conversationMessages, setConversationMessages] = useState<ChatMessage[]>([]);
+  const [followUpInput, setFollowUpInput] = useState('');
+  const [isFollowUpStreaming, setIsFollowUpStreaming] = useState(false);
+  const [followUpStreamingContent, setFollowUpStreamingContent] = useState('');
+  const followUpContainerRef = useRef<HTMLDivElement>(null);
+  const followUpInputRef = useRef<HTMLTextAreaElement>(null);
   const previousAttempts = profile.moduleProgress?.[moduleData.id]?.exerciseFeedback?.[section.id] || [];
+
+  const scrollFollowUpToBottom = useCallback(() => {
+    const container = followUpContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollFollowUpToBottom();
+  }, [conversationMessages, followUpStreamingContent, scrollFollowUpToBottom]);
 
   const handleSubmit = async () => {
     if (!input.trim() || isSubmitting) return;
@@ -216,6 +233,10 @@ function ExerciseBlock({
           timestamp: Date.now(),
           attemptNumber,
         });
+        setConversationMessages([
+          { role: 'user', content: input.trim() },
+          { role: 'assistant', content: accumulated },
+        ]);
       },
       () => {
         setFeedback('Unable to get feedback right now. Your response has been saved.');
@@ -224,6 +245,59 @@ function ExerciseBlock({
         onComplete(section.id, input.trim());
       }
     );
+  };
+
+  const handleFollowUp = async () => {
+    if (!followUpInput.trim() || isFollowUpStreaming) return;
+
+    const userMessage: ChatMessage = { role: 'user', content: followUpInput.trim() };
+    const newMessages = [...conversationMessages, userMessage];
+    setConversationMessages(newMessages);
+    setFollowUpInput('');
+    setIsFollowUpStreaming(true);
+
+    let accumulated = '';
+
+    await streamChat(
+      {
+        messages: newMessages,
+        mode: 'feedback',
+        context: {
+          role: profile.role || undefined,
+          moduleTitle: moduleData.title,
+          sectionTitle: section.title,
+          sectionContent: section.content?.slice(0, 500),
+          exercisePrompt: section.exercise?.prompt,
+          evaluationCriteria: section.exercise?.evaluationCriteria,
+        },
+      },
+      (text) => {
+        accumulated += text;
+        setFollowUpStreamingContent(accumulated);
+      },
+      () => {
+        const updatedMessages: ChatMessage[] = [...newMessages, { role: 'assistant', content: accumulated }];
+        setConversationMessages(updatedMessages);
+        setFollowUpStreamingContent('');
+        setIsFollowUpStreaming(false);
+        updateExerciseFeedback(moduleData.id, section.id, updatedMessages.slice(2));
+      },
+      () => {
+        setConversationMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: "I'm having trouble responding right now. Please try again." },
+        ]);
+        setFollowUpStreamingContent('');
+        setIsFollowUpStreaming(false);
+      }
+    );
+  };
+
+  const handleFollowUpKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleFollowUp();
+    }
   };
 
   return (
@@ -339,6 +413,86 @@ function ExerciseBlock({
             </div>
           )}
 
+          {isSubmitted && conversationMessages.length >= 2 && (
+            <div className="mt-4 border border-border rounded-lg overflow-hidden">
+              <div className="px-4 py-2 bg-muted/50 border-b border-border flex items-center gap-2">
+                <MessageCircle className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-medium text-foreground">Continue the conversation</span>
+              </div>
+
+              {(conversationMessages.length > 2 || isFollowUpStreaming) && (
+                <div
+                  ref={followUpContainerRef}
+                  className="px-4 py-3 space-y-3 max-h-[400px] overflow-y-auto"
+                >
+                  {conversationMessages.slice(2).map((msg, i) => (
+                    <div
+                      key={i}
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-3 py-2 ${
+                          msg.role === 'user'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-foreground'
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {msg.content}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+
+                  {isFollowUpStreaming && followUpStreamingContent && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[85%] rounded-2xl px-3 py-2 bg-muted text-foreground">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {followUpStreamingContent}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {isFollowUpStreaming && !followUpStreamingContent && (
+                    <div className="flex justify-start">
+                      <div className="rounded-2xl px-3 py-2 bg-muted">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="px-4 py-3 border-t border-border bg-background">
+                <div className="flex gap-2">
+                  <textarea
+                    ref={followUpInputRef}
+                    value={followUpInput}
+                    onChange={(e) => setFollowUpInput(e.target.value)}
+                    onKeyDown={handleFollowUpKeyDown}
+                    placeholder="Ask a follow-up question or share revised thinking..."
+                    aria-label="Ask a follow-up question about the exercise"
+                    disabled={isFollowUpStreaming}
+                    className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[36px] max-h-[80px]"
+                    rows={1}
+                  />
+                  <Button
+                    onClick={handleFollowUp}
+                    disabled={!followUpInput.trim() || isFollowUpStreaming}
+                    size="icon"
+                    className="h-[36px] w-[36px] rounded-lg shrink-0"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1.5">
+                  Ask questions, share revised answers, or explore the concept deeper
+                </p>
+              </div>
+            </div>
+          )}
+
           {isSubmitted && (
             <Button
               variant="outline"
@@ -348,6 +502,9 @@ function ExerciseBlock({
                 setFeedback('');
                 setIsSubmitted(false);
                 setAttemptNumber(prev => prev + 1);
+                setConversationMessages([]);
+                setFollowUpInput('');
+                setFollowUpStreamingContent('');
               }}
               className="mt-3 gap-1"
             >

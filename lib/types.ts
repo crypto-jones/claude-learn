@@ -147,6 +147,7 @@ export interface ExerciseFeedback {
   feedback: string;
   timestamp: number;
   attemptNumber: number;
+  conversation?: ChatMessage[];
 }
 
 // Module progress
