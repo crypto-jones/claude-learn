@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLearner } from '@/contexts/LearnerContext';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
@@ -155,8 +155,9 @@ function renderChatMarkdown(text: string): React.ReactNode[] {
 
 const MAX_ASSESSMENT_TURNS = 4;
 
-export default function AssessPage() {
+function AssessPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { profile, setRole, setExperienceLevel, completeAssessment } = useLearner();
   const [step, setStep] = useState<Step>('role');
   const [selectedRole, setSelectedRole] = useState<LearnerRole | null>(null);
@@ -173,6 +174,17 @@ export default function AssessPage() {
   const [questionCount, setQuestionCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Pre-select role from query param (e.g., /assess?role=developer)
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam && LEARNER_ROLES.some((r) => r.id === roleParam)) {
+      const role = roleParam as LearnerRole;
+      setSelectedRole(role);
+      setRole(role);
+      setStep('experience');
+    }
+  }, [searchParams, setRole]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -634,5 +646,13 @@ export default function AssessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AssessPage() {
+  return (
+    <Suspense>
+      <AssessPageInner />
+    </Suspense>
   );
 }

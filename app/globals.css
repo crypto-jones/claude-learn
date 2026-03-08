@@ -126,9 +126,19 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Offset anchor scroll targets below sticky nav */
+[id="paths"],
+[id="how-it-works"],
+[id="curriculum"] {
+  scroll-margin-top: 4.5rem;
 }
 
 /* Page transition */
@@ -216,6 +226,28 @@
 .stagger-children > *:nth-child(4) { animation-delay: 240ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 320ms; }
 .stagger-children > *:nth-child(6) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 560ms; }
+
+/* Floating radar decoration */
+@keyframes radar-pulse {
+  0%, 100% { opacity: 0.04; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.08; transform: scale(1.02) rotate(3deg); }
+}
+
+.animate-radar-pulse {
+  animation: radar-pulse 6s ease-in-out infinite;
+}
+
+/* Smooth line drawing */
+@keyframes draw-line {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.animate-draw-line {
+  animation: draw-line 1s ease-out forwards;
+}
 
 /* Markdown content styling */
 .prose-module h2 {
