@@ -51,6 +51,12 @@ export const LEARNER_ROLES: {
   icon: string;
 }[] = [
   {
+    id: 'getting-started',
+    label: 'Getting Started',
+    description: 'Explore what AI can do and find your path',
+    icon: 'Compass',
+  },
+  {
     id: 'developer',
     label: 'Developer',
     description: 'Building software with Claude',
@@ -73,12 +79,6 @@ export const LEARNER_ROLES: {
     label: 'Business / Operations',
     description: 'Using AI to improve workflows',
     icon: 'Briefcase',
-  },
-  {
-    id: 'getting-started',
-    label: 'Getting Started',
-    description: 'Explore what AI can do and find your path',
-    icon: 'Compass',
   },
 ];
 

@@ -59,6 +59,20 @@ These foundational modules are available across multiple paths:
 | Prompt Engineering Essentials | System prompts, few-shot examples, chain-of-thought reasoning | Beginner |
 | Claude for Content & Communication | Drafting, editing, research synthesis, and document analysis | Beginner |
 
+### 🧭 Getting Started Path (11 modules)
+For beginners exploring what AI can do and building a foundation for any path.
+
+| Module | Description | Difficulty |
+|--------|-------------|------------|
+| What AI Can Do | A practical introduction to generative AI and Claude's capabilities | Beginner |
+| Understanding AI Capabilities | How language models work, context windows, hallucinations, and training data | Beginner |
+| AI for Everyday Tasks | Writing, brainstorming, organizing, and planning with Claude | Beginner |
+| AI for Learning & Research | Using Claude as a tutor, research assistant, and study partner | Beginner |
+| Evaluating AI Outputs | Critical thinking framework for assessing AI-generated content | Beginner |
+| Fact-Checking with AI | Verification strategies and recognizing unverifiable claims | Intermediate |
+| Responsible AI Use | Principles of responsible use — transparency, accountability, and privacy | Beginner |
+| Navigating AI Ethics | Bias, fairness, societal impact, and the evolving regulatory landscape | Intermediate |
+
 ### 🛠️ Developer Path (12 modules)
 For developers building with the Claude API and shipping AI-powered applications.
 
@@ -117,25 +131,18 @@ For business professionals automating workflows, creating content, and measuring
 | AI Governance Essentials | Foundational governance concepts — policies, oversight, and compliance | Beginner |
 | AI Compliance & Risk | Risk management frameworks, regulatory requirements, and mitigation strategies | Intermediate |
 
-### 🧭 Getting Started Path (11 modules)
-For beginners exploring what AI can do and building a foundation for any path.
-
-| Module | Description | Difficulty |
-|--------|-------------|------------|
-| What AI Can Do | A practical introduction to generative AI and Claude's capabilities | Beginner |
-| Understanding AI Capabilities | How language models work, context windows, hallucinations, and training data | Beginner |
-| AI for Everyday Tasks | Writing, brainstorming, organizing, and planning with Claude | Beginner |
-| AI for Learning & Research | Using Claude as a tutor, research assistant, and study partner | Beginner |
-| Evaluating AI Outputs | Critical thinking framework for assessing AI-generated content | Beginner |
-| Fact-Checking with AI | Verification strategies and recognizing unverifiable claims | Intermediate |
-| Responsible AI Use | Principles of responsible use — transparency, accountability, and privacy | Beginner |
-| Navigating AI Ethics | Bias, fairness, societal impact, and the evolving regulatory landscape | Intermediate |
-
 ---
 
 ## Skill Dimensions
 
 Each learning path tracks growth across its own five competency areas, tailored to what matters for that role. Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *Advanced*.
+
+### Getting Started
+- **AI Fundamentals** — Understanding what AI is and how language models work
+- **Prompt Engineering** — Crafting effective prompts and system prompts
+- **Practical Applications** — Using AI for everyday tasks, learning, and research
+- **Critical Thinking** — Evaluating AI outputs and fact-checking with AI
+- **AI Ethics** — Responsible use, bias awareness, and navigating ethical questions
 
 ### Developer
 - **Prompt Engineering** — Crafting effective prompts and system prompts
@@ -164,13 +171,6 @@ Each learning path tracks growth across its own five competency areas, tailored 
 - **Content & Communication** — Reports, business writing, and professional content
 - **Evaluation & Testing** — Evaluator-optimizer patterns and systematic evals
 - **AI Governance** — Governance, compliance, and risk management
-
-### Getting Started
-- **AI Fundamentals** — Understanding what AI is and how language models work
-- **Prompt Engineering** — Crafting effective prompts and system prompts
-- **Practical Applications** — Using AI for everyday tasks, learning, and research
-- **Critical Thinking** — Evaluating AI outputs and fact-checking with AI
-- **AI Ethics** — Responsible use, bias awareness, and navigating ethical questions
 
 ---
 
