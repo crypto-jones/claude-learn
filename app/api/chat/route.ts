@@ -185,6 +185,7 @@ The learner is a ${context.role || 'developer'}.
 You will receive a section of educational content. Generate a SHORT (2-3 sentence) role-specific example that illustrates the concept for this specific role. Use a practical, realistic scenario they would encounter in their work.
 
 Role-specific context:
+- developer: API integration, code architecture, debugging, building AI-powered features, SDK usage
 - product-manager: AI feature evaluation, PRDs, stakeholder communication, roadmap planning
 - designer: UX design, prototyping, user research, design systems, conversational UI
 - business: Process automation, document analysis, reporting, ROI measurement

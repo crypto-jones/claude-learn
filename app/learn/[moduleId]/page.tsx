@@ -881,7 +881,7 @@ export default function ModulePage() {
                         {section.title}
                       </h2>
                       <SectionContent content={section.content} moduleId={moduleId} sectionId={section.id} />
-                      {profile.role && profile.role !== 'developer' && (
+                      {profile.role && (
                         <AdaptedContent
                           sectionContent={section.content}
                           role={profile.role}
