@@ -96,7 +96,7 @@ The platform tracks learner growth across six competency areas:
 - **Evaluation** — Evaluator-optimizer patterns and systematic evals
 - **Agent Design** — Tool use, agentic workflows, and Claude Code
 
-Each dimension is assessed at four levels: *Foundations*, *Developing*, *Practitioner*, and *Advanced*.
+Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *Advanced*.
 
 ---
 
