@@ -150,7 +150,7 @@ Keep your feedback concise (3-5 short paragraphs max). Be encouraging but honest
 
 The student is currently studying: "${context.moduleTitle || 'Claude'}"
 ${context.sectionTitle ? `Current section: "${context.sectionTitle}"` : ''}
-${context.sectionContent ? `\nCurrent section content (for reference):\n${context.sectionContent.slice(0, 1500)}\n` : ''}
+${context.sectionContent ? `\nCurrent section content (for reference):\n${context.sectionContent.slice(0, 750)}\n` : ''}
 They are a ${context.role || 'developer'} at the ${context.skills?.['prompt-engineering'] || 'foundations'} level.
 
 The platform has these modules available for cross-referencing:
@@ -212,8 +212,12 @@ export async function POST(req: NextRequest) {
     const body: ChatRequest = await req.json();
     const systemPrompt = getSystemPrompt(body);
 
+    // Use Sonnet for assessment + feedback (quality matters), Haiku for everything else
+    const useSonnet = body.mode === 'assessment' || body.mode === 'feedback';
+    const model = useSonnet ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001';
+
     const stream = anthropic.messages.stream({
-      model: 'claude-sonnet-4-20250514',
+      model,
       max_tokens: body.mode === 'playground' ? 512 : body.mode === 'adapt' ? 256 : 1024,
       system: systemPrompt,
       messages: body.messages.map((m) => ({

@@ -11,14 +11,15 @@ interface AdaptedContentProps {
   role: LearnerRole;
   moduleId: string;
   sectionId: string;
+  staticExample?: string;
 }
 
 function getCacheKey(moduleId: string, sectionId: string, role: string): string {
   return `claude-learn-adapted-${moduleId}-${sectionId}-${role}`;
 }
 
-export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: AdaptedContentProps) {
-  const [content, setContent] = useState<string | null>(null);
+export function AdaptedContent({ sectionContent, role, moduleId, sectionId, staticExample }: AdaptedContentProps) {
+  const [content, setContent] = useState<string | null>(staticExample || null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,7 +27,13 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
 
   const roleLabel = LEARNER_ROLES.find((r) => r.id === role)?.label || role;
 
+  // If we have a static example, render it immediately — no API call needed
+  const isStatic = !!staticExample;
+
   useEffect(() => {
+    // Static examples don't need fetching
+    if (isStatic) return;
+
     // Check cache first
     const cacheKey = getCacheKey(moduleId, sectionId, role);
     const cached = localStorage.getItem(cacheKey);
@@ -57,7 +64,7 @@ export function AdaptedContent({ sectionContent, role, moduleId, sectionId }: Ad
     }
 
     return () => observer.disconnect();
-  }, [moduleId, sectionId, role]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [moduleId, sectionId, role, isStatic]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchAdaptedContent() {
     setIsLoading(true);

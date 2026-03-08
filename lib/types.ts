@@ -207,6 +207,7 @@ export interface ModuleSection {
   content: string;
   exercise?: ModuleExercise;
   playground?: PlaygroundTemplate;
+  adaptedExamples?: Record<string, string>;
 }
 
 // Learning module

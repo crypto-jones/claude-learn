@@ -887,6 +887,7 @@ export default function ModulePage() {
                           role={profile.role}
                           moduleId={moduleId as string}
                           sectionId={section.id}
+                          staticExample={section.adaptedExamples?.[profile.role]}
                         />
                       )}
                       <div className="flex items-center gap-2 mt-4">
