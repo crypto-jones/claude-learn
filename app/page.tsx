@@ -132,42 +132,46 @@ export default function Home() {
     <div className="min-h-screen">
       {/* ─── Nav ─── */}
       <nav className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <span className="font-semibold text-foreground">Claude Learn</span>
           </div>
           <div className="flex items-center gap-1">
-            <a
-              href="#paths"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-            >
-              Paths
-            </a>
-            <a
-              href="#how-it-works"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-            >
-              How It Works
-            </a>
-            <a
-              href="#curriculum"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-            >
-              Curriculum
-            </a>
+            {isLoaded && !profile.assessmentComplete && (
+              <>
+                <a
+                  href="#paths"
+                  className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                >
+                  Paths
+                </a>
+                <a
+                  href="#how-it-works"
+                  className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                >
+                  How It Works
+                </a>
+                <Link
+                  href="/assess"
+                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-md ml-1"
+                >
+                  Get Started
+                  <Zap className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            )}
             {isLoaded && profile.assessmentComplete && (
               <>
-                <div className="hidden sm:block w-px h-4 bg-border mx-1" />
                 <Link
                   href="/path"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                  className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
                 >
                   My Path
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 sm:px-3 py-1.5"
                 >
                   Dashboard
                 </Link>
@@ -179,7 +183,7 @@ export default function Home() {
       </nav>
 
       {/* ─── Hero ─── */}
-      <section className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 overflow-hidden">
+      <section className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-14 sm:pb-20 overflow-hidden">
         {/* Decorative radar silhouette */}
         <div className="absolute top-8 right-0 w-80 h-80 opacity-[0.04] animate-radar-pulse pointer-events-none hidden md:block">
           <svg viewBox="0 0 200 200" className="w-full h-full text-primary">
@@ -211,7 +215,7 @@ export default function Home() {
             <div className="h-px w-8 bg-primary/60" />
             <span className="text-sm font-medium text-primary">AI-Native Learning Platform</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-foreground leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-foreground leading-[1.1] mb-6">
             Master Claude
             <br />
             <span className="text-primary">at your level, for your role</span>
@@ -222,43 +226,42 @@ export default function Home() {
           </p>
 
           {/* Micro-stats */}
-          <div className="flex items-center gap-4 sm:gap-6 mb-10 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-foreground">{totalPaths}</span> learning paths
-            </div>
-            <div className="w-1 h-1 rounded-full bg-border" />
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-foreground">{totalModules}</span> modules
-            </div>
-            <div className="w-1 h-1 rounded-full bg-border" />
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-foreground">{totalDimensions}</span> skill dimensions
-            </div>
+          <div className="flex items-center justify-center sm:justify-start gap-4 sm:gap-6 mb-10 text-sm text-muted-foreground">
+            <span className="whitespace-nowrap"><span className="font-semibold text-foreground">{totalPaths}</span> paths</span>
+            <div className="w-1 h-1 rounded-full bg-border shrink-0" />
+            <span className="whitespace-nowrap"><span className="font-semibold text-foreground">{totalModules}</span> modules</span>
+            <div className="w-1 h-1 rounded-full bg-border shrink-0" />
+            <span className="whitespace-nowrap"><span className="font-semibold text-foreground">{totalDimensions}</span> dimensions</span>
           </div>
 
           {/* CTA */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center sm:items-start gap-2">
             {!isLoaded ? (
               <Skeleton className="h-12 w-52 rounded-md" />
             ) : (
               <>
-                <Link href={profile.assessmentComplete ? '/path' : '/assess'}>
-                  <Button size="lg" className="gap-2 text-base px-6 h-12">
-                    {profile.assessmentComplete ? (
-                      <>
-                        Continue Learning
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        Start Your Assessment
-                        <Zap className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-4">
+                  <Link href={profile.assessmentComplete ? '/path' : '/assess'}>
+                    <Button size="lg" className="gap-2 text-base px-6 h-12">
+                      {profile.assessmentComplete ? (
+                        <>
+                          Continue Learning
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      ) : (
+                        <>
+                          Start Your Assessment
+                          <Zap className="h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </Link>
+                  {!profile.assessmentComplete && (
+                    <span className="hidden sm:inline text-sm text-muted-foreground">Takes ~3 minutes</span>
+                  )}
+                </div>
                 {!profile.assessmentComplete && (
-                  <span className="text-sm text-muted-foreground">Takes ~3 minutes</span>
+                  <span className="sm:hidden text-xs text-muted-foreground">Takes ~3 minutes</span>
                 )}
               </>
             )}
@@ -267,7 +270,7 @@ export default function Home() {
       </section>
 
       {/* ─── Role Paths Showcase ─── */}
-      <section id="paths" className="max-w-5xl mx-auto px-6 py-20 border-t border-border/50">
+      <section id="paths" className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
         <div className="mb-10">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
             {totalPaths} paths. One platform.
@@ -279,17 +282,18 @@ export default function Home() {
         </div>
 
         <Tabs defaultValue={LEARNER_ROLES[0].id} className="w-full">
-          <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/50 p-1 rounded-xl">
+          <TabsList className="w-full flex h-auto gap-0.5 sm:gap-1 bg-muted/50 p-1 rounded-xl overflow-x-auto scrollbar-none">
             {LEARNER_ROLES.map((role) => {
               const Icon = iconMap[role.icon];
               return (
                 <TabsTrigger
                   key={role.id}
                   value={role.id}
-                  className="flex-1 min-w-[120px] gap-1.5 py-2 text-xs sm:text-sm"
+                  className="flex-1 min-w-0 gap-1 py-2 px-1.5 sm:px-2 text-[11px] sm:text-sm whitespace-nowrap"
                 >
                   {Icon && <Icon className="h-4 w-4 hidden sm:block" />}
-                  {role.label}
+                  <span className="sm:hidden">{{ 'getting-started': 'Beginner', 'developer': 'Dev', 'product-manager': 'PM', 'designer': 'Designer', 'business': 'Business' }[role.id] ?? role.label}</span>
+                  <span className="hidden sm:inline">{role.label}</span>
                 </TabsTrigger>
               );
             })}
@@ -336,15 +340,13 @@ export default function Home() {
 
                   {/* Module count + CTA */}
                   <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4" />
-                      <span>
-                        <span className="font-semibold text-foreground">{moduleCount}</span> modules
-                      </span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
+                      <BookOpen className="h-4 w-4 shrink-0" />
+                      <span><span className="font-semibold text-foreground">{moduleCount}</span> modules</span>
                     </div>
                     <Link href={`/assess?role=${role.id}`}>
-                      <Button variant="outline" size="sm" className="gap-1.5">
-                        Start as {role.label}
+                      <Button variant="outline" size="sm" className="gap-1.5 whitespace-nowrap shrink-0">
+                        <span>Start as <span className="sm:hidden">{{ 'business': 'Business', 'getting-started': 'Beginner', 'product-manager': 'PM' }[role.id] ?? role.label}</span><span className="hidden sm:inline">{{ 'business': 'Business', 'getting-started': 'Beginner' }[role.id] ?? role.label}</span></span>
                         <ChevronRight className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
@@ -357,7 +359,7 @@ export default function Home() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-20 border-t border-border/50">
+      <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
         <div className="text-center mb-14">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
             Three minutes to your personalized path
@@ -392,7 +394,7 @@ export default function Home() {
       </section>
 
       {/* ─── Features ─── */}
-      <section className="max-w-5xl mx-auto px-6 py-20 border-t border-border/50">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
         <div className="mb-10">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
             Everything is powered by Claude
@@ -425,7 +427,7 @@ export default function Home() {
       </section>
 
       {/* ─── Curriculum Depth ─── */}
-      <section id="curriculum" className="max-w-5xl mx-auto px-6 py-20 border-t border-border/50">
+      <section id="curriculum" className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
         <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
           {totalModules} modules. Real depth.
         </h2>
@@ -453,8 +455,8 @@ export default function Home() {
       </section>
 
       {/* ─── Final CTA ─── */}
-      <section className="max-w-5xl mx-auto px-6 py-20 border-t border-border/50">
-        <div className="rounded-2xl bg-muted/30 border border-border/50 p-10 sm:p-14 text-center">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 border-t border-border/50">
+        <div className="rounded-2xl bg-muted/30 border border-border/50 p-6 sm:p-14 text-center">
           <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
             Start learning in 3 minutes
           </h2>
@@ -486,7 +488,7 @@ export default function Home() {
 
       {/* ─── Footer ─── */}
       <footer className="border-t border-border/50 py-8">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Sparkles className="h-4 w-4" />

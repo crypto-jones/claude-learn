@@ -92,7 +92,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen">
         <Navigation />
-        <div className="max-w-5xl mx-auto px-6 py-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="flex items-center justify-between mb-8">
             <Skeleton className="h-8 w-48" />
             <Skeleton className="h-9 w-36 rounded-md" />
@@ -204,14 +204,14 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Navigation />
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
-        <div className="flex items-start justify-between mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 sm:mb-10">
           <div>
-            <h1 className="text-3xl font-semibold text-foreground mb-2">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-2">
               Skills Dashboard
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Track your progress and see how your skills are growing.
             </p>
           </div>
@@ -232,7 +232,8 @@ export default function DashboardPage() {
               className="gap-1.5 shrink-0"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              Retake Assessment
+              <span className="hidden sm:inline">Retake Assessment</span>
+              <span className="sm:hidden">Retake</span>
             </Button>
           </div>
         </div>
@@ -273,9 +274,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Skills radar + Skills breakdown */}
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-10">
           {/* Skills radar chart */}
-          <div className="sm:col-span-3">
+          <div className="md:col-span-3">
             <Card className="p-6">
               <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Target className="h-4 w-4 text-primary" />
@@ -290,7 +291,7 @@ export default function DashboardPage() {
                     Before / After Comparison
                   </h3>
                   <div className="space-y-2">
-                    <div className="grid grid-cols-[1fr_80px_24px_80px] gap-2 text-xs text-muted-foreground mb-1 px-1">
+                    <div className="grid grid-cols-[1fr_60px_20px_60px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 text-xs text-muted-foreground mb-1 px-1">
                       <span>Skill</span>
                       <span className="text-center">Initial</span>
                       <span />
@@ -303,9 +304,9 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={dim.id}
-                          className="grid grid-cols-[1fr_80px_24px_80px] gap-2 items-center px-1 py-1.5 rounded-md hover:bg-muted/50 transition-colors"
+                          className="grid grid-cols-[1fr_60px_20px_60px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 items-center px-1 py-1.5 rounded-md hover:bg-muted/50 transition-colors"
                         >
-                          <span className="text-sm text-foreground">{dim.shortLabel}</span>
+                          <span className="text-xs sm:text-sm text-foreground truncate">{dim.shortLabel}</span>
                           <span className="text-xs text-muted-foreground text-center capitalize">
                             {levelLabel(initial)}
                           </span>
@@ -339,7 +340,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Skills breakdown */}
-          <div className="sm:col-span-2">
+          <div className="md:col-span-2">
             <Card className="p-6">
               <h2 className="text-sm font-semibold text-foreground mb-4">
                 Skill Levels
@@ -393,7 +394,7 @@ export default function DashboardPage() {
 
           {/* Goal form */}
           {showGoalForm && (
-            <div className="flex items-end gap-3 mb-5 p-4 bg-muted/50 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-5 p-4 bg-muted/50 rounded-lg">
               <div className="flex-1">
                 <label htmlFor="goal-dimension" className="text-xs font-medium text-muted-foreground block mb-1.5">
                   Skill Dimension
@@ -633,7 +634,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recommended next + Recently completed */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Recommended next */}
           {nextModule && (
             <Card className="p-6">

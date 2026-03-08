@@ -174,11 +174,11 @@ export default function PathPage() {
     return (
       <div className="min-h-screen">
         <Navigation />
-        <div className="max-w-3xl mx-auto px-6 py-12">
-          <div className="mb-10">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="mb-8 sm:mb-10">
             <Skeleton className="h-4 w-32 mb-4" />
             <Skeleton className="h-8 w-64 mb-3" />
-            <Skeleton className="h-4 w-96" />
+            <Skeleton className="h-4 w-full max-w-96" />
           </div>
           <Card className="p-5 mb-6">
             <Skeleton className="h-4 w-28 mb-4" />
@@ -227,9 +227,9 @@ export default function PathPage() {
     <div className="min-h-screen">
       <Navigation />
 
-      <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
-        <div className="mb-10">
+        <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-primary/60" />
             <span className="text-sm font-medium text-primary">
@@ -260,7 +260,7 @@ export default function PathPage() {
               {completedCount}/{totalCount} modules completed
             </span>
           </div>
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
             {(profile.role ? ROLE_SKILL_DIMENSIONS[profile.role] : []).map((dim) => {
               const level = profile.skills[dim.id] || 'foundations';
               const value = SKILL_LEVEL_VALUES[level];

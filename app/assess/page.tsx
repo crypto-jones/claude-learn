@@ -375,7 +375,7 @@ function AssessPageInner() {
     <div className="min-h-screen flex flex-col">
       <Navigation />
 
-      <div className="max-w-2xl mx-auto w-full px-6 pt-6">
+      <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 pt-6">
         <Progress value={progressPercent} className="h-1" />
         <p className="text-xs text-muted-foreground mt-2">
           {step === 'role' && 'Step 1 of 3 — Select your role'}
@@ -385,7 +385,7 @@ function AssessPageInner() {
         </p>
       </div>
 
-      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 py-8">
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
         {step === 'role' && (
           <div className="animate-fade-in-up">
             <h1 className="text-2xl font-semibold text-foreground mb-2">

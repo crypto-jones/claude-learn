@@ -134,6 +134,15 @@
   }
 }
 
+/* Hide scrollbar for horizontally scrolling elements */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Offset anchor scroll targets below sticky nav */
 [id="paths"],
 [id="how-it-works"],

@@ -772,7 +772,7 @@ export default function ModulePage() {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
-          <div className="max-w-3xl mx-auto px-6 py-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             {/* Module header */}
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-3">
@@ -962,34 +962,38 @@ export default function ModulePage() {
                   </div>
                 </Card>
               )}
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-3">
                 {prevModuleId ? (
                   <Link href={`/learn/${prevModuleId}`}>
-                    <Button variant="outline" className="gap-2">
-                      <ArrowLeft className="h-4 w-4" />
-                      Previous Module
+                    <Button variant="outline" className="gap-1.5 text-sm">
+                      <ArrowLeft className="h-4 w-4 shrink-0" />
+                      <span className="hidden sm:inline">Previous Module</span>
+                      <span className="sm:hidden">Previous</span>
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/path">
-                    <Button variant="outline" className="gap-2">
-                      <ArrowLeft className="h-4 w-4" />
-                      Back to Path
+                    <Button variant="outline" className="gap-1.5 text-sm">
+                      <ArrowLeft className="h-4 w-4 shrink-0" />
+                      <span className="hidden sm:inline">Back to Path</span>
+                      <span className="sm:hidden">Path</span>
                     </Button>
                   </Link>
                 )}
                 {nextModuleId ? (
                   <Link href={`/learn/${nextModuleId}`}>
-                    <Button className="gap-2">
-                      Next Module
-                      <ArrowRight className="h-4 w-4" />
+                    <Button className="gap-1.5 text-sm">
+                      <span className="hidden sm:inline">Next Module</span>
+                      <span className="sm:hidden">Next</span>
+                      <ArrowRight className="h-4 w-4 shrink-0" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/dashboard">
-                    <Button className="gap-2">
-                      View Dashboard
-                      <ArrowRight className="h-4 w-4" />
+                    <Button className="gap-1.5 text-sm">
+                      <span className="hidden sm:inline">View Dashboard</span>
+                      <span className="sm:hidden">Dashboard</span>
+                      <ArrowRight className="h-4 w-4 shrink-0" />
                     </Button>
                   </Link>
                 )}
