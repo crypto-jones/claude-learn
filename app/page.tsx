@@ -116,7 +116,7 @@ const difficultyTiers = [
 const roleTaglines: Record<string, string> = {
   'getting-started': 'Build a foundation in AI — understand what it can do, how to use it responsibly, and where to go next.',
   developer: 'Ship AI-powered software — from your first API call to production deployment with tools, evals, and Claude Code.',
-  'product-manager': 'Lead AI product strategy — evaluate opportunities, define metrics, communicate value, and manage governance.',
+  'product-manager': 'Apply Claude to product work — sharpen strategy, define metrics, communicate value, and manage governance.',
   designer: 'Design AI-native experiences — conversational UI, research synthesis, prototyping, and design system integration.',
   business: 'Transform your workflows — automate processes, measure ROI, create AI-powered reports, and manage compliance.',
 };

@@ -65,7 +65,7 @@ export const LEARNER_ROLES: {
   {
     id: 'product-manager',
     label: 'Product Manager',
-    description: 'Evaluating and planning AI features',
+    description: 'Using Claude for product strategy and analysis',
     icon: 'BarChart3',
   },
   {

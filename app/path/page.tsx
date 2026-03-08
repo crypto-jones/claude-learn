@@ -58,7 +58,7 @@ function getRecommendationReason(
 // Role-specific subtitles
 const roleSubtitles: Record<string, string> = {
   developer: 'Master the Claude API, build agentic workflows, and ship production AI.',
-  'product-manager': 'Evaluate AI opportunities, define success metrics, and lead AI product strategy.',
+  'product-manager': 'Use Claude to sharpen your product strategy, define metrics, and communicate AI value.',
   designer: 'Design AI-powered experiences and integrate Claude into creative workflows.',
   business: 'Automate workflows, analyze documents, and measure AI ROI.',
   'getting-started': 'Explore what AI can do, build practical skills, and find your path.',
@@ -267,7 +267,7 @@ export default function PathPage() {
               return (
                 <div key={dim.id} className="text-center">
                   <div className="text-xs text-muted-foreground mb-1.5 truncate">
-                    {dim.label.split(' ')[0]}
+                    {dim.shortLabel || dim.label.split(' ')[0]}
                   </div>
                   <div className="flex justify-center gap-0.5">
                     {[1, 2, 3].map((v) => (

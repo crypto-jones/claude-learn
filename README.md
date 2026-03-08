@@ -10,13 +10,13 @@
 
 Claude Learn rethinks how people learn to work with AI. Instead of static tutorials or passive video content, every interaction is powered by Claude itself — from evaluating what you already know to giving feedback on your work in real time.
 
-The platform serves five audiences — developers building with the API, product managers evaluating AI use cases, designers prototyping AI experiences, business professionals integrating AI into their workflows, and beginners just getting started with AI. Each path has its own skill dimensions, curated curriculum, and tailored assessment.
+The platform serves five audiences — developers building with the API, product managers applying Claude to product work, designers prototyping AI experiences, business professionals integrating AI into their workflows, and beginners just getting started with AI. Each path has its own skill dimensions, curated curriculum, and tailored assessment.
 
 ### The Learning Flow
 
 1. **Conversational Assessment** — Claude conducts a natural conversation to understand your role, experience, and current skill level. The assessment adapts to your role — each path is evaluated across its own five skill dimensions. No multiple choice — Claude infers your competencies from how you talk about AI.
 
-2. **Personalized Learning Path** — Based on assessment results, the platform generates a recommended sequence of modules tailored to your skill gaps. A developer building with the API gets a different path than a product manager evaluating AI features.
+2. **Personalized Learning Path** — Based on assessment results, the platform generates a recommended sequence of modules tailored to your skill gaps. A developer building with the API gets a different path than a product manager using Claude for strategy and stakeholder communication.
 
 3. **Interactive Modules** — Each module combines concept explanations with hands-on exercises. You write real prompts, design real tool schemas, and build real patterns — then Claude evaluates your work against specific rubrics and gives streaming, actionable feedback. After initial feedback, you can continue the conversation: ask follow-up questions, submit revised thinking, and get deeper coaching from Claude in a natural dialogue.
 
@@ -38,11 +38,6 @@ The platform serves five audiences — developers building with the API, product
 - **Learning goals** — Set target skill levels and track progress toward them
 - **Shareable skills card** — Export your skills radar as a PNG for sharing progress
 - **Syntax-highlighted code blocks** — Language badges, one-click copy, light/dark theme support
-- **Dark mode** — Full dark theme with system preference detection and manual toggle
-- **Skeleton loading states** — Content-aware placeholder UI on every page during data hydration
-- **Smooth page transitions** — Fade/slide animations between routes
-- **Per-route error boundaries** — Errors in one page don't break navigation; each route recovers independently
-- **Rate limiting** — Server-side request throttling (20 req/min per IP) protects the API key
 
 ---
 
@@ -57,7 +52,7 @@ These foundational modules are available across multiple paths:
 |--------|-------------|------------|
 | How Claude Thinks | Mental models for Claude's architecture, strengths, and limitations | Beginner |
 | Prompt Engineering Essentials | System prompts, few-shot examples, chain-of-thought reasoning | Beginner |
-| Claude for Content & Communication | Drafting, editing, research synthesis, and document analysis | Beginner |
+| Thinking with Claude | Document analysis, research synthesis, structured reasoning, and strategic thinking | Beginner |
 
 ### 🧭 Getting Started Path (11 modules)
 For beginners exploring what AI can do and building a foundation for any path.
@@ -89,18 +84,18 @@ For developers building with the Claude API and shipping AI-powered applications
 | Deploying AI to Production | From prototype to production — infrastructure, monitoring, and reliability | Intermediate |
 
 ### 📊 Product Manager Path (12 modules)
-For PMs evaluating AI opportunities, defining strategy, and managing AI-powered products.
+For PMs applying Claude to product work — competitive analysis, PRD drafting, stakeholder communication, and governance.
 
 | Module | Description | Difficulty |
 |--------|-------------|------------|
-| AI Product Strategy | Evaluating AI opportunities, defining success metrics, building product strategies | Intermediate |
+| Claude for Product Strategy | Using Claude for competitive analysis, PRD drafting, roadmap planning, and feature prioritization | Intermediate |
 | Measuring AI Product Success | KPIs, metrics frameworks, and data-driven AI product decisions | Intermediate |
 | Evaluating AI Use Cases | Framework for identifying, evaluating, and scoping AI use cases | Beginner |
 | Evaluator-Optimizer Loops | Building loops where Claude evaluates and improves its own outputs | Intermediate |
 | Building Systematic Evaluations | Designing rigorous evaluation suites for production AI systems | Advanced |
 | Communicating AI Value | Translating AI capabilities into stakeholder-friendly language | Beginner |
-| Managing AI Projects | Planning, scoping, and executing AI projects across cross-functional teams | Intermediate |
-| AI Governance for PMs | Governance frameworks, policies, and oversight for AI products | Intermediate |
+| Managing AI Projects | Planning, scoping, and executing AI projects — with Claude for risk registers, status updates, and timelines | Intermediate |
+| AI Governance for PMs | Governance frameworks, policies, and oversight — with Claude for drafting checklists and compliance docs | Intermediate |
 | AI Risk Assessment | Identifying, evaluating, and mitigating risks in AI-powered products | Advanced |
 
 ### 🎨 Designer Path (11 modules)
@@ -153,7 +148,7 @@ Each learning path tracks growth across its own five competency areas, tailored 
 
 ### Product Manager
 - **Prompt Engineering** — Crafting effective prompts and system prompts
-- **AI Strategy** — Product strategy, opportunity evaluation, and metrics
+- **AI Strategy** — Using Claude for competitive analysis, PRD drafting, and roadmap planning
 - **Evaluation & Testing** — Evaluator-optimizer patterns and systematic evals
 - **Stakeholder Communication** — Presenting AI capabilities, value, and project status
 - **AI Governance** — Governance frameworks, risk assessment, and policy design
