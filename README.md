@@ -61,7 +61,7 @@ For beginners exploring what AI can do and building a foundation for any path.
 |--------|-------------|------------|
 | What AI Can Do | A practical introduction to generative AI and Claude's capabilities | Beginner |
 | Understanding AI Capabilities | How language models work, context windows, hallucinations, and training data | Beginner |
-| AI for Everyday Tasks | Writing, brainstorming, organizing, and planning with Claude | Beginner |
+| AI for Everyday Tasks | Personal and everyday use — trip planning, thank-you notes, meal ideas, and hobby projects | Beginner |
 | AI for Learning & Research | Using Claude as a tutor, research assistant, and study partner | Beginner |
 | Evaluating AI Outputs | Critical thinking framework for assessing AI-generated content | Beginner |
 | Fact-Checking with AI | Verification strategies and recognizing unverifiable claims | Intermediate |
@@ -107,7 +107,7 @@ For designers creating AI-powered interfaces, conversational experiences, and de
 | Designing AI Experiences | Design patterns for AI interfaces — loading states, confidence indicators, trust | Intermediate |
 | Conversational UI Patterns | Anatomy of conversational interfaces — message types, input mechanisms, flows | Beginner |
 | Chatbot UX Design | Personality design, conversation repair, onboarding, and measuring conversational UX | Intermediate |
-| AI-Powered User Research | Using Claude to analyze qualitative data and generate research artifacts | Beginner |
+| AI-Powered User Research | Using Claude as a design research partner — synthesizing interviews into personas, journey maps, and design insights | Beginner |
 | Design Synthesis with AI | From data to insights — personas, journey maps, and design recommendations | Intermediate |
 | Rapid Prototyping with AI | AI-assisted ideation, UI copy generation, and interaction flow creation | Beginner |
 | AI in Design Systems | AI components, accessibility auditing, and documentation maintenance | Intermediate |
