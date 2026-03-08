@@ -430,7 +430,7 @@ export default function Home() {
           {totalModules} modules. Real depth.
         </h2>
         <p className="text-muted-foreground max-w-lg mb-8">
-          From first prompts to advanced workflows — ~8+ hours of hands-on,
+          From first prompts to advanced workflows — 8+ hours of hands-on,
           exercise-driven content with real-time AI feedback.
         </p>
 

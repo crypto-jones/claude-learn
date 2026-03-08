@@ -129,7 +129,7 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
   );
 
   const retakeAssessment = useCallback(() => {
-    updateProfile({ assessmentComplete: false });
+    updateProfile({ assessmentComplete: false, initialSkills: null });
   }, [updateProfile]);
 
   const updateModuleProgress = useCallback(

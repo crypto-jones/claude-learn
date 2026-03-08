@@ -297,9 +297,9 @@ export default function DashboardPage() {
                       <span className="text-center">Current</span>
                     </div>
                     {activeDims.map((dim) => {
-                      const change = skillChanged(dim.id);
-                      const initial = profile.initialSkills![dim.id];
+                      const initial = profile.initialSkills![dim.id] ?? profile.skills[dim.id];
                       const current = profile.skills[dim.id];
+                      const change = initial === current ? 'same' as const : skillChanged(dim.id);
                       return (
                         <div
                           key={dim.id}
