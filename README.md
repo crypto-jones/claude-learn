@@ -87,14 +87,13 @@ The platform serves multiple audiences — developers building with the API, pro
 
 ## Skill Dimensions
 
-The platform tracks learner growth across six competency areas:
+The platform tracks learner growth across five competency areas:
 
 - **Prompt Engineering** — Crafting effective prompts and system prompts
-- **Mental Models** — Understanding how Claude thinks and reasons
 - **API Integration** — Building with the Messages API and handling structured outputs
-- **Output Design** — Designing reliable, structured AI outputs
-- **Evaluation** — Evaluator-optimizer patterns and systematic evals
 - **Agent Design** — Tool use, agentic workflows, and Claude Code
+- **Evaluation & Testing** — Evaluator-optimizer patterns and systematic evals
+- **Production Deployment** — Shipping AI to production with safety and reliability
 
 Each dimension is assessed at three levels: *Foundations*, *Practitioner*, and *Advanced*.
 

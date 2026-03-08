@@ -10,11 +10,12 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
-import { SkillsProfile, SKILL_DIMENSIONS, SKILL_LEVEL_VALUES } from '@/lib/types';
+import { SkillsProfile, SkillDimension, SKILL_DIMENSIONS, SKILL_LEVEL_VALUES } from '@/lib/types';
 
 interface SkillsRadarProps {
   skills: SkillsProfile;
   initialSkills?: SkillsProfile | null;
+  dimensions?: SkillDimension[];
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -47,10 +48,10 @@ function createCustomTick(targetDist: number, fontSize: number, color: string) {
   };
 }
 
-export function SkillsRadar({ skills, initialSkills }: SkillsRadarProps) {
+export function SkillsRadar({ skills, initialSkills, dimensions: dimensionFilter }: SkillsRadarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-  const [dimensions, setDimensions] = useState({ targetDist: 130, fontSize: 13, outerRadius: '100%' });
+  const [sizing, setSizing] = useState({ targetDist: 130, fontSize: 13, outerRadius: '100%' });
   const [colors, setColors] = useState({
     primary: '#b87a4a',
     border: '#e5e5e5',
@@ -74,9 +75,9 @@ export function SkillsRadar({ skills, initialSkills }: SkillsRadarProps) {
       if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
       if (width < 400) {
-        setDimensions({ targetDist: 95, fontSize: 11, outerRadius: '60%' });
+        setSizing({ targetDist: 95, fontSize: 11, outerRadius: '60%' });
       } else {
-        setDimensions({ targetDist: 130, fontSize: 13, outerRadius: '80%' });
+        setSizing({ targetDist: 130, fontSize: 13, outerRadius: '80%' });
       }
     }
     update();
@@ -84,23 +85,27 @@ export function SkillsRadar({ skills, initialSkills }: SkillsRadarProps) {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const data = SKILL_DIMENSIONS.map((dim) => ({
+  const dims = dimensionFilter
+    ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
+    : SKILL_DIMENSIONS;
+
+  const data = dims.map((dim) => ({
     skill: dim.shortLabel,
     value: SKILL_LEVEL_VALUES[skills[dim.id]],
     initial: initialSkills ? SKILL_LEVEL_VALUES[initialSkills[dim.id]] : undefined,
     fullMark: 3,
   }));
 
-  const hasGrowth = initialSkills && SKILL_DIMENSIONS.some(
+  const hasGrowth = initialSkills && dims.some(
     (dim) => SKILL_LEVEL_VALUES[skills[dim.id]] > SKILL_LEVEL_VALUES[initialSkills[dim.id]]
   );
 
-  const TickComponent = createCustomTick(dimensions.targetDist, dimensions.fontSize, colors.mutedForeground);
+  const TickComponent = createCustomTick(sizing.targetDist, sizing.fontSize, colors.mutedForeground);
 
   return (
     <div ref={containerRef} className="w-full h-[280px] [&_svg]:!overflow-visible">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} cx="50%" cy="50%" outerRadius={dimensions.outerRadius}>
+        <RadarChart data={data} cx="50%" cy="50%" outerRadius={sizing.outerRadius}>
           <PolarGrid stroke={colors.border} />
           <PolarAngleAxis dataKey="skill" tick={TickComponent} />
           <PolarRadiusAxis

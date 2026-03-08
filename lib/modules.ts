@@ -1,4 +1,4 @@
-import { Module, LearnerRole } from './types';
+import { Module, LearnerRole, SkillDimension, SKILL_DIMENSIONS } from './types';
 
 import howClaudeThinks from '@/content/modules/how-claude-thinks.json';
 import promptEngineering from '@/content/modules/prompt-engineering.json';
@@ -46,4 +46,15 @@ export function getModulesByRole(role: LearnerRole | null): Module[] {
 
 export function getModulesByTrack(trackId: string): Module[] {
   return Object.values(moduleMap).filter((m) => m.track === trackId);
+}
+
+/** Return the skill dimensions reachable from a learning path, in canonical order. */
+export function getReachableDimensions(learningPath: string[]): SkillDimension[] {
+  if (learningPath.length === 0) return SKILL_DIMENSIONS.map((d) => d.id);
+  const reachable = new Set<SkillDimension>();
+  for (const id of learningPath) {
+    const mod = moduleMap[id];
+    if (mod) reachable.add(mod.skillDimension);
+  }
+  return SKILL_DIMENSIONS.filter((d) => reachable.has(d.id)).map((d) => d.id);
 }

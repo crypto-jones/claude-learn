@@ -4,6 +4,7 @@ import React from 'react';
 import { useTheme } from 'next-themes';
 import {
   SkillsProfile,
+  SkillDimension,
   SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
   LearnerRole,
@@ -17,6 +18,7 @@ interface ShareableSkillsCardProps {
   streakDays: number;
   totalMinutesLearned: number;
   role: LearnerRole | null;
+  dimensions?: SkillDimension[];
 }
 
 const LIGHT = {
@@ -41,11 +43,13 @@ const DARK = {
   statBg: 'oklch(0.22 0.008 60)',
 };
 
-function MiniRadar({ skills, colors }: { skills: SkillsProfile; colors: typeof LIGHT }) {
+function MiniRadar({ skills, colors, dimensions: dimensionFilter }: { skills: SkillsProfile; colors: typeof LIGHT; dimensions?: SkillDimension[] }) {
   const cx = 100;
   const cy = 100;
   const maxR = 75;
-  const dims = SKILL_DIMENSIONS;
+  const dims = dimensionFilter
+    ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id))
+    : SKILL_DIMENSIONS;
 
   const gridRings = [1, 2, 3].map((level) => {
     const pts = dims.map((_, i) => {
@@ -75,7 +79,7 @@ function MiniRadar({ skills, colors }: { skills: SkillsProfile; colors: typeof L
   });
 
   return (
-    <svg viewBox="0 0 200 200" width="180" height="180">
+    <svg viewBox="-20 -10 240 220" width="180" height="180" overflow="visible">
       {gridRings.map((pts, i) => (
         <polygon
           key={i}
@@ -128,7 +132,7 @@ function MiniRadar({ skills, colors }: { skills: SkillsProfile; colors: typeof L
 
 export const ShareableSkillsCard = React.forwardRef<HTMLDivElement, ShareableSkillsCardProps>(
   function ShareableSkillsCard(
-    { skills, completedModules, totalModules, streakDays, totalMinutesLearned, role },
+    { skills, completedModules, totalModules, streakDays, totalMinutesLearned, role, dimensions: dimensionFilter },
     ref,
   ) {
     const { resolvedTheme } = useTheme();
@@ -186,12 +190,12 @@ export const ShareableSkillsCard = React.forwardRef<HTMLDivElement, ShareableSki
 
         {/* Radar */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <MiniRadar skills={skills} colors={colors} />
+          <MiniRadar skills={skills} colors={colors} dimensions={dimensionFilter} />
         </div>
 
         {/* Skill levels */}
         <div style={{ marginBottom: 20 }}>
-          {SKILL_DIMENSIONS.map((dim) => (
+          {(dimensionFilter ? SKILL_DIMENSIONS.filter((d) => dimensionFilter.includes(d.id)) : SKILL_DIMENSIONS).map((dim) => (
             <div
               key={dim.id}
               style={{

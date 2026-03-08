@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest } from 'next/server';
-import { ChatRequest } from '@/lib/types';
+import { ChatRequest, SKILL_DIMENSIONS, LearnerRole } from '@/lib/types';
+import { getModulesByRole } from '@/lib/modules';
 
 const anthropic = new Anthropic();
 
@@ -29,14 +30,36 @@ setInterval(() => {
   }
 }, 300000);
 
+const DIMENSION_DESCRIPTIONS: Record<string, string> = {
+  'prompt-engineering': 'Prompt Engineering - How well they can craft effective prompts',
+  'api-integration': 'API Integration - Their understanding of working with the Claude API',
+  'agent-design': 'Agent Design - Knowledge of agentic workflows and tool use',
+  evaluation: 'Evaluation & Testing - Understanding of how to evaluate AI outputs',
+  production: 'Production Deployment - Knowledge of shipping AI to production',
+};
+
+function getReachableDimensionsForRole(role: string): string[] {
+  const modules = getModulesByRole(role as LearnerRole);
+  const reachable = new Set<string>();
+  for (const mod of modules) {
+    reachable.add(mod.skillDimension);
+  }
+  return SKILL_DIMENSIONS.filter((d) => reachable.has(d.id)).map((d) => d.id);
+}
+
 function getSystemPrompt(request: ChatRequest): string {
   const { mode, context } = request;
 
   switch (mode) {
-    case 'assessment':
+    case 'assessment': {
+      const role = context.role || 'developer';
+      const dims = getReachableDimensionsForRole(role);
+      const dimList = dims.map((id, i) => `${i + 1}. ${DIMENSION_DESCRIPTIONS[id]}`).join('\n');
+      const skillsJson = dims.map((id) => `    "${id}": "foundations|practitioner|advanced"`).join(',\n');
+
       return `You are an AI learning assessment evaluator for Claude Learn, an AI-native education platform that teaches people how to use Claude effectively.
 
-You are assessing a learner who is a ${context.role || 'developer'} with "${context.experienceLevel || 'new'}" experience with AI.
+You are assessing a learner who is a ${role} with "${context.experienceLevel || 'new'}" experience with AI.
 
 Your job is to ask exactly 4 adaptive questions to evaluate their actual skill level. Do NOT ask generic multiple-choice questions. Instead, ask questions that test real understanding and ability.
 
@@ -46,12 +69,8 @@ For designers: Ask about designing AI-powered experiences and understanding AI c
 For business/operations: Ask about identifying automation opportunities and evaluating AI ROI.
 For students: Ask about their understanding of AI concepts and practical applications.
 
-You are evaluating skills across these dimensions:
-1. Prompt Engineering - How well they can craft effective prompts
-2. API Integration - Their understanding of working with the Claude API
-3. Agent Design - Knowledge of agentic workflows and tool use
-4. Evaluation & Testing - Understanding of how to evaluate AI outputs
-5. Production Deployment - Knowledge of shipping AI to production
+You are evaluating skills across these dimensions (ONLY these — do not evaluate other dimensions):
+${dimList}
 
 IMPORTANT RULES:
 - Ask ONE question at a time
@@ -66,17 +85,14 @@ IMPORTANT RULES:
 {
   "assessment_complete": true,
   "skills": {
-    "prompt-engineering": "foundations|practitioner|advanced",
-    "api-integration": "foundations|practitioner|advanced",
-    "agent-design": "foundations|practitioner|advanced",
-    "evaluation": "foundations|practitioner|advanced",
-    "production": "foundations|practitioner|advanced"
+${skillsJson}
   },
   "summary": "A 2-3 sentence summary of where the learner is and what they should focus on"
 }
 \`\`\`
 
 Only include this JSON block in your FINAL message. Never include it in intermediate messages.`;
+    }
 
     case 'feedback':
       return `You are a learning coach providing feedback on a student exercise on the Claude Learn platform.

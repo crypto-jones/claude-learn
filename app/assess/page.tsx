@@ -19,6 +19,7 @@ import {
   ChatMessage,
 } from '@/lib/types';
 import { streamChat, extractAssessmentResult, generateLearningPath } from '@/lib/claude';
+import { getReachableDimensions } from '@/lib/modules';
 import {
   Code2,
   BarChart3,
@@ -167,6 +168,7 @@ export default function AssessPage() {
   const [assessmentResult, setAssessmentResult] = useState<{
     skills: SkillsProfile;
     summary: string;
+    reachableDimensions?: string[];
   } | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -301,22 +303,33 @@ export default function AssessPage() {
               : 'foundations',
           };
 
+          const path = generateLearningPath(
+            validatedSkills as unknown as Record<string, string>,
+            selectedRole || 'developer'
+          );
           setAssessmentResult({
             skills: validatedSkills,
             summary: result.summary,
+            reachableDimensions: getReachableDimensions(path),
           });
           setTimeout(() => setStep('results'), 1500);
         } else if (newCount >= MAX_ASSESSMENT_TURNS) {
           // Force completion with experience-based defaults
+          const fallbackSkills: SkillsProfile = {
+            'prompt-engineering': selectedExperience === 'building' ? 'practitioner' : selectedExperience === 'familiar' ? 'practitioner' : 'foundations',
+            'api-integration': selectedExperience === 'building' ? 'practitioner' : 'foundations',
+            'agent-design': 'foundations',
+            evaluation: 'foundations',
+            production: selectedExperience === 'building' ? 'foundations' : 'foundations',
+          };
+          const fallbackPath = generateLearningPath(
+            fallbackSkills as unknown as Record<string, string>,
+            selectedRole || 'developer'
+          );
           setAssessmentResult({
-            skills: {
-              'prompt-engineering': selectedExperience === 'building' ? 'practitioner' : selectedExperience === 'familiar' ? 'practitioner' : 'foundations',
-              'api-integration': selectedExperience === 'building' ? 'practitioner' : 'foundations',
-              'agent-design': 'foundations',
-              evaluation: 'foundations',
-              production: selectedExperience === 'building' ? 'foundations' : 'foundations',
-            },
+            skills: fallbackSkills,
             summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
+            reachableDimensions: getReachableDimensions(fallbackPath),
           });
           setTimeout(() => setStep('results'), 1500);
         }
@@ -587,7 +600,9 @@ export default function AssessPage() {
 
             <Card className="p-6 mb-8">
               <div className="space-y-4">
-                {SKILL_DIMENSIONS.map((dim) => {
+                {SKILL_DIMENSIONS.filter(
+                  (d) => !assessmentResult.reachableDimensions || assessmentResult.reachableDimensions.includes(d.id)
+                ).map((dim, idx) => {
                   const level = assessmentResult.skills[dim.id];
                   const value = SKILL_LEVEL_VALUES[level];
                   const percent = (value / 3) * 100;
@@ -606,7 +621,7 @@ export default function AssessPage() {
                           className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
                           style={{
                             width: `${percent}%`,
-                            animationDelay: `${SKILL_DIMENSIONS.indexOf(dim) * 200}ms`,
+                            animationDelay: `${idx * 200}ms`,
                           }}
                         />
                       </div>

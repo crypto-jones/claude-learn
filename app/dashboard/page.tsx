@@ -19,7 +19,7 @@ import {
   SKILL_DIMENSIONS,
   SKILL_LEVEL_VALUES,
 } from '@/lib/types';
-import { moduleMap } from '@/lib/modules';
+import { moduleMap, getReachableDimensions } from '@/lib/modules';
 import {
   ArrowRight,
   ArrowUp,
@@ -140,6 +140,10 @@ export default function DashboardPage() {
     (id) => profile.learningPath.length === 0 || profile.learningPath.includes(id)
   ).length;
   const overallProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
+
+  // Filter skill dimensions to only those reachable from the learning path
+  const activeDimensions = getReachableDimensions(profile.learningPath);
+  const activeDims = SKILL_DIMENSIONS.filter((d) => activeDimensions.includes(d.id));
 
   // Find next recommended module
   const nextModuleId = profile.learningPath?.find(
@@ -272,7 +276,7 @@ export default function DashboardPage() {
                 <Target className="h-4 w-4 text-primary" />
                 Skills Profile
               </h2>
-              <SkillsRadar skills={profile.skills} initialSkills={profile.initialSkills} />
+              <SkillsRadar skills={profile.skills} initialSkills={profile.initialSkills} dimensions={activeDimensions} />
 
               {/* Before / After comparison */}
               {hasInitialSkills && (
@@ -287,7 +291,7 @@ export default function DashboardPage() {
                       <span />
                       <span className="text-center">Current</span>
                     </div>
-                    {SKILL_DIMENSIONS.map((dim) => {
+                    {activeDims.map((dim) => {
                       const change = skillChanged(dim.id);
                       const initial = profile.initialSkills![dim.id];
                       const current = profile.skills[dim.id];
@@ -336,7 +340,7 @@ export default function DashboardPage() {
                 Skill Levels
               </h2>
               <div className="space-y-4">
-                {SKILL_DIMENSIONS.map((dim) => {
+                {activeDims.map((dim) => {
                   const level = profile.skills[dim.id];
                   const value = SKILL_LEVEL_VALUES[level];
                   const percent = (value / 3) * 100;
@@ -395,7 +399,7 @@ export default function DashboardPage() {
                   onChange={(e) => setGoalDimension(e.target.value as SkillDimension)}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  {SKILL_DIMENSIONS.map((dim) => (
+                  {activeDims.map((dim) => (
                     <option key={dim.id} value={dim.id}>
                       {dim.label}
                     </option>
@@ -712,6 +716,7 @@ export default function DashboardPage() {
         streakDays={profile.streakDays}
         totalMinutesLearned={profile.totalMinutesLearned}
         role={profile.role}
+        dimensions={activeDimensions}
       />
 
       <ConfirmDialog

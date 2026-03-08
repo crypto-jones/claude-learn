@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ShareableSkillsCard } from './ShareableSkillsCard';
-import { SkillsProfile, LearnerRole } from '@/lib/types';
+import { SkillsProfile, SkillDimension, LearnerRole } from '@/lib/types';
 import { Download, Check } from 'lucide-react';
 
 interface ShareDialogProps {
@@ -22,6 +22,7 @@ interface ShareDialogProps {
   streakDays: number;
   totalMinutesLearned: number;
   role: LearnerRole | null;
+  dimensions?: SkillDimension[];
 }
 
 export function ShareDialog({
