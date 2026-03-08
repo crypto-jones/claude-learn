@@ -49,8 +49,9 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     setIsLoaded(true);
   }, []);
 
-  // Flush session time every 60 seconds
+  // Flush session time every 60 seconds — only after profile is loaded
   useEffect(() => {
+    if (!isLoaded) return;
     const interval = setInterval(() => {
       setProfile((prev) => {
         const updated = flushSessionTime(prev);
@@ -59,17 +60,19 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
       });
     }, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoaded]);
 
   // Flush session time on page unload — uses ref to always read latest profile
+  // Only register after profile is loaded to avoid overwriting with defaults
   useEffect(() => {
+    if (!isLoaded) return;
     const handleUnload = () => {
       const flushed = flushSessionTime(profileRef.current);
       saveProfile(flushed);
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, []);
+  }, [isLoaded]);
 
   // Expose test helper for injecting profiles (dev only)
   useEffect(() => {

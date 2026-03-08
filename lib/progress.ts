@@ -67,7 +67,8 @@ export function loadProfile(): LearnerProfile {
 
     saveProfile(profile);
     return profile;
-  } catch {
+  } catch (e) {
+    console.warn('Failed to load profile from localStorage:', e);
     return getDefaultProfile();
   }
 }
