@@ -276,7 +276,7 @@ function AssessPageInner() {
           : 100;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navigation />
 
       <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 pt-6">
@@ -476,7 +476,7 @@ function AssessPageInner() {
                     placeholder="Type your response..."
                     aria-label="Type your assessment response"
                     disabled={isStreaming}
-                    className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[44px] max-h-[120px]"
+                    className="flex-1 min-w-0 resize-none rounded-xl border border-border bg-background px-4 py-3 text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[44px] max-h-[120px]"
                     rows={1}
                   />
                   <Button

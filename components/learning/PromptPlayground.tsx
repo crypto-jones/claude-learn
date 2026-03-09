@@ -145,7 +145,7 @@ export function PromptPlayground({ section, moduleData }: PromptPlaygroundProps)
             onChange={(e) => setSystemPrompt(e.target.value)}
             disabled={isStreaming}
             rows={4}
-            className="w-full rounded-md border border-border bg-muted/30 px-3 py-2 text-sm font-mono leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 resize-y"
+            className="w-full rounded-md border border-border bg-muted/30 px-3 py-2 text-base sm:text-sm font-mono leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 resize-y"
           />
         </div>
 
@@ -159,7 +159,7 @@ export function PromptPlayground({ section, moduleData }: PromptPlaygroundProps)
             onChange={(e) => setUserMessage(e.target.value)}
             disabled={isStreaming}
             rows={3}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 resize-y"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-base sm:text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 resize-y"
           />
         </div>
 
