@@ -291,7 +291,7 @@ export default function DashboardPage() {
                     Before / After Comparison
                   </h3>
                   <div className="space-y-2">
-                    <div className="grid grid-cols-[1fr_60px_20px_60px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 text-xs text-muted-foreground mb-1 px-1">
+                    <div className="grid grid-cols-[1fr_74px_20px_74px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 text-xs text-muted-foreground mb-1 px-1">
                       <span>Skill</span>
                       <span className="text-center">Initial</span>
                       <span />
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={dim.id}
-                          className="grid grid-cols-[1fr_60px_20px_60px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 items-center px-1 py-1.5 rounded-md hover:bg-muted/50 transition-colors"
+                          className="grid grid-cols-[1fr_74px_20px_74px] sm:grid-cols-[1fr_80px_24px_80px] gap-1.5 sm:gap-2 items-center px-1 py-1.5 rounded-md hover:bg-muted/50 transition-colors"
                         >
                           <span className="text-xs sm:text-sm text-foreground truncate">{dim.shortLabel}</span>
                           <span className="text-xs text-muted-foreground text-center capitalize">
