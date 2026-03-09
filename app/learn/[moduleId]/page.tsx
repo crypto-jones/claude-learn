@@ -564,6 +564,11 @@ export default function ModulePage() {
   const moduleId = params.moduleId as string;
   const moduleData = moduleMap[moduleId];
 
+  // Scroll to top when navigating between modules
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [moduleId]);
+
   useEffect(() => {
     if (moduleData && isLoaded) {
       updateModuleProgress(moduleId, { started: true });

@@ -127,7 +127,6 @@
     @apply border-border outline-ring/50;
   }
   html {
-    scroll-behavior: smooth;
     scroll-padding-top: 3.75rem;
   }
   body {
@@ -142,13 +141,6 @@
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
-}
-
-/* Offset anchor scroll targets below sticky nav */
-[id="paths"],
-[id="how-it-works"],
-[id="curriculum"] {
-  scroll-margin-top: 4.5rem;
 }
 
 /* Page transition */
