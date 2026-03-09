@@ -260,6 +260,30 @@
   animation: draw-line 1s ease-out forwards;
 }
 
+/* Section completion feedback */
+@keyframes section-complete {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.animate-section-complete {
+  animation: section-complete 2.5s ease-in-out forwards;
+}
+
 /* Markdown content styling */
 .prose-module h2 {
   @apply text-xl font-semibold mt-8 mb-3 text-foreground;

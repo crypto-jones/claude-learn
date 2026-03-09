@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from '@/components/ui/sheet';
 import { Module, ModuleSection, ExerciseFeedback, ChatMessage, ALL_SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { renderChatMarkdown } from '@/lib/render-markdown';
@@ -38,6 +39,7 @@ import {
   Trophy,
   AlertCircle,
   X,
+  List,
 } from 'lucide-react';
 
 function parseContentSegments(content: string): Array<{ type: 'code' | 'text'; content: string; language?: string }> {
@@ -529,6 +531,23 @@ function ExerciseBlock({
   );
 }
 
+function SectionCompleteBadge({ sectionId, justCompletedSection, completedCount, totalCount }: {
+  sectionId: string;
+  justCompletedSection: string | null;
+  completedCount: number;
+  totalCount: number;
+}) {
+  if (justCompletedSection !== sectionId) return null;
+  return (
+    <div className="mt-2 animate-section-complete">
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+        <CheckCircle2 className="h-3 w-3" />
+        Section complete — {completedCount} of {totalCount}
+      </div>
+    </div>
+  );
+}
+
 export default function ModulePage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -540,6 +559,7 @@ export default function ModulePage() {
   const [prereqDismissed, setPrereqDismissed] = useState(false);
   const wasCompletedRef = useRef(false);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [justCompletedSection, setJustCompletedSection] = useState<string | null>(null);
 
   const moduleId = params.moduleId as string;
   const moduleData = moduleMap[moduleId];
@@ -589,6 +609,14 @@ export default function ModulePage() {
       }
     }
   }, [searchParams, moduleData]);
+
+  // Auto-dismiss section completion feedback
+  useEffect(() => {
+    if (justCompletedSection) {
+      const timer = setTimeout(() => setJustCompletedSection(null), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [justCompletedSection]);
 
   // Track completion state for confetti trigger
   const isCompleted = profile.completedModules.includes(moduleId);
@@ -707,6 +735,7 @@ export default function ModulePage() {
     const newCompleted = new Set(completedSections);
     newCompleted.add(sectionId);
     setCompletedSections(newCompleted);
+    setJustCompletedSection(sectionId);
 
     const exerciseResponses = response
       ? { ...profile.moduleProgress?.[moduleId]?.exerciseResponses, [sectionId]: response }
@@ -812,12 +841,62 @@ export default function ModulePage() {
               </h1>
               <p className="text-muted-foreground">{moduleData.description}</p>
 
-              {/* Progress (visible on mobile where sidebar is hidden) */}
-              <div className="mt-4 flex items-center gap-3 lg:hidden">
-                <Progress value={progressPercent} className="h-1.5 flex-1" />
-                <span className="text-xs text-muted-foreground">
-                  {completedSections.size}/{moduleData.sections.length} sections
-                </span>
+              {/* Progress + section navigator (visible on mobile where sidebar is hidden) */}
+              <div className="mt-4 lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button className="flex items-center gap-3 w-full group">
+                      <Progress value={progressPercent} className="h-1.5 flex-1" />
+                      <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
+                        {completedSections.size}/{moduleData.sections.length} sections
+                        <List className="h-3 w-3 text-muted-foreground/50 group-hover:text-foreground transition-colors" />
+                      </span>
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="max-h-[70vh]" showCloseButton={false}>
+                    <SheetHeader>
+                      <SheetTitle className="text-sm">Module Outline</SheetTitle>
+                      <SheetDescription className="sr-only">Navigate to sections in this module</SheetDescription>
+                    </SheetHeader>
+                    <div className="px-4 pb-6 overflow-y-auto">
+                      <div className="space-y-0.5">
+                        {moduleData.sections.map((section) => {
+                          const isDone = completedSections.has(section.id);
+                          return (
+                            <SheetClose asChild key={section.id}>
+                              <button
+                                onClick={() => {
+                                  setTimeout(() => {
+                                    document.getElementById(`section-${section.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }, 150);
+                                }}
+                                className="w-full flex items-start gap-2.5 px-2 py-2.5 rounded-md text-left hover:bg-muted/50 transition-colors"
+                              >
+                                {isDone ? (
+                                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                ) : (
+                                  <Circle className="h-4 w-4 text-muted-foreground/40 shrink-0 mt-0.5" />
+                                )}
+                                <span className={`text-sm leading-tight ${isDone ? 'text-muted-foreground' : 'text-foreground/80'}`}>
+                                  {section.title}
+                                </span>
+                              </button>
+                            </SheetClose>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-border">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs text-muted-foreground">Progress</span>
+                          <span className="text-xs text-muted-foreground">
+                            {completedSections.size}/{moduleData.sections.length}
+                          </span>
+                        </div>
+                        <Progress value={progressPercent} className="h-1" />
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
 
               {/* Learning objectives */}
@@ -915,6 +994,12 @@ export default function ModulePage() {
                           </div>
                         )}
                       </div>
+                      <SectionCompleteBadge
+                        sectionId={section.id}
+                        justCompletedSection={justCompletedSection}
+                        completedCount={completedSections.size}
+                        totalCount={moduleData.sections.length}
+                      />
                     </div>
                   )}
 
@@ -952,6 +1037,12 @@ export default function ModulePage() {
                           Got it
                         </Button>
                       )}
+                      <SectionCompleteBadge
+                        sectionId={section.id}
+                        justCompletedSection={justCompletedSection}
+                        completedCount={completedSections.size}
+                        totalCount={moduleData.sections.length}
+                      />
                     </Card>
                   )}
 
