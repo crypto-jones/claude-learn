@@ -206,38 +206,41 @@ function AssessPageInner() {
         const newCount = questionCount + 1;
         setQuestionCount(newCount);
 
-        // Check if assessment is complete
-        const result = extractAssessmentResult(accumulated);
-        if (result) {
-          const skills = result.skills as unknown as SkillsProfile;
-          const validLevels: SkillLevel[] = ['foundations', 'practitioner', 'advanced'];
-          const roleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
-          const validatedSkills: SkillsProfile = {};
-          for (const dim of roleDims) {
-            validatedSkills[dim.id] = validLevels.includes(skills[dim.id])
-              ? skills[dim.id]
-              : 'foundations';
-          }
+        // Only complete the assessment after the user has answered all questions.
+        // This prevents Claude from ending the assessment early by including the
+        // JSON result block before the user has had enough turns.
+        if (newCount > MAX_ASSESSMENT_TURNS) {
+          const result = extractAssessmentResult(accumulated);
+          if (result) {
+            const skills = result.skills as unknown as SkillsProfile;
+            const validLevels: SkillLevel[] = ['foundations', 'practitioner', 'advanced'];
+            const roleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
+            const validatedSkills: SkillsProfile = {};
+            for (const dim of roleDims) {
+              validatedSkills[dim.id] = validLevels.includes(skills[dim.id])
+                ? skills[dim.id]
+                : 'foundations';
+            }
 
-          setAssessmentResult({
-            skills: validatedSkills,
-            summary: result.summary,
-            reachableDimensions: getDimensionsForRole(selectedRole || null),
-          });
-          setTimeout(() => setStep('results'), 1500);
-        } else if (newCount > MAX_ASSESSMENT_TURNS) {
-          // Force completion — default all skills to foundations since Claude
-          // couldn't produce a structured result from the conversation
-          const fallbackRoleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
-          const fallbackSkills: SkillsProfile = {};
-          for (const dim of fallbackRoleDims) {
-            fallbackSkills[dim.id] = 'foundations';
+            setAssessmentResult({
+              skills: validatedSkills,
+              summary: result.summary,
+              reachableDimensions: getDimensionsForRole(selectedRole || null),
+            });
+          } else {
+            // Fallback — default all skills to foundations since Claude
+            // couldn't produce a structured result from the conversation
+            const fallbackRoleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
+            const fallbackSkills: SkillsProfile = {};
+            for (const dim of fallbackRoleDims) {
+              fallbackSkills[dim.id] = 'foundations';
+            }
+            setAssessmentResult({
+              skills: fallbackSkills,
+              summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
+              reachableDimensions: getDimensionsForRole(selectedRole || null),
+            });
           }
-          setAssessmentResult({
-            skills: fallbackSkills,
-            summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
-            reachableDimensions: getDimensionsForRole(selectedRole || null),
-          });
           setTimeout(() => setStep('results'), 1500);
         }
       },
