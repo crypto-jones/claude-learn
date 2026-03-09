@@ -87,10 +87,10 @@ export function renderChatMarkdown(text: string): React.ReactNode[] {
       continue;
     }
 
-    // Empty line = paragraph break
+    // Empty line = paragraph break (visual gap between paragraphs)
     if (line.trim() === '') {
       if (elements.length > 0) {
-        elements.push(<br key={`br-${i}`} />);
+        elements.push(<div key={`gap-${i}`} className="h-3" />);
       }
       i++;
       continue;
@@ -99,8 +99,8 @@ export function renderChatMarkdown(text: string): React.ReactNode[] {
     // Regular text line
     if (elements.length > 0) {
       const prev = elements[elements.length - 1];
-      // Add line break between text lines, but not after lists or breaks
-      if (React.isValidElement(prev) && prev.type !== 'ul' && prev.type !== 'ol' && prev.type !== 'br') {
+      // Add line break between text lines, but not after lists or paragraph gaps
+      if (React.isValidElement(prev) && prev.type !== 'ul' && prev.type !== 'ol' && prev.type !== 'div') {
         elements.push(<br key={`br-${i}`} />);
       }
     }
