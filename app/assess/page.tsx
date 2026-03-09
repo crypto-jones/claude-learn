@@ -68,6 +68,8 @@ function AssessPageInner() {
     reachableDimensions?: string[];
   } | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const kickoffRef = useRef<ChatMessage | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -108,6 +110,7 @@ function AssessPageInner() {
       role: 'user',
       content: `Hi! I'm a ${selectedRole} with ${selectedExperience} experience level. Please begin my skills assessment.`,
     };
+    kickoffRef.current = kickoff;
 
     await streamChat(
       {
@@ -168,12 +171,19 @@ function AssessPageInner() {
     setMessages(newMessages);
     setInput('');
     setIsStreaming(true);
+    setChatError(null);
+
+    // Prepend kickoff message so the API always gets a user-first conversation
+    // with full context (role + experience self-introduction)
+    const apiMessages = kickoffRef.current
+      ? [kickoffRef.current, ...newMessages]
+      : newMessages;
 
     let accumulated = '';
 
     await streamChat(
       {
-        messages: newMessages,
+        messages: apiMessages,
         mode: 'assessment',
         context: {
           role: selectedRole || undefined,
@@ -209,32 +219,20 @@ function AssessPageInner() {
               : 'foundations';
           }
 
-          const path = generateLearningPath(
-            validatedSkills as unknown as Record<string, string>,
-            selectedRole || 'developer'
-          );
           setAssessmentResult({
             skills: validatedSkills,
             summary: result.summary,
             reachableDimensions: getDimensionsForRole(selectedRole || null),
           });
           setTimeout(() => setStep('results'), 1500);
-        } else if (newCount >= MAX_ASSESSMENT_TURNS) {
-          // Force completion with experience-based defaults
+        } else if (newCount > MAX_ASSESSMENT_TURNS) {
+          // Force completion — default all skills to foundations since Claude
+          // couldn't produce a structured result from the conversation
           const fallbackRoleDims = ROLE_SKILL_DIMENSIONS[selectedRole || 'getting-started'];
           const fallbackSkills: SkillsProfile = {};
           for (const dim of fallbackRoleDims) {
-            // Give prompt-engineering a boost for experienced learners
-            if (dim.id === 'prompt-engineering' && (selectedExperience === 'building' || selectedExperience === 'familiar')) {
-              fallbackSkills[dim.id] = 'practitioner';
-            } else {
-              fallbackSkills[dim.id] = 'foundations';
-            }
+            fallbackSkills[dim.id] = 'foundations';
           }
-          const fallbackPath = generateLearningPath(
-            fallbackSkills as unknown as Record<string, string>,
-            selectedRole || 'developer'
-          );
           setAssessmentResult({
             skills: fallbackSkills,
             summary: 'Assessment completed based on your conversation. Your learning path has been personalized to help you grow.',
@@ -244,7 +242,11 @@ function AssessPageInner() {
         }
       },
       () => {
+        // Restore user's message so they can retry
+        setMessages((prev) => prev.slice(0, -1));
+        setInput(userMessage.content);
         setIsStreaming(false);
+        setChatError('Something went wrong. Please try sending your answer again.');
       }
     );
   };
@@ -467,6 +469,9 @@ function AssessPageInner() {
 
             {!assessmentResult && (
               <div className="border-t border-border pt-4">
+                {chatError && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mb-2">{chatError}</p>
+                )}
                 <div className="flex gap-2">
                   <textarea
                     ref={inputRef}
