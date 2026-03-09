@@ -1,6 +1,8 @@
 import { ChatMessage, ChatRequest, LearnerRole } from './types';
 import { getModulesByRole } from './modules';
 
+const STREAM_TIMEOUT = 30000; // 30 seconds per chunk
+
 export async function streamChat(
   request: ChatRequest,
   onChunk: (text: string) => void,
@@ -15,7 +17,13 @@ export async function streamChat(
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      // Parse structured error messages from API validation
+      let errorMsg = `API error: ${response.status}`;
+      try {
+        const errBody = await response.json();
+        if (errBody.error) errorMsg = errBody.error;
+      } catch { /* use default */ }
+      throw new Error(errorMsg);
     }
 
     const reader = response.body?.getReader();
@@ -24,37 +32,45 @@ export async function streamChat(
     const decoder = new TextDecoder();
     let buffer = '';
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    try {
+      while (true) {
+        // Race against timeout to prevent infinite hangs
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Response timed out. Please try again.')), STREAM_TIMEOUT)
+        );
+        const { done, value } = await Promise.race([reader.read(), timeoutPromise]);
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') {
-            onDone();
-            return;
-          }
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.text) {
-              onChunk(parsed.text);
-            }
-            if (parsed.error) {
-              onError?.(parsed.error);
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              onDone();
               return;
             }
-          } catch {
-            // Skip malformed JSON
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.text) {
+                onChunk(parsed.text);
+              }
+              if (parsed.error) {
+                onError?.(parsed.error);
+                return;
+              }
+            } catch {
+              // Skip malformed JSON
+            }
           }
         }
       }
+      onDone();
+    } finally {
+      reader.cancel().catch(() => {});
     }
-    onDone();
   } catch (error) {
     onError?.(error instanceof Error ? error.message : 'Unknown error');
   }

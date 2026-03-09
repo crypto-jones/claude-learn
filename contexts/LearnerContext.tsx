@@ -19,6 +19,8 @@ import { loadProfile, saveProfile, resetProfile, getDefaultProfile, flushSession
 interface LearnerContextType {
   profile: LearnerProfile;
   isLoaded: boolean;
+  saveError: boolean;
+  dismissSaveError: () => void;
   setRole: (role: LearnerRole) => void;
   setExperienceLevel: (level: ExperienceLevel) => void;
   setSkills: (skills: SkillsProfile) => void;
@@ -42,8 +44,16 @@ const LearnerContext = createContext<LearnerContextType | undefined>(undefined);
 export function LearnerProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<LearnerProfile>(getDefaultProfile());
   const [isLoaded, setIsLoaded] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const profileRef = useRef(profile);
   useEffect(() => { profileRef.current = profile; }, [profile]);
+
+  // Centralized save helper — surfaces localStorage failures to the UI
+  const persistProfile = useCallback((updated: LearnerProfile) => {
+    if (!saveProfile(updated)) setSaveError(true);
+  }, []);
+
+  const dismissSaveError = useCallback(() => setSaveError(false), []);
 
   useEffect(() => {
     const loaded = loadProfile();
@@ -57,12 +67,12 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     const interval = setInterval(() => {
       setProfile((prev) => {
         const updated = flushSessionTime(prev);
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     }, 60000);
     return () => clearInterval(interval);
-  }, [isLoaded]);
+  }, [isLoaded, persistProfile]);
 
   // Flush session time on page unload — uses ref to always read latest profile
   // Only register after profile is loaded to avoid overwriting with defaults
@@ -81,18 +91,18 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       (window as unknown as Record<string, unknown>).__setTestProfile = (p: LearnerProfile) => {
         setProfile(p);
-        saveProfile(p);
+        persistProfile(p);
       };
     }
-  }, []);
+  }, [persistProfile]);
 
   const updateProfile = useCallback((updates: Partial<LearnerProfile>) => {
     setProfile((prev) => {
       const updated = { ...prev, ...updates };
-      saveProfile(updated);
+      persistProfile(updated);
       return updated;
     });
-  }, []);
+  }, [persistProfile]);
 
   const setRole = useCallback(
     (role: LearnerRole) => updateProfile({ role }),
@@ -121,11 +131,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
           lastActiveDate: new Date().toISOString().split('T')[0],
           initialSkills: prev.initialSkills || skills,
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const retakeAssessment = useCallback(() => {
@@ -154,11 +164,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             },
           },
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const completeModule = useCallback(
@@ -211,11 +221,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             [moduleId]: { ...existing, completed: true, completedAt: Date.now() },
           },
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const saveExerciseFeedback = useCallback(
@@ -242,11 +252,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             },
           },
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const updateExerciseFeedback = useCallback(
@@ -274,11 +284,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             },
           },
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const setLearningPath = useCallback(
@@ -293,11 +303,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
           (g) => g.skillDimension !== goal.skillDimension
         );
         const updated = { ...prev, learningGoals: [...filtered, goal] };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const removeLearningGoal = useCallback(
@@ -309,11 +319,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             (g) => g.skillDimension !== skillDimension
           ),
         };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const addReview = useCallback(
@@ -321,11 +331,11 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
       setProfile((prev) => {
         const filtered = prev.reviews.filter((r) => r.moduleId !== review.moduleId);
         const updated = { ...prev, reviews: [...filtered, review] };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const completeReview = useCallback(
@@ -343,20 +353,20 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
             : r
         );
         const updated = { ...prev, reviews: updatedReviews };
-        saveProfile(updated);
+        persistProfile(updated);
         return updated;
       });
     },
-    []
+    [persistProfile]
   );
 
   const flushSession = useCallback(() => {
     setProfile((prev) => {
       const updated = flushSessionTime(prev);
-      saveProfile(updated);
+      persistProfile(updated);
       return updated;
     });
-  }, []);
+  }, [persistProfile]);
 
   const reset = useCallback(() => {
     resetProfile();
@@ -368,6 +378,8 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
       value={{
         profile,
         isLoaded,
+        saveError,
+        dismissSaveError,
         setRole,
         setExperienceLevel,
         setSkills,
@@ -386,6 +398,20 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
         reset,
       }}
     >
+      {saveError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-900 shadow-lg dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+          <span>Unable to save progress — storage may be full</span>
+          <button
+            onClick={dismissSaveError}
+            className="ml-1 rounded-md p-0.5 hover:bg-amber-200/50 dark:hover:bg-amber-800/50 transition-colors"
+            aria-label="Dismiss save error"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
       {children}
     </LearnerContext.Provider>
   );

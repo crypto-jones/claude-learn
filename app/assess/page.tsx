@@ -478,6 +478,7 @@ function AssessPageInner() {
                     disabled={isStreaming}
                     className="flex-1 min-w-0 resize-none rounded-xl border border-border bg-background px-4 py-3 text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[44px] max-h-[120px]"
                     rows={1}
+                    maxLength={5000}
                   />
                   <Button
                     onClick={handleSendMessage}

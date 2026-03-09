@@ -394,6 +394,7 @@ function ExerciseBlock({
             aria-label="Write your exercise response"
             disabled={isSubmitted}
             className="w-full min-h-[120px] resize-y rounded-lg border border-border bg-background px-4 py-3 text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-60 mb-3"
+            maxLength={5000}
           />
 
           {!isSubmitted && (
@@ -489,6 +490,7 @@ function ExerciseBlock({
                     disabled={isFollowUpStreaming}
                     className="flex-1 min-w-0 resize-none rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[36px] max-h-[80px]"
                     rows={1}
+                    maxLength={2000}
                   />
                   <Button
                     onClick={handleFollowUp}
@@ -927,7 +929,7 @@ export default function ModulePage() {
                   <div className="flex items-start gap-3">
                     <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-amber-800 dark:text-amber-300">
+                      <p className="text-sm text-amber-800 dark:text-amber-300 break-words">
                         {unmetPrereqs.length === 1 ? 'Recommended prerequisite:' : 'Recommended prerequisites:'}{' '}
                         {unmetPrereqs.map((prereq, i) => (
                           <Fragment key={prereq.id}>
@@ -960,7 +962,7 @@ export default function ModulePage() {
             {/* Sections */}
             <div className="space-y-10">
               {moduleData.sections.map((section) => (
-                <div key={section.id} id={`section-${section.id}`} className="scroll-mt-20">
+                <div key={section.id} id={`section-${section.id}`} className="scroll-mt-[3.75rem]">
                   {section.type === 'concept' && (
                     <div>
                       <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">

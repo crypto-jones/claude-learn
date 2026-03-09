@@ -14,6 +14,8 @@ function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const entry = rateLimit.get(ip);
   if (!entry || now > entry.resetTime) {
+    // Safety cap: prevent unbounded map growth
+    if (rateLimit.size > 10000) rateLimit.clear();
     rateLimit.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     return true;
   }
@@ -21,6 +23,9 @@ function checkRateLimit(ip: string): boolean {
   entry.count++;
   return true;
 }
+
+const VALID_MODES = ['assessment', 'feedback', 'companion', 'playground', 'adapt'] as const;
+const MAX_MESSAGE_LENGTH = 6000;
 
 // Clean up stale entries every 5 minutes
 setInterval(() => {
@@ -199,6 +204,14 @@ Format: Write ONLY the example text — no labels, no headers, no markdown forma
 }
 
 export async function POST(req: NextRequest) {
+  // Check API key is configured
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return new Response(
+      JSON.stringify({ error: 'Claude API is not configured. Set the ANTHROPIC_API_KEY environment variable.' }),
+      { status: 503, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   // Rate limiting
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   if (!checkRateLimit(ip)) {
@@ -210,20 +223,48 @@ export async function POST(req: NextRequest) {
 
   try {
     const body: ChatRequest = await req.json();
+
+    // Validate request body
+    if (!body.mode || !VALID_MODES.includes(body.mode as typeof VALID_MODES[number])) {
+      return new Response(
+        JSON.stringify({ error: `Invalid mode. Expected one of: ${VALID_MODES.join(', ')}` }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!Array.isArray(body.messages) || body.messages.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Messages array is required and must not be empty.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    for (const msg of body.messages) {
+      if (!msg.role || !['user', 'assistant'].includes(msg.role) || typeof msg.content !== 'string') {
+        return new Response(
+          JSON.stringify({ error: 'Each message must have a valid role (user|assistant) and string content.' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const systemPrompt = getSystemPrompt(body);
 
     // Use Sonnet for assessment + feedback (quality matters), Haiku for everything else
     const useSonnet = body.mode === 'assessment' || body.mode === 'feedback';
     const model = useSonnet ? 'claude-sonnet-4-20250514' : 'claude-haiku-4-5-20251001';
 
+    // Truncate overly long messages to cap API costs
+    const sanitizedMessages = body.messages.map((m) => ({
+      role: m.role,
+      content: m.content.slice(0, MAX_MESSAGE_LENGTH),
+    }));
+
     const stream = anthropic.messages.stream({
       model,
       max_tokens: body.mode === 'playground' ? 512 : body.mode === 'adapt' ? 256 : 1024,
       system: systemPrompt,
-      messages: body.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      messages: sanitizedMessages,
     });
 
     const encoder = new TextEncoder();

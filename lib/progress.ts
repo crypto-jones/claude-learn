@@ -88,12 +88,14 @@ export function loadProfile(): LearnerProfile {
   }
 }
 
-export function saveProfile(profile: LearnerProfile): void {
-  if (typeof window === 'undefined') return;
+export function saveProfile(profile: LearnerProfile): boolean {
+  if (typeof window === 'undefined') return true;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    return true;
   } catch {
     // localStorage might be full or unavailable
+    return false;
   }
 }
 

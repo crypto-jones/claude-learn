@@ -166,6 +166,7 @@ export function CompanionPanel({ moduleData, currentSectionTitle, currentSection
             disabled={isStreaming}
             className="flex-1 min-w-0 resize-none rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 min-h-[36px] max-h-[80px]"
             rows={1}
+            maxLength={2000}
           />
           <Button
             onClick={handleSend}

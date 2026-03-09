@@ -12,6 +12,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Module,
+  LearnerRole,
   SkillDimension,
   ROLE_SKILL_DIMENSIONS,
   ALL_SKILL_DIMENSIONS,
@@ -45,11 +46,11 @@ function getRecommendationReason(
 ): string | null {
   const level = skills[module.skillDimension];
   if (level === 'foundations') {
-    const dimLabel = getDimensionLabel(module.skillDimension, role as any);
+    const dimLabel = getDimensionLabel(module.skillDimension, role as LearnerRole | null);
     return `You scored Foundations on ${dimLabel} — this module builds that skill`;
   }
   if (level === 'practitioner') {
-    const dimLabel = getDimensionLabel(module.skillDimension, role as any);
+    const dimLabel = getDimensionLabel(module.skillDimension, role as LearnerRole | null);
     return `Strengthen your ${dimLabel} skills from Practitioner toward Advanced`;
   }
   return null;

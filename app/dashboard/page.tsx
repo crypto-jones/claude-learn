@@ -251,7 +251,7 @@ export default function DashboardPage() {
           <Card className="p-4 text-center">
             <div className="text-2xl font-semibold text-foreground flex items-center justify-center gap-1">
               {profile.streakDays}
-              <Flame className="h-5 w-5 text-orange-500" />
+              <Flame className="h-5 w-5 text-orange-500 dark:text-orange-400" />
             </div>
             <div className="text-xs text-muted-foreground mt-1">Day Streak</div>
           </Card>
@@ -740,7 +740,7 @@ export default function DashboardPage() {
         title="Reset All Progress"
         description="This will erase all your progress, skills, and completed modules. This cannot be undone."
         confirmLabel="Reset Everything"
-        onConfirm={() => { reset(); router.push('/'); }}
+        onConfirm={() => { router.push('/'); setTimeout(() => reset(), 100); }}
         variant="destructive"
       />
     </div>
