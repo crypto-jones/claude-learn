@@ -45,7 +45,15 @@ const roleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 type Step = 'role' | 'experience' | 'conversation' | 'results';
 
 function stripAssessmentJson(text: string): string {
-  return text.replace(/```json[\s\S]*?```/g, '').trim();
+  // Only strip JSON that contains the assessment_complete marker — leave all other JSON intact
+  // so developer-path questions with JSON examples render correctly.
+  // Complete fenced blocks containing assessment result
+  let stripped = text.replace(/```(?:json)?\s*\{[\s\S]*?assessment_complete[\s\S]*?```/g, '').trim();
+  // Incomplete fenced block being streamed that already contains the marker
+  stripped = stripped.replace(/```(?:json)?\s*\{[\s\S]*?assessment_complete[\s\S]*$/g, '').trim();
+  // Bare JSON object with the marker
+  stripped = stripped.replace(/\{[\s\S]*?"assessment_complete"[\s\S]*?\}/g, '').trim();
+  return stripped;
 }
 
 

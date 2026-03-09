@@ -79,11 +79,15 @@ export async function streamChat(
 export function extractAssessmentResult(
   content: string
 ): { skills: Record<string, string>; summary: string } | null {
-  const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-  if (!jsonMatch) return null;
+  // Try fenced code block first (```json...``` or ```...```)
+  const fencedMatch = content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  // Fall back to bare JSON object with assessment_complete key
+  const bareMatch = !fencedMatch ? content.match(/(\{[\s\S]*?"assessment_complete"[\s\S]*?\})/) : null;
+  const jsonStr = fencedMatch?.[1] || bareMatch?.[1];
+  if (!jsonStr) return null;
 
   try {
-    const parsed = JSON.parse(jsonMatch[1]);
+    const parsed = JSON.parse(jsonStr);
     if (parsed.assessment_complete && parsed.skills) {
       return { skills: parsed.skills, summary: parsed.summary || '' };
     }
