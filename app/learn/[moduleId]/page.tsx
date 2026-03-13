@@ -19,6 +19,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 import { Module, ModuleSection, ExerciseFeedback, ChatMessage, ALL_SKILL_DIMENSIONS } from '@/lib/types';
 import { streamChat } from '@/lib/claude';
 import { renderChatMarkdown } from '@/lib/render-markdown';
+import { useActiveTime } from '@/lib/useActiveTime';
 import { moduleMap, allModuleIds } from '@/lib/modules';
 import { injectConceptLinks } from '@/lib/concepts';
 import {
@@ -553,7 +554,7 @@ function SectionCompleteBadge({ sectionId, justCompletedSection, completedCount,
 export default function ModulePage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const { profile, isLoaded, updateModuleProgress, completeModule } = useLearner();
+  const { profile, isLoaded, updateModuleProgress, completeModule, addMinutesLearned } = useLearner();
   const [showCompanion, setShowCompanion] = useState(false);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [currentSectionTitle, setCurrentSectionTitle] = useState<string | undefined>();
@@ -565,6 +566,9 @@ export default function ModulePage() {
 
   const moduleId = params.moduleId as string;
   const moduleData = moduleMap[moduleId];
+
+  // Track active (visible) time on this page
+  useActiveTime(addMinutesLearned);
 
   // Scroll to top when navigating between modules
   useEffect(() => {

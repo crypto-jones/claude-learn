@@ -65,7 +65,6 @@ export default function DashboardPage() {
     addLearningGoal,
     removeLearningGoal,
     completeReview,
-    flushSession,
   } = useLearner();
 
   const [showGoalForm, setShowGoalForm] = useState(false);
@@ -74,13 +73,6 @@ export default function DashboardPage() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [goalDimension, setGoalDimension] = useState<SkillDimension>('prompt-engineering');
   const [goalLevel, setGoalLevel] = useState<SkillLevel>('practitioner');
-
-  // Flush session time on mount so minutes are up to date
-  useEffect(() => {
-    if (isLoaded) {
-      flushSession();
-    }
-  }, [isLoaded, flushSession]);
 
   useEffect(() => {
     if (isLoaded && !profile.assessmentComplete) {

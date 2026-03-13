@@ -283,7 +283,6 @@ export interface LearnerProfile {
   streakDays: number;
   lastActiveDate: string;
   totalMinutesLearned: number;
-  currentSessionStart: number | null;
   learningGoals: LearningGoal[];
   reviews: ReviewItem[];
 }

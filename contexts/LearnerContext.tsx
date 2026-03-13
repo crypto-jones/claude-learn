@@ -14,7 +14,7 @@ import {
   LearningGoal,
   ReviewItem,
 } from '@/lib/types';
-import { loadProfile, saveProfile, resetProfile, getDefaultProfile, flushSessionTime } from '@/lib/progress';
+import { loadProfile, saveProfile, resetProfile, getDefaultProfile } from '@/lib/progress';
 
 interface LearnerContextType {
   profile: LearnerProfile;
@@ -35,7 +35,7 @@ interface LearnerContextType {
   removeLearningGoal: (skillDimension: SkillDimension) => void;
   addReview: (review: ReviewItem) => void;
   completeReview: (moduleId: string) => void;
-  flushSession: () => void;
+  addMinutesLearned: (minutes: number) => void;
   reset: () => void;
 }
 
@@ -61,26 +61,12 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     setIsLoaded(true);
   }, []);
 
-  // Flush session time every 60 seconds — only after profile is loaded
-  useEffect(() => {
-    if (!isLoaded) return;
-    const interval = setInterval(() => {
-      setProfile((prev) => {
-        const updated = flushSessionTime(prev);
-        persistProfile(updated);
-        return updated;
-      });
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [isLoaded, persistProfile]);
-
-  // Flush session time on page unload — uses ref to always read latest profile
+  // Persist on page unload — uses ref to always read latest profile
   // Only register after profile is loaded to avoid overwriting with defaults
   useEffect(() => {
     if (!isLoaded) return;
     const handleUnload = () => {
-      const flushed = flushSessionTime(profileRef.current);
-      saveProfile(flushed);
+      saveProfile(profileRef.current);
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
@@ -360,9 +346,10 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
     [persistProfile]
   );
 
-  const flushSession = useCallback(() => {
+  const addMinutesLearned = useCallback((minutes: number) => {
+    if (minutes <= 0) return;
     setProfile((prev) => {
-      const updated = flushSessionTime(prev);
+      const updated = { ...prev, totalMinutesLearned: prev.totalMinutesLearned + minutes };
       persistProfile(updated);
       return updated;
     });
@@ -394,7 +381,7 @@ export function LearnerProvider({ children }: { children: React.ReactNode }) {
         removeLearningGoal,
         addReview,
         completeReview,
-        flushSession,
+        addMinutesLearned,
         reset,
       }}
     >
